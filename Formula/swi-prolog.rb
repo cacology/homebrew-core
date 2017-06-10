@@ -1,18 +1,18 @@
 class SwiProlog < Formula
   desc "ISO/Edinburgh-style Prolog interpreter"
   homepage "http://www.swi-prolog.org/"
-  url "http://www.swi-prolog.org/download/stable/src/swipl-7.2.3.tar.gz"
-  sha256 "43657d51b7c5887bc2d2bced50a9822b86a08a6841399b8e76ee877f51d646b5"
+  url "http://www.swi-prolog.org/download/stable/src/swipl-7.4.2.tar.gz"
+  sha256 "7f17257da334bc1e7a35e9cf5cb8fca01d82f1ea406c7ace76e9062af8f0df8b"
 
   bottle do
-    sha256 "9466d3335c7675046a2ef8e5886a2c3eb852a6d1e13b3bc064e76b9a9a775b29" => :el_capitan
-    sha256 "b6dbf92ebdc159642b9e4e8d5e7689d2fdb4bd51ee106f325c85d97885b7b40e" => :yosemite
-    sha256 "50ba51c36829d3a39c3bcda5e842175199d216d2a8e6ec2c11adc91a656dc5f0" => :mavericks
+    sha256 "ba534d0cc2cceb366ef8d19c1f1bb41441930fc1416c0491cf4233ed170ca23f" => :sierra
+    sha256 "ad17932306bca2156e865b80697ccf7c497ff03f6da6d8cf37eb7c966b581ba8" => :el_capitan
+    sha256 "ff7f400d368f44da8372423df94000e7b4cb84780a5b53936ff414a993db299b" => :yosemite
   end
 
   devel do
-    url "http://www.swi-prolog.org/download/devel/src/swipl-7.3.24.tar.gz"
-    sha256 "4fd337d0817373c7c8d59cce5324e068be316d28dc3e81877075cd51168dd7cd"
+    url "http://www.swi-prolog.org/download/devel/src/swipl-7.5.6.tar.gz"
+    sha256 "47c31d4d3140e96706295555b01916dd7bde6c4151c80515a48e7aabfc747288"
   end
 
   head do
@@ -36,11 +36,6 @@ class SwiProlog < Formula
   if build.with? "xpce"
     depends_on :x11
     depends_on "jpeg"
-  end
-
-  fails_with :llvm do
-    build 2335
-    cause "Exported procedure chr_translate:chr_translate_line_info/3 is not defined"
   end
 
   def install

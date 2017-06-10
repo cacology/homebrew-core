@@ -1,14 +1,14 @@
 class Libphonenumber < Formula
   desc "C++ Phone Number library by Google"
   homepage "https://github.com/googlei18n/libphonenumber"
-  url "https://github.com/googlei18n/libphonenumber/archive/libphonenumber-7.5.2.tar.gz"
-  sha256 "c116c1299074b10ed8b862221ca57f822bae7637b717706ff2c71350f430b3b1"
+  url "https://github.com/googlei18n/libphonenumber/archive/v8.5.1.tar.gz"
+  sha256 "0d1311c43d4aad613d8871d558d1fc1101f01122988ba6a1a9fffa4525fb9345"
 
   bottle do
     cellar :any
-    sha256 "94e3ae2fa673a715cc920afe1735f77937e1c3ba74835e2c313b0e2a51fafd0b" => :el_capitan
-    sha256 "909df5e61993716764df96f22839bf0b1f0669b05077d0fa4f04dc7ffdbe5cc9" => :yosemite
-    sha256 "e53f237071882b92ebeca368d63aac3843f2cbb33191e97b5915c2e133ef296e" => :mavericks
+    sha256 "397c026a34092b7af148708d3f5499cd4925c6dc1bb5ff99a28ac9a5338befc2" => :sierra
+    sha256 "2d3bd673d5f3d2e8b32cd08ffbc1e18b95ce097f66dc42740ad3caa6a607f816" => :el_capitan
+    sha256 "ea57d92893c35fa599b590a735cb71b7bc1552c186c7dd188d4df241e966cfdf" => :yosemite
   end
 
   depends_on "cmake" => :build
@@ -19,25 +19,15 @@ class Libphonenumber < Formula
   depends_on "re2"
 
   resource "gtest" do
-    url "https://googletest.googlecode.com/files/gtest-1.7.0.zip"
-    sha256 "247ca18dd83f53deb1328be17e4b1be31514cedfc1e3424f672bf11fd7e0d60d"
+    url "https://github.com/google/googletest/archive/release-1.8.0.tar.gz"
+    sha256 "58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8"
   end
 
   def install
     (buildpath/"gtest").install resource("gtest")
-
-    cd "gtest" do
-      system "cmake", ".", *std_cmake_args
-      system "make"
-    end
-
-    args = std_cmake_args + %W[
-      -DGTEST_INCLUDE_DIR:PATH=#{buildpath}/gtest/include
-      -DGTEST_LIB:PATH=#{buildpath}/gtest/libgtest.a
-      -DGTEST_SOURCE_DIR:PATH=#{buildpath}/gtest/src
-    ]
-
-    system "cmake", "cpp", *args
+    system "cmake", "cpp", "-DGTEST_SOURCE_DIR=gtest/googletest",
+                           "-DGTEST_INCLUDE_DIR=gtest/googletest/include",
+                           *std_cmake_args
     system "make", "install"
   end
 

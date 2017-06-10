@@ -3,17 +3,17 @@ require "language/node"
 class AzureCli < Formula
   desc "Official Azure CLI"
   homepage "https://github.com/azure/azure-xplat-cli"
-  url "https://github.com/Azure/azure-xplat-cli/archive/v0.10.3-August2016.tar.gz"
-  version "0.10.3"
-  sha256 "90490475b04e516feae9a2d7793859b1d11bfbefbb0036436e166ea5696e4ec0"
-
+  url "https://github.com/Azure/azure-xplat-cli/archive/v0.10.12-May2017.tar.gz"
+  version "0.10.13"
+  sha256 "60194e770b8dca0485db9d4c99f9cd432f7b43096cc5ad0353f52fd5b1b29181"
   head "https://github.com/azure/azure-xplat-cli.git", :branch => "dev"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "c79b3a95ed9001d285d540b95c402fc8381c0ebd755ef577a957b6359db58726" => :el_capitan
-    sha256 "2358dbdb722f04609a17f5368a714ae80df499da4240d1a9500a36651c4db1ff" => :yosemite
-    sha256 "e6d195fdfc6eec6875ad0af52ff035a2aa5e7e46ea05dfa3a8a9449029c11992" => :mavericks
+    rebuild 1
+    sha256 "3d9cce38a38527dda6131d937e22c5ead62e071b7dfafc49f2f6eb3123bba0aa" => :sierra
+    sha256 "6f892658bd3cb909822027352e8826eefd7c9258d9b3488513526da0995d8af7" => :el_capitan
+    sha256 "a9301281b69223213f638fc92b99a4f8032fd354464adfe30d5031664ad4af75" => :yosemite
   end
 
   depends_on "node"
@@ -21,6 +21,13 @@ class AzureCli < Formula
 
   def install
     rm_rf "bin/windows"
+
+    # Workaround for incorrect file system permissios inside the npm published
+    # easy_table@0.0.1 package, which would break build with npm@5.
+    # See: https://github.com/Azure/azure-xplat-cli/issues/3605
+    inreplace "package.json", '"easy-table": "0.0.1",',
+              '"easy-table": "https://github.com/eldargab/easy-table/archive/v0.0.1.tar.gz",'
+
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
     (bash_completion/"azure").write Utils.popen_read("#{bin}/azure --completion")
@@ -29,7 +36,7 @@ class AzureCli < Formula
   test do
     shell_output("#{bin}/azure telemetry --disable")
     json_text = shell_output("#{bin}/azure account env show AzureCloud --json")
-    azure_cloud = Utils::JSON.load(json_text)
+    azure_cloud = JSON.parse(json_text)
     assert_equal azure_cloud["name"], "AzureCloud"
     assert_equal azure_cloud["managementEndpointUrl"], "https://management.core.windows.net"
     assert_equal azure_cloud["resourceManagerEndpointUrl"], "https://management.azure.com/"

@@ -1,13 +1,13 @@
 class Libsoup < Formula
   desc "HTTP client/server library for GNOME"
   homepage "https://live.gnome.org/LibSoup"
-  url "https://download.gnome.org/sources/libsoup/2.54/libsoup-2.54.1.tar.xz"
-  sha256 "47b42c232034734d66e5f093025843a5d8cc4b2357c011085a2fd04ef02dd633"
+  url "https://download.gnome.org/sources/libsoup/2.58/libsoup-2.58.1.tar.xz"
+  sha256 "62c669f557de745b7b20ba9d5b74d839c95e4c9cea1a5ab7f3da5531a1aeefb9"
 
   bottle do
-    sha256 "2c80bed91542ec201d048111f191d1d587c11a891b535a7e5829f65c58f61fa6" => :el_capitan
-    sha256 "1cf828bf708c7ecad96eaa47c8669aca22995d9587113be10639ef4fda4f8c61" => :yosemite
-    sha256 "d3be03abe735a36ab28fdcf1bbd9a98d5be013ed8ed2b4d52ba566183aab03d4" => :mavericks
+    sha256 "78fac8b92b98239f87cb5cbba77cdee42f0bf2f4609447e370ddc14a3973234f" => :sierra
+    sha256 "25687655c70ca2d6243daeccca02f97b25e34234520d4a9a290b16e6a3e02d8d" => :el_capitan
+    sha256 "940af1f0e8fb0657eca2f5b967c62bdf56e511780668c7e1243917191d06dd23" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -61,7 +61,6 @@ class Libsoup < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lintl
       -lsoup-2.4
     ]
     system ENV.cc, "test.c", "-o", "test", *flags

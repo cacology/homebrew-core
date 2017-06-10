@@ -1,22 +1,37 @@
 class Libproxy < Formula
   desc "Library that provides automatic proxy configuration management"
   homepage "https://libproxy.github.io/libproxy/"
-  url "https://github.com/libproxy/libproxy/archive/0.4.13.tar.gz"
-  sha256 "d610bc0ef81a18ba418d759c5f4f87bf7102229a9153fb397d7d490987330ffd"
+  url "https://github.com/libproxy/libproxy/archive/0.4.15.tar.gz"
+  sha256 "18f58b0a0043b6881774187427ead158d310127fc46a1c668ad6d207fb28b4e0"
   head "https://github.com/libproxy/libproxy.git"
 
   bottle do
-    sha256 "68aaba945b87320573bff0c536e607cdedc93a90b7b90530c62ca5a84c198009" => :el_capitan
-    sha256 "9f5bd17d93068b1e4074f72214dd5b9e850ac65a5ed0972f3bb0358fabec1883" => :yosemite
-    sha256 "8c8a57a319799b3277f503142ef124a34b5d12866dffbffad299fd4b68fba572" => :mavericks
+    sha256 "2da6c1c16c4d821a03f3af0095e8c083650d8236b2a9a08cb5af1b2b235658a7" => :sierra
+    sha256 "2afb8712e1a562617d7ab8fcd1436290e83f65dd636e1927761d2e9e914879cc" => :el_capitan
+    sha256 "af63072e26e2dd635ff04988d1dbb68e4f83d966aad935a6071072fe22508f15" => :yosemite
   end
 
   depends_on "cmake" => :build
+  # Non-fatally fails to build against system Perl, so stick to Homebrew's here.
+  depends_on "perl" => :optional
+  depends_on :python if MacOS.version <= :snow_leopard
 
   def install
+    args = std_cmake_args + %W[
+      ..
+      -DPYTHON2_SITEPKG_DIR=#{lib}/python2.7/site-packages
+      -DWITH_PYTHON3=OFF
+    ]
+
+    if build.with? "perl"
+      args << "-DPX_PERL_ARCH=#{lib}/perl5/site_perl"
+      args << "-DPERL_LINK_LIBPERL=YES"
+    else
+      args << "-DWITH_PERL=OFF"
+    end
+
     mkdir "build" do
-      # build tries to install to non-standard locations for Python bindings
-      system "cmake", "..", "-DWITH_PYTHON=no", *std_cmake_args
+      system "cmake", *args
       system "make", "install"
     end
   end

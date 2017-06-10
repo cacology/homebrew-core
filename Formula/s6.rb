@@ -1,26 +1,26 @@
 class S6 < Formula
   desc "Small & secure supervision software suite."
-  homepage "http://skarnet.org/software/s6/"
+  homepage "https://skarnet.org/software/s6/"
 
   stable do
-    url "http://skarnet.org/software/s6/s6-2.3.0.0.tar.gz"
-    sha256 "49c9a0476d93c6279c776ca5ae9c49b3fd39c356eda674828aebf78f8488e8e6"
+    url "https://skarnet.org/software/s6/s6-2.5.1.0.tar.gz"
+    sha256 "73cd4c1975905db92122a7c7eebd0c480d046624426800b3bcc5a432e6af27cd"
 
     resource "skalibs" do
-      url "http://skarnet.org/software/skalibs/skalibs-2.3.10.0.tar.gz"
-      sha256 "e4d5147941055b2a367794666f773a4b216c3ae83c015a5fcf2cd0498470ea44"
+      url "https://skarnet.org/software/skalibs/skalibs-2.5.1.1.tar.gz"
+      sha256 "aa387f11a01751b37fd32603fdf9328a979f74f97f0172def1b0ad73b7e8d51d"
     end
 
     resource "execline" do
-      url "http://skarnet.org/software/execline/execline-2.1.5.0.tar.gz"
-      sha256 "8a3605a6db73183baa376bf2130e8b7eb75a5b5347c7f9144e520fe86bcb1142"
+      url "https://skarnet.org/software/execline/execline-2.3.0.1.tar.gz"
+      sha256 "2bf65aaaf808718952e05c2221b4e9472271e53ebd915c8d1d49a3e992583bf4"
     end
   end
 
   bottle do
-    sha256 "afeaac9d3fca98e1db531cc56ed13e6e48eacc9bbeb383afb184c586edbd07ce" => :el_capitan
-    sha256 "e5bcfd0232cf4ab55110bd3f3ec842edc4fa3a5db462c2900f61332268b9da16" => :yosemite
-    sha256 "cb4adf9531421b2321c3b1d0a50e388a21f1c1e7bdb38caaa4a7e8158fc0ce72" => :mavericks
+    sha256 "334c8b0dec1a807935fff68558ba92652cf87f09662a6942d108186eb382905b" => :sierra
+    sha256 "89113837161737a4854c2cad15bf80d32d53fb7223dd23f50aad58eb65de1961" => :el_capitan
+    sha256 "0851bfaaa461210cd2710eef2daf699109a4a1fc317e911d71ea790eb41e823a" => :yosemite
   end
 
   head do

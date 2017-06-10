@@ -2,72 +2,54 @@ class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
   revision 1
-
   head "https://github.com/boostorg/boost.git"
 
   stable do
-    url "https://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.tar.bz2"
-    sha256 "a547bd06c2fd9a71ba1d169d9cf0339da7ebf4753849a8f7d6fdb8feee99b640"
+    url "https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.bz2"
+    sha256 "7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332"
 
-    # Remove for > 1.61.0
-    # Upstream commit "Fix build issues when optional_fwd.hpp is used before
-    # including boost/config.hpp" from PR boostorg/optional#19
-    # See https://svn.boost.org/trac/boost/ticket/12179
+    # Remove for > 1.64.0
+    # "Replace boost::serialization::detail::get_data function."
+    # Upstream PR from 26 Jan 2017 https://github.com/boostorg/mpi/pull/39
     patch :p2 do
-      url "https://github.com/boostorg/optional/commit/844ca6a0.patch"
-      sha256 "1ef54ca1dcd12d809e2a01b558113fcd734d992402d2ec78c387298ef29cc887"
+      url "https://github.com/boostorg/mpi/commit/f5bdcc1.patch"
+      sha256 "c7af75a83fef90fdb9858bc988d64ca569ae8d940396b9bc60a57d63fca2587b"
     end
   end
 
   bottle do
     cellar :any
-    sha256 "0c06f4558c5f98e5615cb9a33b66ab912e702ad50a2e1051ae80171b0bda9aa3" => :el_capitan
-    sha256 "508bfe58b3ba391690be77da7a47a34f2cf0b489cc2590c69c746d7919fa12c1" => :yosemite
-    sha256 "92db134e4a77c4cc0566261b09b96886b30f6c1bf81d65b120dffd6937e99f58" => :mavericks
+    sha256 "94c29d2d149a6383fa4050e7cb478e3dcae66895d78b0a0492d8fff63dd73a14" => :sierra
+    sha256 "24ae06f30527b4b2375cc2c375ce1af22e4dc0db04dd65896c80231e46ea0ba8" => :el_capitan
+    sha256 "ab391a24436ffb4e32dd580d4b0de42e25f822d985273f16595ee865d7a5d995" => :yosemite
   end
 
-  env :userpaths
-
-  option :universal
   option "with-icu4c", "Build regexp engine with icu support"
   option "without-single", "Disable building single-threading variant"
   option "without-static", "Disable building static library variant"
-  option "with-mpi", "Build with MPI support"
   option :cxx11
 
   deprecated_option "with-icu" => "with-icu4c"
 
   if build.cxx11?
     depends_on "icu4c" => [:optional, "c++11"]
-    depends_on "open-mpi" => "c++11" if build.with? "mpi"
   else
     depends_on "icu4c" => :optional
-    depends_on :mpi => [:cc, :cxx, :optional]
-  end
-
-  fails_with :llvm do
-    build 2335
-    cause "Dropped arguments to functions when linking with boost"
   end
 
   needs :cxx11 if build.cxx11?
 
+  # fix error: no member named 'make_array' in namespace 'boost::serialization'
+  # https://svn.boost.org/trac/boost/ticket/12978
+  patch :p2 do
+    url "https://github.com/boostorg/serialization/commit/1d86261.diff"
+    sha256 "155f603a00975a1702808be072c1420964feac8323de39c111a9d3a363a4ed9a"
+  end
+
   def install
-    # https://svn.boost.org/trac/boost/ticket/8841
-    if build.with?("mpi") && build.with?("single")
-      raise <<-EOS.undent
-        Building MPI support for both single and multi-threaded flavors
-        is not supported.  Please use "--with-mpi" together with
-        "--without-single".
-      EOS
-    end
-
-    ENV.universal_binary if build.universal?
-
     # Force boost to compile with the desired compiler
     open("user-config.jam", "a") do |file|
       file.write "using darwin : : #{ENV.cxx} ;\n"
-      file.write "using mpi ;\n" if build.with? "mpi"
     end
 
     # libdir should be set by --prefix but isn't
@@ -81,25 +63,15 @@ class Boost < Formula
     end
 
     # Handle libraries that will not be built.
-    without_libraries = ["python"]
-
-    # The context library is implemented as x86_64 ASM, so it
-    # won't build on PPC or 32-bit builds
-    # see https://github.com/Homebrew/homebrew/issues/17646
-    if Hardware::CPU.ppc? || Hardware::CPU.is_32_bit? || build.universal?
-      without_libraries << "context"
-      # The coroutine library depends on the context library.
-      without_libraries << "coroutine"
-    end
+    without_libraries = ["python", "mpi"]
 
     # Boost.Log cannot be built using Apple GCC at the moment. Disabled
     # on such systems.
-    without_libraries << "log" if ENV.compiler == :gcc || ENV.compiler == :llvm
-    without_libraries << "mpi" if build.without? "mpi"
+    without_libraries << "log" if ENV.compiler == :gcc
 
     bootstrap_args << "--without-libraries=#{without_libraries.join(",")}"
 
-    # layout should be synchronized with boost-python
+    # layout should be synchronized with boost-python and boost-mpi
     args = ["--prefix=#{prefix}",
             "--libdir=#{lib}",
             "-d2",
@@ -119,8 +91,6 @@ class Boost < Formula
     else
       args << "link=shared"
     end
-
-    args << "address-model=32_64" << "architecture=x86" << "pch=off" if build.universal?
 
     # Trunk starts using "clang++ -x c" to select C compiler which breaks C++11
     # handling using ENV.cxx11. Using "cxxflags" and "linkflags" still works.
@@ -144,14 +114,6 @@ class Boost < Formula
       s += <<-EOS.undent
 
       Building of Boost.Log is disabled because it requires newer GCC or Clang.
-      EOS
-    end
-
-    if Hardware::CPU.ppc? || Hardware::CPU.is_32_bit? || build.universal?
-      s += <<-EOS.undent
-
-      Building of Boost.Context and Boost.Coroutine is disabled as they are
-      only supported on x86_64.
       EOS
     end
 

@@ -1,28 +1,28 @@
 class Lynis < Formula
   desc "Security and system auditing tool to harden systems"
   homepage "https://cisofy.com/lynis/"
-  url "https://cisofy.com/files/lynis-2.3.1.tar.gz"
-  sha256 "7657ee66f81f72504c70a3a321f4fe87ddb5754f32e6a3c4234fd38a5c23c28c"
+  url "https://cisofy.com/files/lynis-2.5.0.tar.gz"
+  sha256 "af05f5e2474da29d5ad0921a67e422a9c4d6eddef40e64d8b218a309477de416"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "f11621d247bfc4fa9571ee78081f7111ff9ea33d80c63a35e5bbea15cdae3668" => :el_capitan
-    sha256 "dfa06ae915df07c88e10f57061a528e02abfdc82d5ea5559f3965e8fc6d18435" => :yosemite
-    sha256 "2ddc163d0dc97885bb863cd373eeefb2d053d3a4700a6b980bd515cb561f5083" => :mavericks
+    sha256 "3ecbd00edce0df88a2f6da03ec25045cb2c85be307c9ba030fa29614f13e87da" => :sierra
+    sha256 "621b780e6aec6c5541b40510c0b235b281104e820e8e72e3e6fe58b44765c120" => :el_capitan
+    sha256 "621b780e6aec6c5541b40510c0b235b281104e820e8e72e3e6fe58b44765c120" => :yosemite
   end
 
   def install
     inreplace "lynis" do |s|
       s.gsub! 'tINCLUDE_TARGETS="/usr/local/include/lynis /usr/local/lynis/include /usr/share/lynis/include ./include"',
-        %(tINCLUDE_TARGETS="#{include}")
+        %Q(tINCLUDE_TARGETS="#{include}")
       s.gsub! 'tPLUGIN_TARGETS="/usr/local/lynis/plugins /usr/local/share/lynis/plugins /usr/share/lynis/plugins /etc/lynis/plugins ./plugins"',
-        %(tPLUGIN_TARGETS="#{prefix}/plugins")
+        %Q(tPLUGIN_TARGETS="#{prefix}/plugins")
       s.gsub! 'tDB_TARGETS="/usr/local/share/lynis/db /usr/local/lynis/db /usr/share/lynis/db ./db"',
-        %(tDB_TARGETS="#{prefix}/db")
+        %Q(tDB_TARGETS="#{prefix}/db")
     end
     inreplace "include/functions" do |s|
       s.gsub! 'tPROFILE_TARGETS="/usr/local/etc/lynis /etc/lynis /usr/local/lynis ."',
-        %(tPROFILE_TARGETS="#{prefix}")
+        %Q(tPROFILE_TARGETS="#{prefix}")
     end
 
     prefix.install "db", "include", "plugins", "default.prf"

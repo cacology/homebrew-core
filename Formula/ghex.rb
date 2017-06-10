@@ -1,19 +1,20 @@
 class Ghex < Formula
   desc "GNOME hex editor"
   homepage "https://wiki.gnome.org/Apps/Ghex"
-  url "https://download.gnome.org/sources/ghex/3.18/ghex-3.18.2.tar.xz"
-  sha256 "ebd341c49e2cc4e710230703cd20e9febb29b64e34a1b5396d6aa818936e55bf"
+  url "https://download.gnome.org/sources/ghex/3.18/ghex-3.18.3.tar.xz"
+  sha256 "c67450f86f9c09c20768f1af36c11a66faf460ea00fbba628a9089a6804808d3"
 
   bottle do
-    sha256 "1bddbbe5d0ec759f23cffd8e9125492326417212762a45049c5375d2254385ff" => :el_capitan
-    sha256 "c817ef9963054421bec94208ce55ac74209c27c0dbff8ce80be220afaa7b954b" => :yosemite
-    sha256 "061169057a411c6b4f656b53124c7f92c5cf9898417ce1f39ec59fce7484c05c" => :mavericks
+    rebuild 1
+    sha256 "02c744417d58dc442de342f0277ca4d320dde285365d5c88d002932cad2538de" => :sierra
+    sha256 "8123441a65bd5d45a1baf9a227911a1edeb514240d8c81fa563de5cc756b3fc8" => :el_capitan
+    sha256 "378e85b6e1f712c2415430f426a6381e03c692f8e8f72b93a77f94c2e205fe5a" => :yosemite
   end
 
   depends_on "pkg-config" => :build
   depends_on "intltool" => :build
   depends_on "itstool" => :build
-  depends_on "libxml2" => [:build, "with-python"]
+  depends_on "libxml2" => :build
   depends_on :python => :build if MacOS.version <= :snow_leopard
   depends_on "gtk+3"
   depends_on "hicolor-icon-theme"

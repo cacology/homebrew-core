@@ -3,12 +3,13 @@ class Zbackup < Formula
   homepage "http://zbackup.org"
   url "https://github.com/zbackup/zbackup/archive/1.4.4.tar.gz"
   sha256 "efccccd2a045da91576c591968374379da1dc4ca2e3dec4d3f8f12628fa29a85"
+  revision 4
 
   bottle do
     cellar :any
-    sha256 "890f726ccbbf70315eefc7274e427e4c86a0fa1816611a906403dab27863c2c2" => :el_capitan
-    sha256 "31810ae9ab799eaa715815973d64229f29f6847e9f7608d475c1c1c63f4988e4" => :yosemite
-    sha256 "5f98bc19b226d88e2cd3e68edc9286779fa082251d0a587d5d5ffb6210b43133" => :mavericks
+    sha256 "6c0851da2b016b37a4ee95a6d181590382eda2c491a2a230ef37b2eb07ed57b8" => :sierra
+    sha256 "22c5b291a3daac5ed9959c18fa0a3152e44388dc78bd9c1ec417aea853444ae4" => :el_capitan
+    sha256 "8917c9b6f38a75b164b1daac0269da5e6fbfb0ba7f33b758f1224126c0642560" => :yosemite
   end
 
   depends_on "cmake" => :build
@@ -29,6 +30,22 @@ class Zbackup < Formula
   end
 
   def install
+    # Avoid collision with protobuf 3.x CHECK macro
+    inreplace [
+      "backup_creator.cc",
+      "check.hh",
+      "chunk_id.cc",
+      "chunk_storage.cc",
+      "compression.cc",
+      "encrypted_file.cc",
+      "encryption.cc",
+      "encryption_key.cc",
+      "mt.cc",
+      "tests/bundle/test_bundle.cc",
+      "tests/encrypted_file/test_encrypted_file.cc",
+      "unbuffered_file.cc",
+    ],
+    /\bCHECK\b/, "ZBCHECK"
     system "cmake", ".", *std_cmake_args
     system "make", "install"
   end

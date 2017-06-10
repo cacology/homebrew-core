@@ -3,12 +3,13 @@ class Liblastfm < Formula
   homepage "https://github.com/lastfm/liblastfm/"
   url "https://github.com/lastfm/liblastfm/archive/1.0.9.tar.gz"
   sha256 "5276b5fe00932479ce6fe370ba3213f3ab842d70a7d55e4bead6e26738425f7b"
+  revision 2
 
   bottle do
-    sha256 "08c012245f390b452719170d2df7d986854b6ff4de0b40a3fa332f7ffc1c4dc3" => :el_capitan
-    sha256 "6d6010150ff154400622bb6e95d1017ece5627b1eb845ff58d0753767f0d7965" => :yosemite
-    sha256 "e9e9d6f323fcf3d7ccd07bed4c25bdb8c6053769c24729486868f7f2c9f7af17" => :mavericks
-    sha256 "7083be85d79ee12c621e380ae149d5105a1117de4733eca024d64ef72d435cb5" => :mountain_lion
+    cellar :any
+    sha256 "ed421bdd81c4643de07048e5d73575bb4a6909fce584c5e5b6760a5103cd0617" => :sierra
+    sha256 "40e10cadb1dc55904ae6114a13597e7209596e1d274b94db8ac96f1ebf7da979" => :el_capitan
+    sha256 "0d5342788a8f4eb95ea970d2247e829d7dac17db2d43713aacbf4617e742bbba" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -21,6 +22,15 @@ class Liblastfm < Formula
     mkdir "build" do
       system "cmake", "..", *std_cmake_args
       system "make", "install"
+      cd "tests" do
+        system "make"
+      end
+      share.install "tests"
     end
+  end
+
+  test do
+    cp_r "#{share}/tests/.", testpath
+    system "./TrackTest"
   end
 end

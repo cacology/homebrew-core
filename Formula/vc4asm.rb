@@ -1,34 +1,36 @@
 class Vc4asm < Formula
   desc "Macro assembler for Broadcom VideoCore IV aka Raspberry Pi GPU"
   homepage "http://maazl.de/project/vc4asm/doc/index.html"
-  url "https://github.com/maazl/vc4asm/archive/V0.2.1.tar.gz"
-  sha256 "c9ffb315961a634cef1a26620a73483e7b819a963374952046aa7099d7ceb25c"
+  url "https://github.com/maazl/vc4asm/archive/V0.2.3.tar.gz"
+  sha256 "8d5f49f7573d1cc6a7baf7cee5e1833af2a87427ad8176989083c6ba7d034c8c"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "d3e5bf0d350fe121f98dc5f9382a540246a35aa6ba329738ff6d328537521311" => :el_capitan
-    sha256 "0f859510fcf092ac9aea3edf1a3bdca06fb33fbac058a6c6b07c4fe8485cf756" => :yosemite
-    sha256 "17e23f6685049ca463e555f56947f2694fd14d45ac3e5be7cc82475cae251ca9" => :mavericks
+    sha256 "2547c982e3fde40316d01d802bd01bf49af208e6737ecafeaeb8ad988ea3255d" => :sierra
+    sha256 "72d54a4237c4e0f952fd1a3d913725d84814ed5b657affa1d6dcafa19e1cdc44" => :el_capitan
+    sha256 "871b3b109ac49b09056f83e4488105196060d2388dc5052c679776b43fab5927" => :yosemite
   end
 
   needs :cxx11
 
-  # Removes ELF support for OSX (merged upstream)
-  patch do
-    url "https://github.com/maazl/vc4asm/pull/7.patch"
-    sha256 "50e8d58bf406aed69c8e247cb447353cc7a9fb6d5c6c7862c6447bf28a4c8779"
-  end
-  patch do
-    url "https://github.com/maazl/vc4asm/commit/e2e855cd728f7f2eab45499dd251cf63db19c0cb.patch"
-    sha256 "72aa18f016669cdafec927b917f951f30c3f8946f1e8a4df1fd0016c171fa6d4"
+  # Fixes "ar: illegal option combination for -r"
+  # Reported 13 Apr 2017 https://github.com/maazl/vc4asm/issues/18
+  resource "old_makefile" do
+    url "https://raw.githubusercontent.com/maazl/vc4asm/c6991f0/src/Makefile"
+    sha256 "2ea9a9e660e85dace2e9b1c9be17a57c8a91e89259d477f9f63820aee102a2d3"
   end
 
   def install
     ENV.cxx11
-    cd "src" do
-      system "make"
-    end
-    bin.install %w[bin/vc4asm bin/vc4dis]
+
+    # Fixes "error: use of undeclared identifier 'errno'"
+    # Reported 13 Apr 2017 https://github.com/maazl/vc4asm/issues/19
+    inreplace "src/utils.cpp", "#include <unistd.h>",
+                               "#include <unistd.h>\n#include <errno.h>"
+
+    (buildpath/"src").install resource("old_makefile")
+    system "make", "-C", "src"
+    bin.install "bin/vc4asm", "bin/vc4dis"
     share.install "share/vc4.qinc"
   end
 
@@ -36,7 +38,7 @@ class Vc4asm < Formula
     (testpath/"test.qasm").write <<-EOS.undent
       mov -, sacq(9)
       add r0, r4, ra1.unpack8b
-      add.unpack8a r0, r4, ra1
+      add.unpack8ai r0, r4, ra1
       add r0, r4.8a, ra1
     EOS
     system "#{bin}/vc4asm", "-o test.hex", "-V", "#{share}/vc4.qinc", "test.qasm"

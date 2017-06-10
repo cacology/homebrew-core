@@ -1,16 +1,15 @@
 class Asciinema < Formula
   desc "Record and share terminal sessions"
   homepage "https://asciinema.org"
-  url "https://github.com/asciinema/asciinema/archive/v1.3.0.tar.gz"
-  sha256 "968016828119d53b8e4e6ccf40a2635704d236f8e805f635c15adc09a4373a55"
-
+  url "https://github.com/asciinema/asciinema/archive/v1.4.0.tar.gz"
+  sha256 "841a55b0f51988d5e155e99badbd6ce5cf3b43cca2ba15cd20c971a19719dc9a"
   head "https://github.com/asciinema/asciinema.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "6205d485d86ea24d0a0396cc56fd76b09490a83c5210e74ff505aa03cd4fcb1d" => :el_capitan
-    sha256 "6578e8f11c7d2918f1f7a6c00350c485a937ae1a7037e4d715ecf66e80001cd7" => :yosemite
-    sha256 "25455ff63f3f68f17671727ba02f09bb7b03bfa4fadab3fa0c9bd4a7d687cbf0" => :mavericks
+    sha256 "bb083c12bf50fe56b223784cb761a6dcefd55cefaac138815912c85102c43153" => :sierra
+    sha256 "e95c895bee1ee5c1f852e06522104489807510f157843ef10ea1d68a84318634" => :el_capitan
+    sha256 "e95c895bee1ee5c1f852e06522104489807510f157843ef10ea1d68a84318634" => :yosemite
   end
 
   depends_on :python3

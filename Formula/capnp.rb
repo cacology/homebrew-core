@@ -1,15 +1,14 @@
 class Capnp < Formula
   desc "Data interchange format and capability-based RPC system"
   homepage "https://capnproto.org/"
-  url "https://capnproto.org/capnproto-c++-0.5.3.tar.gz"
-  sha256 "cdb17c792493bdcd4a24bcd196eb09f70ee64c83a3eccb0bc6534ff560536afb"
+  url "https://capnproto.org/capnproto-c++-0.6.0.tar.gz"
+  sha256 "e50911191afc44d6ab03b8e0452cf8c00fd0edfcd34b39f169cea6a53b0bf73e"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "d614f361c80a3218d4f5bed478f98a97f00d816dbd53730bd17cbc5ccb517166" => :el_capitan
-    sha256 "bd5a6b2c7961bad80928fdcf612619495e0c9208fe69ba5c207b797cd9fc8bb2" => :yosemite
-    sha256 "f99f439becc2eb9bf12e60cb8af0245fffee9aecf9ed07dc460196fe3f2d5f6e" => :mavericks
-    sha256 "9c11b6174a97e022be4ebe5e05435818234dedc11c194afe09bce81fbf8f9a50" => :mountain_lion
+    sha256 "fe035ee20666f60bea72a033625e30981da7cf49bca28e3ded78daeb9a0cc9f3" => :sierra
+    sha256 "5ef99277556769e117350e4c4c625c4498aab44aec043c24a3e8596ee98a311a" => :el_capitan
+    sha256 "7068ca3b3c0db13d8669d1c6e70c5a4a5f31872b70741c8cd54485b5f66052db" => :yosemite
   end
 
   needs :cxx11
@@ -17,15 +16,18 @@ class Capnp < Formula
 
   def install
     ENV.cxx11
-
     mkdir "build" do
       system "cmake", "..", *std_cmake_args
-      system "make", "check"
       system "make", "install"
     end
   end
 
   test do
-    system "#{bin}/capnp", "--version"
+    file = testpath/"test.capnp"
+    text = "\"Is a happy little duck\""
+
+    file.write Utils.popen_read("#{bin}/capnp id").chomp + ";\n"
+    file.append_lines "const dave :Text = #{text};"
+    assert_match text, shell_output("#{bin}/capnp eval #{file} dave")
   end
 end

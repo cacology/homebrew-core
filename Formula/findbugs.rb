@@ -1,15 +1,15 @@
 class Findbugs < Formula
   desc "Find bugs in Java programs through static analysis"
-  homepage "http://findbugs.sourceforge.net/index.html"
+  homepage "https://findbugs.sourceforge.io"
   url "https://downloads.sourceforge.net/project/findbugs/findbugs/3.0.1/findbugs-3.0.1.tar.gz"
   sha256 "e80e0da0c213a27504ef3188ef25f107651700ffc66433eac6a7454bbe336419"
 
   bottle :unneeded
 
+  depends_on :java => "1.7+"
+
   conflicts_with "fb-client",
     :because => "findbugs and fb-client both install a `fb` binary"
-
-  depends_on :java => "1.7+"
 
   def install
     # Remove windows files

@@ -1,37 +1,37 @@
 class Qscintilla2 < Formula
   desc "Port to Qt of the Scintilla editing component"
   homepage "https://www.riverbankcomputing.com/software/qscintilla/intro"
-  url "https://downloads.sf.net/project/pyqt/QScintilla2/QScintilla-2.9.3/QScintilla_gpl-2.9.3.tar.gz"
-  sha256 "98aab93d73b05635867c2fc757acb383b5856a0b416e3fd7659f1879996ddb7e"
+  url "https://downloads.sourceforge.net/project/pyqt/QScintilla2/QScintilla-2.10/QScintilla_gpl-2.10.tar.gz"
+  sha256 "16be30577bc178470936c458551f2512cc068aff6e7a7de6ed244e28c045f6ec"
   revision 1
 
   bottle do
-    sha256 "e5fac505a410da72bfadc180edfb0edf7434e54ef87bca4bc258d0d938e42c4e" => :el_capitan
-    sha256 "7bdeceb85326ce37a906e61a5362a27c8a81e102a3f6e61f735348ddf3ea7bbe" => :yosemite
-    sha256 "db639eed58e90ef1da3f4b44aed6feaabf6bac610e5eb9bda051c9f1fcc1c075" => :mavericks
+    sha256 "be5b890f7fc46b4f410d6614e04e029e59271f42bd15b9b86448f81a51547c31" => :sierra
+    sha256 "6e6a132481e431975a38d5c0daaa6773e99c8d17e3850fd51bcd2c0c5fbfa0e1" => :el_capitan
+    sha256 "9b151c614982db90c934aaecde129babece7b817e5ac3e449bff4043d7704f58" => :yosemite
   end
 
   option "with-plugin", "Build the Qt Designer plugin"
   option "with-python", "Build Python bindings"
   option "without-python3", "Do not build Python3 bindings"
 
-  depends_on "qt5"
+  depends_on "qt"
   depends_on :python3 => :recommended
   depends_on :python => :optional
 
   if build.with?("python") && build.with?("python3")
     depends_on "sip" => "with-python3"
-    depends_on "pyqt5" => "with-python"
+    depends_on "pyqt" => "with-python"
   elsif build.with?("python")
     depends_on "sip"
-    depends_on "pyqt5" => "with-python"
+    depends_on "pyqt" => "with-python"
   elsif build.with?("python3")
     depends_on "sip" => "with-python3"
-    depends_on "pyqt5"
+    depends_on "pyqt"
   end
 
   def install
-    spec = ENV.compiler == :clang && MacOS.version >= :mavericks ? "macx-clang" : "macx-g++"
+    spec = (ENV.compiler == :clang && MacOS.version >= :mavericks) ? "macx-clang" : "macx-g++"
     args = %W[-config release -spec #{spec}]
 
     cd "Qt4Qt5" do
@@ -68,7 +68,7 @@ class Qscintilla2 < Formula
                            "--qsci-incdir=#{include}",
                            "--qsci-libdir=#{lib}",
                            "--pyqt=PyQt5",
-                           "--pyqt-sipdir=#{Formula["pyqt5"].opt_share}/sip/Qt5",
+                           "--pyqt-sipdir=#{Formula["pyqt"].opt_share}/sip/Qt5",
                            "--sip-incdir=#{Formula["sip"].opt_include}",
                            "--spec=#{spec}"
           system "make"
@@ -82,7 +82,7 @@ class Qscintilla2 < Formula
       mkpath prefix/"plugins/designer"
       cd "designer-Qt4Qt5" do
         inreplace "designer.pro" do |s|
-          s.sub! "$$[QT_INSTALL_PLUGINS]", "#{lib}/qt5/plugins"
+          s.sub! "$$[QT_INSTALL_PLUGINS]", "#{lib}/qt/plugins"
           s.sub! "$$[QT_INSTALL_LIBS]", lib
         end
         system "qmake", "designer.pro", *args

@@ -1,8 +1,8 @@
 class Redpen < Formula
   desc "Proofreading tool to help writers of technical documentation"
   homepage "http://redpen.cc/"
-  url "https://github.com/redpen-cc/redpen/releases/download/redpen-1.7.0/redpen-1.7.0.tar.gz"
-  sha256 "41b67738f9169939f6e60c097e2a4fd383311152eead53846756c19e4c84fb54"
+  url "https://github.com/redpen-cc/redpen/releases/download/redpen-1.9.0/redpen-1.9.0.tar.gz"
+  sha256 "9981328bd6f1618899cf903bd01bf64f7e3541c1ba8ac4896c9b1b98c1ae4474"
 
   bottle :unneeded
 

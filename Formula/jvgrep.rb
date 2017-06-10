@@ -3,42 +3,37 @@ require "language/go"
 class Jvgrep < Formula
   desc "Grep for Japanese users of Vim"
   homepage "https://github.com/mattn/jvgrep"
-  url "https://github.com/mattn/jvgrep/archive/v5.0.tar.gz"
-  sha256 "70078c61ff86a7d1c8c689c8535d06010672027d636f6e624598ec186df4d2e7"
+  url "https://github.com/mattn/jvgrep/archive/v5.2.tar.gz"
+  sha256 "de1c4361223f65617f56e08ac900de40a7f0c14c13d3cdcf4590e669079f81ad"
   head "https://github.com/mattn/jvgrep.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "45d5106b0e3a254203d40489bdfc6fd50fd44495aca304b61e691f79cb8d7def" => :el_capitan
-    sha256 "c79c76dfa09b772150c27124f16dd173a96662dbfe5adcdba252a3f904e814b0" => :yosemite
-    sha256 "4310042fda0b82082f52cd90572981e975e14693893f83c5382a352755d0dbbc" => :mavericks
+    sha256 "25875f8f7664bb73f67622364d5dbb4026dff1025bf21ca17237df834de75254" => :sierra
+    sha256 "81f82bd8539e7f0b2a31e9c9762b2961ec914a0526e4f54fa96a870ff7afe64d" => :el_capitan
+    sha256 "f2fbc679edd166fa0d8234ace76b4f57a597be97ff95260ae92cd2a3c85651ac" => :yosemite
   end
 
   depends_on "go" => :build
 
-  go_resource "github.com/k-takata/go-iscygpty" do
-    url "https://github.com/k-takata/go-iscygpty.git",
-    :revision => "f91f8810106213f01bd64933dc10d849bd9137ac"
-  end
-
   go_resource "github.com/mattn/go-colorable" do
     url "https://github.com/mattn/go-colorable.git",
-    :revision => "9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59"
+        :revision => "ded68f7a9561c023e790de24279db7ebf473ea80"
   end
 
   go_resource "github.com/mattn/go-isatty" do
     url "https://github.com/mattn/go-isatty.git",
-    :revision => "56b76bdf51f7708750eac80fa38b952bb9f32639"
+        :revision => "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
   end
 
   go_resource "golang.org/x/net" do
     url "https://go.googlesource.com/net.git",
-    :revision => "e445b19913b9d40fdbdfe19ac5e3d314aafd6f63"
+        :revision => "59a0b19b5533c7977ddeb86b017bf507ed407b12"
   end
 
   go_resource "golang.org/x/text" do
     url "https://go.googlesource.com/text.git",
-    :revision => "4440cd4f4c2ea31e1872e00de675a86d0c19006c"
+        :revision => "ccbd3f7822129ff389f8ca4858a9b9d4d910531c"
   end
 
   def install

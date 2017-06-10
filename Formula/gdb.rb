@@ -1,30 +1,18 @@
-class UniversalBrewedPython < Requirement
-  satisfy { archs_for_command("python").universal? }
-
-  def message; <<-EOS.undent
-    A build of GDB using a brewed Python was requested, but Python is not
-    a universal build.
-
-    GDB requires Python to be built as a universal binary or it will fail
-    if attempting to debug a 32-bit binary on a 64-bit host.
-    EOS
-  end
-end
-
 class Gdb < Formula
   desc "GNU debugger"
   homepage "https://www.gnu.org/software/gdb/"
-  url "https://ftpmirror.gnu.org/gdb/gdb-7.11.1.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/gdb/gdb-7.11.1.tar.xz"
-  sha256 "e9216da4e3755e9f414c1aa0026b626251dfc57ffe572a266e98da4f6988fc70"
+  url "https://ftp.gnu.org/gnu/gdb/gdb-8.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gdb/gdb-8.0.tar.xz"
+  sha256 "f6a24ffe4917e67014ef9273eb8b547cb96a13e5ca74895b06d683b391f3f4ee"
 
   bottle do
-    sha256 "90b608379fefd418b72e6b73ae1bde9014d94b9f366259cbc3fea99dc63985b1" => :el_capitan
-    sha256 "588dcb9acd832060e189004a4c7fef14b7a3bdeda3a7780b1f1bb8106c810327" => :yosemite
-    sha256 "07db094029ff33ec19e0b90633f9a2b8fcceaec14d2bf30f7824b618ce993a3e" => :mavericks
+    sha256 "b96357f0123e05b7e7ce81a9de3c62b28266de974d84e783cba967e87de45e2e" => :sierra
+    sha256 "f8691947439aeb3c87f4fd4f58881f2b936d38fe23c0b2091669034785bfecab" => :el_capitan
+    sha256 "4d17723734c2754c62d6e15ef95098427e2a3651cae9ea0a28a1747d78b87b2c" => :yosemite
   end
 
   deprecated_option "with-brewed-python" => "with-python"
+  deprecated_option "with-guile" => "with-guile@2.0"
 
   option "with-python", "Use the Homebrew version of Python; by default system Python is used"
   option "with-version-suffix", "Add a version suffix to program"
@@ -32,11 +20,7 @@ class Gdb < Formula
 
   depends_on "pkg-config" => :build
   depends_on "python" => :optional
-  depends_on "guile" => :optional
-
-  if build.with? "python"
-    depends_on UniversalBrewedPython
-  end
+  depends_on "guile@2.0" => :optional
 
   def install
     args = [
@@ -45,7 +29,7 @@ class Gdb < Formula
       "--disable-dependency-tracking",
     ]
 
-    args << "--with-guile" if build.with? "guile"
+    args << "--with-guile" if build.with? "guile@2.0"
     args << "--enable-targets=all" if build.with? "all-targets"
 
     if build.with? "python"
@@ -60,13 +44,11 @@ class Gdb < Formula
 
     system "./configure", *args
     system "make"
-    system "make", "install"
 
-    # Remove conflicting items with binutils
-    rm_rf include
-    rm_rf lib
-    rm_rf share/"locale"
-    rm_rf share/"info"
+    # Don't install bfd or opcodes, as they are provided by binutils
+    inreplace ["bfd/Makefile", "opcodes/Makefile"], /^install:/, "dontinstall:"
+
+    system "make", "install"
   end
 
   def caveats; <<-EOS.undent
@@ -74,6 +56,10 @@ class Gdb < Formula
     You will need to codesign the binary. For instructions, see:
 
       https://sourceware.org/gdb/wiki/BuildingOnDarwin
+
+    On 10.12 (Sierra) or later with SIP, you need to run this:
+
+      echo "set startup-with-shell off" >> ~/.gdbinit
     EOS
   end
 

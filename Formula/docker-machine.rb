@@ -2,15 +2,15 @@ class DockerMachine < Formula
   desc "Create Docker hosts locally and on cloud providers"
   homepage "https://docs.docker.com/machine"
   url "https://github.com/docker/machine.git",
-      :tag => "v0.8.1",
-      :revision => "41b3b253352b8b355d668f5e12b5f329f88c3482"
+      :tag => "v0.12.0",
+      :revision => "45c69ad1676da683308960e6998e5c38a7dbba2c"
   head "https://github.com/docker/machine.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "6076fc037a2a038567c95692dffe50075bacbc1914457dd71aa5471bda16b601" => :el_capitan
-    sha256 "d2f8bb096fdab17e49b2794e6fcf9d618a5a2bda34362f4b0439f2ac7af1da2d" => :yosemite
-    sha256 "a67a2f3cc2c89ea8cb3efde4a3269a65ce397481ee85be9317a33b21a3c9c7c7" => :mavericks
+    sha256 "e9ec893b2fb43f9b71be3f54c932572c55e27475f841803d1427d0a8a5596eaf" => :sierra
+    sha256 "125481cb14c9a26d8ad1207f7a521ab7e41b56e58ceeb77461022c12d6eda606" => :el_capitan
+    sha256 "b91230730d8b01de747cbd313d786e299abf3c003990993984321f450db8dcdd" => :yosemite
   end
 
   depends_on "go" => :build
@@ -23,6 +23,7 @@ class DockerMachine < Formula
       system "make", "build"
       bin.install Dir["bin/*"]
       bash_completion.install Dir["contrib/completion/bash/*.bash"]
+      zsh_completion.install "contrib/completion/zsh/_docker-machine"
       prefix.install_metafiles
     end
   end

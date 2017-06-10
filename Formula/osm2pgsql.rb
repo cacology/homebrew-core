@@ -1,51 +1,50 @@
 class Osm2pgsql < Formula
   desc "OpenStreetMap data to PostgreSQL converter"
   homepage "https://wiki.openstreetmap.org/wiki/Osm2pgsql"
-  url "https://github.com/openstreetmap/osm2pgsql/archive/0.88.1.tar.gz"
-  sha256 "08ec33c833768dec9856f537bbf4416ad45837ee0851eeeab0081c7bbed3449e"
-  revision 1
+  url "https://github.com/openstreetmap/osm2pgsql/archive/0.92.1.tar.gz"
+  sha256 "0912a344aaa38ed4b78f6dcab1a873975adb434dcc31cdd6fec3ec6a30025390"
+  head "https://github.com/openstreetmap/osm2pgsql.git"
 
   bottle do
-    sha256 "7f388ee56a6bf0d685434823d238ebbd8ca01e74320c862892e61e21b24b9a08" => :el_capitan
-    sha256 "17c80db14f36b5831b03a4026d3d970ae29c782344c11c5fbec9cf19716a3e6d" => :yosemite
-    sha256 "ef2655f802ca66c3cb137d80be9fcbe9fae64743c0f67c0b0e3944faddbc8913" => :mavericks
+    sha256 "83079b4af4dc2b2e37b9b42ae39d7d29a272e2571c5e9afdbcaf94c6f7fa9c0f" => :sierra
+    sha256 "a52cb4295d28d3ecfa71a7dfc23593588611c11fbb94035d791207da09da787d" => :el_capitan
+    sha256 "cb4248c8b8ce11c4bd836387a3d48f0e8bd297d609b5f70a8c4581a82d13aba1" => :yosemite
   end
 
+  depends_on "cmake" => :build
   depends_on :postgresql
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
   depends_on "boost"
   depends_on "geos"
   depends_on "proj"
-  depends_on "protobuf-c" => :recommended
   depends_on "lua" => :recommended
 
+  # Compatibility with GEOS 3.6.1
+  # Upstream PR from 27 Oct 2016 "Geos36"
+  patch do
+    url "https://github.com/openstreetmap/osm2pgsql/pull/636.patch"
+    sha256 "89d1edb197d79a5567636ca0574d68877a31b82157ae8ad549614fd8327a4c79"
+  end
+
   def install
-    args = [
-      "--prefix=#{prefix}",
-      "--disable-dependency-tracking",
-      "--with-proj=#{Formula["proj"].opt_prefix}",
-      "--with-boost=#{Formula["boost"].opt_prefix}",
-      "--with-zlib=/usr",
-      "--with-bzip2=/usr",
-    ]
-    puts args
-    if build.with? "protobuf-c"
-      args << "--with-protobuf-c=#{Formula["protobuf-c"].opt_prefix}"
+    args = std_cmake_args
+
+    if build.with? "lua"
+      # This is essentially a CMake disrespects superenv problem
+      # rather than an upstream issue to handle.
+      lua_version = Formula["lua"].version.to_s.match(/\d\.\d/)
+      inreplace "cmake/FindLua.cmake", "LUA_VERSIONS5 5.3 5.2 5.1 5.0",
+                                       "LUA_VERSIONS5 #{lua_version}"
+    else
+      args << "-DWITH_LUA=OFF"
     end
-    # Mountain Lion has some problems with C++11.
-    # This is probably going to be a fatal issue for 0.89 and 0.90, but
-    # for now it can be worked around.
-    args << "--without-cxx11" if MacOS.version < :mavericks
-    system "./autogen.sh"
-    system "./configure", *args
-    system "make"
-    system "make", "install"
+
+    mkdir "build" do
+      system "cmake", "..", *args
+      system "make", "install"
+    end
   end
 
   test do
-    assert_match "version #{version}",
-      shell_output("#{bin}/osm2pgsql -h 2>&1", 1)
+    assert_match version.to_s, shell_output("#{bin}/osm2pgsql -h 2>&1")
   end
 end

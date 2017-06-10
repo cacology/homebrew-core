@@ -3,14 +3,14 @@ require "language/node"
 class DiffSoFancy < Formula
   desc "Good-lookin' diffs with diff-highlight and more"
   homepage "https://github.com/so-fancy/diff-so-fancy"
-  url "https://registry.npmjs.org/diff-so-fancy/-/diff-so-fancy-0.11.1.tgz"
-  sha256 "c2824f4661d706ef9af7317fc253c123bc8f5d88f83732d880c4504309ae7a0f"
+  url "https://registry.npmjs.org/diff-so-fancy/-/diff-so-fancy-0.11.4.tgz"
+  sha256 "1812b1a36b77c371fc811cc0a9746204954b2c3ab4734ab310b4f01009630b15"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "dc36875af0c049244294a3d55a0f7636b58c07da6a16a45b47b6e96faaecb661" => :el_capitan
-    sha256 "4b1400d88283ea1e4b3a5ec1b0ce3c7c65152357f740cf84aaac97b721fa8707" => :yosemite
-    sha256 "4db05f742f66f26115bc341c1e439d5c11ab4489fa479974a01d8ed15153e3ce" => :mavericks
+    sha256 "cbb9b162c89bec116039e2849656fb253e2ecbbcd7973ba3d7b444e978c969a3" => :sierra
+    sha256 "83cd8afe3628eab0a9ddcb2a4326a935279abb24e4409001eedcf1cee81342db" => :el_capitan
+    sha256 "643d937586cc3e4bbe6d9189f6ef1f0a118b89b10dff5870d26d077edc06fb92" => :yosemite
   end
 
   depends_on "node" => :build
@@ -21,7 +21,19 @@ class DiffSoFancy < Formula
   end
 
   test do
-    ENV["TERM"] = "xterm"
-    system bin/"diff-so-fancy"
+    diff = <<-EOS.undent
+      diff --git a/hello.c b/hello.c
+      index 8c15c31..0a9c78f 100644
+      --- a/hello.c
+      +++ b/hello.c
+      @@ -1,5 +1,5 @@
+       #include <stdio.h>
+
+       int main(int argc, char **argv) {
+      -    printf("Hello, world!\n");
+      +    printf("Hello, Homebrew!\n");
+       }
+    EOS
+    assert_match "modified: hello.c", pipe_output(bin/"diff-so-fancy", diff, 0)
   end
 end

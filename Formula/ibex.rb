@@ -1,20 +1,19 @@
 class Ibex < Formula
   desc "C++ library for constraint processing over real numbers."
   homepage "http://www.ibex-lib.org/"
-  url "https://github.com/ibex-team/ibex-lib/archive/ibex-2.3.0.tar.gz"
-  sha256 "637cd0d3bdae5f72867264fa9349a4f86023ac34b6d01ca0bec3618bc38d4a79"
+  url "https://github.com/ibex-team/ibex-lib/archive/ibex-2.4.1.tar.gz"
+  sha256 "882ed16dff343d8154f94dac1c26ab46a0d1a2dfdf7269f4090eebb192b6d007"
   head "https://github.com/ibex-team/ibex-lib.git"
 
   bottle do
     cellar :any
-    sha256 "3f02be452b5cf8c02fe5c9b94f5046ccd82f5640d1b3b8709a5cb32089631f9b" => :el_capitan
-    sha256 "11790b747655c7b726d8a83e58e569660561734052a7667f07d54dd064178b29" => :yosemite
-    sha256 "01b0a1a82ffa341626c76f858d5387a3a0246d7b30a01f6ab6fef3d4a05d993e" => :mavericks
+    sha256 "f9ce37564f7bb3e7b27542d9fd88f92c268d8fd3859bc0f46d68c527ffc76e4c" => :sierra
+    sha256 "4c921a5b1f8c2897e6924ab080636fa27950d23fab93b88e68b981c8c7eee833" => :el_capitan
+    sha256 "03df426e2fc6477877779f4e5dabfcc423f3a926ce14301fb0090906ff1a789d" => :yosemite
   end
 
   option "with-java", "Enable Java bindings for CHOCO solver."
   option "with-ampl", "Use AMPL file loader plugin"
-
   option "without-ensta-robotics", "Don't build the Contractors for robotics (SLAM) plugin"
   option "without-param-estim", "Don't build the Parameter Estimation (enhanced Q-intersection algorithm) plugin"
 
@@ -24,14 +23,6 @@ class Ibex < Formula
   depends_on "pkg-config" => :build
 
   def install
-    # Test failure "uncaught exception of type ibex::DimException"
-    # Same as upstream fix https://github.com/ibex-team/ibex-lib/commit/1c882ef2
-    if build.stable?
-      inreplace "examples/slam/slam1.cpp",
-        "x,dist(x[t],beacons[b])=d[t][b]);",
-        "x,dist(transpose(x[t]),beacons[b])=d[t][b]);"
-    end
-
     if build.with?("java") && build.with?("ampl")
       odie "Cannot set options --with-java and --with-ampl simultaneously for now."
     end
@@ -39,7 +30,6 @@ class Ibex < Formula
     args = %W[
       --prefix=#{prefix}
       --enable-shared
-      --with-affine
       --with-optim
     ]
 
@@ -51,16 +41,6 @@ class Ibex < Formula
     system "./waf", "configure", *args
     system "./waf", "install"
 
-    cd "examples" do
-      ENV["PKG_CONFIG_PATH"] = "#{share}/pkgconfig"
-      # Build Ibex examples
-      system "make", *%w[ctc01 ctc02 symb01 solver01 solver02]
-      # Build SLAM examples
-      cd "slam" do
-        system "make", *%w[slam1 slam2 slam3]
-      end
-    end
-
     pkgshare.install %w[examples benchs]
     (pkgshare/"examples/symb01.txt").write <<-EOS.undent
       function f(x)
@@ -70,16 +50,21 @@ class Ibex < Formula
   end
 
   test do
-    cp_r "#{pkgshare}/examples/.", testpath
+    cp_r (pkgshare/"examples").children, testpath
+    cp pkgshare/"benchs/cyclohexan3D.bch", testpath/"c3D.bch"
 
-    # Base Ibex examples
-    %w[ctc01 ctc02 symb01].each { |a| system "./#{a}" }
-    # Ibex solver examples
-    cp "#{pkgshare}/benchs/cyclohexan3D.bch", testpath
-    %w[solver01 solver02].each { |a| system "./#{a}", "cyclohexan3D.bch", "1e-05", "10" }
-    # Slam example (base Ibex)
-    cd "slam" do
-      %w[slam1 slam2 slam3].each { |a| system "./#{a}" }
+    # so that pkg-config can remain a build-time only dependency
+    inreplace %w[makefile slam/makefile] do |s|
+      s.gsub! /CXXFLAGS.*pkg-config --cflags ibex./,
+              "CXXFLAGS := -I#{include} -I#{include}/ibex "\
+                          "-I#{include}/ibex/3rd/coin -I#{include}/ibex/3rd"
+      s.gsub! /LIBS.*pkg-config --libs  ibex./, "LIBS := -L#{lib} -libex"
     end
+
+    system "make", "ctc01", "ctc02", "symb01", "solver01", "solver02"
+    system "make", "-C", "slam", "slam1", "slam2", "slam3"
+    %w[ctc01 ctc02 symb01].each { |a| system "./#{a}" }
+    %w[solver01 solver02].each { |a| system "./#{a}", "c3D.bch", "1e-05", "10" }
+    %w[slam1 slam2 slam3].each { |a| system "./slam/#{a}" }
   end
 end

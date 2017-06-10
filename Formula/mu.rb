@@ -4,30 +4,47 @@
 class Mu < Formula
   desc "Tool for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu-releases/raw/master/mu-0.9.16.tar.gz"
-  sha256 "55dff47f1ec2ea5a409a882009888c4f1b2b6ef2d81ee29753a649654752ee7e"
-  head "https://github.com/djcb/mu.git"
+  url "https://github.com/djcb/mu/releases/download/0.9.18/mu-0.9.18.tar.gz"
+  sha256 "6559ec888d53f8e03b87b67148a73f52fe086477cb10e43f3fc13ed7f717e809"
+  revision 1
 
   bottle do
-    revision 1
-    sha256 "e0e3532baa75ecee2d71a264a8bed4725a1dc1a6ecb9b0afbcc6f225a77dd06e" => :el_capitan
-    sha256 "927ba3c36a061061c679ad91319d614532dbbd7c450ec0e0172681465b8f06e3" => :yosemite
-    sha256 "99553174cd38a3d19993a94c07dafab56e98f591ac5054bf6b79d1d6b13f5e02" => :mavericks
+    sha256 "a38652c9dfce2d6fb774b55b547dec424d46325d480d986061647f7fbe4fc9c9" => :sierra
+    sha256 "292581f0d256a20d26aa2f49e39961cd8212fb041f3e89546830a17e677ae436" => :el_capitan
+    sha256 "807173ae614afee3cd3b577d1653ad78629f564ce0d6e443b55752f8303efc20" => :yosemite
+  end
+
+  head do
+    url "https://github.com/djcb/mu.git"
+
+    depends_on "autoconf-archive" => :build
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
+  depends_on "libgpg-error" => :build
   depends_on "gettext"
   depends_on "glib"
-  depends_on "gmime"
   depends_on "xapian"
   depends_on :emacs => ["23", :optional]
 
+  # Currently requires gmime 2.6.x
+  resource "gmime" do
+    url "https://download.gnome.org/sources/gmime/2.6/gmime-2.6.23.tar.xz"
+    sha256 "7149686a71ca42a1390869b6074815106b061aaeaaa8f2ef8c12c191d9a79f6a"
+  end
+
   def install
+    resource("gmime").stage do
+      system "./configure", "--prefix=#{prefix}/gmime", "--disable-introspection"
+      system "make", "install"
+      ENV.append_path "PKG_CONFIG_PATH", "#{prefix}/gmime/lib/pkgconfig"
+    end
+
     # Explicitly tell the build not to include emacs support as the version
-    # shipped by default with Mac OS X is too old.
+    # shipped by default with macOS is too old.
     ENV["EMACS"] = "no" if build.without? "emacs"
 
     system "autoreconf", "-ivf"

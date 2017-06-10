@@ -1,16 +1,17 @@
 class Gtkx < Formula
   desc "GUI toolkit"
-  homepage "http://gtk.org/"
+  homepage "https://gtk.org/"
+  revision 1
 
   stable do
-    url "https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.30.tar.xz"
-    sha256 "0d15cec3b6d55c60eac205b1f3ba81a1ed4eadd9d0f8e7c508bc7065d0c4ca50"
+    url "https://download.gnome.org/sources/gtk+/2.24/gtk+-2.24.31.tar.xz"
+    sha256 "68c1922732c7efc08df4656a5366dcc3afdc8791513400dac276009b40954658"
   end
 
   bottle do
-    sha256 "2fce410cbdf902f513030a18bc5002ec844bde1b115355e2a168ca2101cd6625" => :el_capitan
-    sha256 "3fe1d4c9e0de77d30e45c88d40de344d829c404abb2af06ef4ca6233f87f25e5" => :yosemite
-    sha256 "995560643ea4d66d24f8147361adf910be6504be8eb58a8c2411a06c17c19944" => :mavericks
+    sha256 "860a8dd62ae8990a7dc3c403421fa3ee6bdf8ae810463fd5368094676b7c827d" => :sierra
+    sha256 "6be79985859e6f5a6bec18a23bf2bb5364b9f536bcd1283913d72f0cb32baa8c" => :el_capitan
+    sha256 "f18ee768ba59c29741133b7427f28ffdb2d615eb1c783d5b2995249b8b473086" => :yosemite
   end
 
   head do
@@ -22,7 +23,6 @@ class Gtkx < Formula
     depends_on "gtk-doc" => :build
   end
 
-  option :universal
   option "with-quartz-relocation", "Build with quartz relocation support"
 
   depends_on "pkg-config" => :build
@@ -33,23 +33,18 @@ class Gtkx < Formula
   depends_on "gobject-introspection"
   depends_on "hicolor-icon-theme"
 
-  fails_with :llvm do
-    build 2326
-    cause "Undefined symbols when linking"
-  end
-
-  # Patch to allow Freeciv's gtk2 client to run.
+  # Patch to allow Eiffel Studio to run in Cocoa / non-X11 mode, as well as Freeciv's freeciv-gtk2 client
   # See:
+  # - https://bugzilla.gnome.org/show_bug.cgi?id=757187
+  # referenced from
   # - https://bugzilla.gnome.org/show_bug.cgi?id=557780
   # - Homebrew/homebrew-games#278
   patch do
-    url "https://bug557780.bugzilla-attachments.gnome.org/attachment.cgi?id=306776"
-    sha256 "4d7a1fe8d55174dc7f0be0016814668098d38bbec233b05a6c46180e96a159fc"
+    url "https://bug757187.bugzilla-attachments.gnome.org/attachment.cgi?id=331173"
+    sha256 "ce5adf1a019ac7ed2a999efb65cfadeae50f5de8663638c7f765f8764aa7d931"
   end
 
   def install
-    ENV.universal_binary if build.universal?
-
     args = ["--disable-dependency-tracking",
             "--disable-silent-rules",
             "--prefix=#{prefix}",

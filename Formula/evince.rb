@@ -1,21 +1,21 @@
 class Evince < Formula
   desc "GNOME document viewer"
   homepage "https://wiki.gnome.org/Apps/Evince"
-  url "https://download.gnome.org/sources/evince/3.20/evince-3.20.1.tar.xz"
-  sha256 "fc7ac23036939c24f02e9fed6dd6e28a85b4b00b60fa4b591b86443251d20055"
-  revision 1
+  url "https://download.gnome.org/sources/evince/3.24/evince-3.24.0.tar.xz"
+  sha256 "043895af7bbd6f1b57f9ab8778e78cf9c0af5dfcc347eaa94a17bf864c04dc8f"
 
   bottle do
-    sha256 "fa5d7a4becdd0da9fe9b864c8fa4b0f67e6949497deb8dd5abd86d92f7ca8107" => :el_capitan
-    sha256 "f8b73e52c589d8c1e19bbd9f4edff0fccb471196304e6bf4c87d08a064904978" => :yosemite
-    sha256 "7987ea6935e9850ce2a4ad72ff6d06269e6cfb966cb0a2e19129ba1ce6ff3993" => :mavericks
+    rebuild 1
+    sha256 "ddf756a0186ae049303383706b8a427dd1228a2745e359c2fc2d26918b7e909d" => :sierra
+    sha256 "28887aff4011d856466d07e3a58cc0bb9d7979eb7f6fb04c79733e4b384df1e8" => :el_capitan
+    sha256 "d167358cd1278860c21057dca9d908963b6e8e0972aed47bd963f99c7e11ae0c" => :yosemite
   end
 
   depends_on "pkg-config" => :build
   depends_on "intltool" => :build
   depends_on "itstool" => :build
   depends_on "poppler"
-  depends_on "libxml2" => "with-python"
+  depends_on "libxml2"
   depends_on "gtk+3"
   depends_on "hicolor-icon-theme"
   depends_on "gnome-icon-theme"
@@ -31,6 +31,7 @@ class Evince < Formula
     # be filed for this since it only occurs because Homebrew renames gtk+3's gtk-update-icon-cache
     # to gtk3-update-icon-cache in order to avoid a collision between gtk+ and gtk+3.
     inreplace "data/Makefile.in", "gtk-update-icon-cache", "gtk3-update-icon-cache"
+
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--disable-silent-rules",

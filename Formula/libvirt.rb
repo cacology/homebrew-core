@@ -1,13 +1,14 @@
 class Libvirt < Formula
   desc "C virtualization API"
   homepage "https://www.libvirt.org"
-  url "https://libvirt.org/sources/libvirt-2.1.0.tar.xz"
-  sha256 "1a799562337472ab00f76aa30a53d54c623c96633070ec53286c9cc2a456316b"
+  url "https://libvirt.org/sources/libvirt-3.4.0.tar.xz"
+  sha256 "42186af6225904d2ada0b494fda4fa777fe5e662a9134686816e7919332c248d"
+  head "https://github.com/libvirt/libvirt.git"
 
   bottle do
-    sha256 "49b0bbb4918ab1b29fbb12deb0d57ee9115bb069c47f52dd5676e915c4361e42" => :el_capitan
-    sha256 "d8068db824e0090c657caf952b6d8cb3a5ca95f92cc7c032405cf25f00b0f1b4" => :yosemite
-    sha256 "852894798a30c9712d8608b5975cb8f1f01a101bef156f17024f75a98a136d35" => :mavericks
+    sha256 "1e1c1805c52c80c387242ba1d38d4a9e2d5bfe234fde54c3fced16aa78123a24" => :sierra
+    sha256 "d625eea79a919548241a626a653125302c47e39283ba468c0b212cbc6eaaa718" => :el_capitan
+    sha256 "94e619ff2e39ac2ee8dcf563f1a3dc929ca49cdea003b5165b7842b0eb16c3dc" => :yosemite
   end
 
   option "without-libvirtd", "Build only the virsh client and development libraries"
@@ -17,15 +18,12 @@ class Libvirt < Formula
   depends_on "libgcrypt"
   depends_on "yajl"
 
-  if MacOS.version <= :leopard
-    # Definitely needed on Leopard, but not on Snow Leopard.
-    depends_on "readline"
-    depends_on "libxml2"
-  end
-
-  fails_with :llvm do
-    build 2326
-    cause "Undefined symbols when linking"
+  if build.head?
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gettext" => :build
+    depends_on "libtool" => :build
+    depends_on "rpcgen" => :build
   end
 
   def install
@@ -44,8 +42,10 @@ class Libvirt < Formula
       --without-qemu
     ]
 
+    args << "ac_cv_path_RPCGEN=#{Formula["rpcgen"].opt_prefix}/bin/rpcgen" if build.head?
     args << "--without-libvirtd" if build.without? "libvirtd"
 
+    system "./autogen.sh" if build.head?
     system "./configure", *args
 
     # Compilation of docs doesn't get done if we jump straight to "make install"
@@ -66,7 +66,12 @@ class Libvirt < Formula
   end
 
   test do
-    output = shell_output("#{bin}/virsh -v")
-    assert_match version.to_s, output
+    if build.head?
+      output = shell_output("#{bin}/virsh -V")
+      assert_match "Compiled with support for:", output
+    else
+      output = shell_output("#{bin}/virsh -v")
+      assert_match version.to_s, output
+    end
   end
 end

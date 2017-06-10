@@ -1,8 +1,8 @@
 class ZshAutosuggestions < Formula
   desc "Fish-like fast/unobtrusive autosuggestions for zsh."
   homepage "https://github.com/zsh-users/zsh-autosuggestions"
-  url "https://github.com/zsh-users/zsh-autosuggestions/archive/v0.3.2.tar.gz"
-  sha256 "2c74e3e27f0ee56d05f9addbeaf3ff69ce972c23b3750a2d1ed0be5005a91613"
+  url "https://github.com/zsh-users/zsh-autosuggestions/archive/v0.4.0.tar.gz"
+  sha256 "39cc5e3976e7928ff12f1cf5fa3108c790f8f6ad8eacf71cfc0b302931bc8308"
 
   bottle :unneeded
 

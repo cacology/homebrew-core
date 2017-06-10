@@ -1,23 +1,28 @@
 class Cmocka < Formula
   desc "Unit testing framework for C"
   homepage "https://cmocka.org/"
-  url "https://cmocka.org/files/1.0/cmocka-1.0.1.tar.xz"
-  mirror "https://mirrors.kernel.org/debian/pool/main/c/cmocka/cmocka_1.0.1.orig.tar.xz"
-  sha256 "b36050d7a1224296803d216cba1a9d4c58c31bf308b2d6d6649d61aa5a36753b"
+  url "https://cmocka.org/files/1.1/cmocka-1.1.0.tar.xz"
+  sha256 "e960d3bf1be618634a4b924f18bb4d6f20a825c109a8ad6d1af03913ba421330"
 
   bottle do
     cellar :any
-    sha256 "df6195f9a7d312247e0a98cca755216d970a5131d8c6482094ef516c97b9dcd0" => :el_capitan
-    sha256 "33765424588cf149679e394842f6132dbb003913e774bc30d0115294952c3cad" => :yosemite
-    sha256 "28ea3d6de51e920dae544f9b4f36288a04f1ee6215dd34f833c6e98bc43de0f9" => :mavericks
-    sha256 "544f9a2bd42b2a868322cc9942afb191733260bb33e8a2731a53311b6c538d7d" => :mountain_lion
+    rebuild 1
+    sha256 "728fa205df7a8e1efd39ddba0bc770d9d312dda20f54945baad099db272e011f" => :sierra
+    sha256 "c88eec638bf6414a40ce20b2e5bb2160b50abe639c83e3ae8b138ac12568e3e9" => :el_capitan
+    sha256 "d64fb55ed84223d2737f1e0902e522a83ced3c29fa196320a1bbe9f0655c7581" => :yosemite
   end
 
   depends_on "cmake" => :build
 
   def install
+    args = std_cmake_args
+    args << "-DWITH_STATIC_LIB=ON" << "-DWITH_CMOCKERY_SUPPORT=ON" << "-DUNIT_TESTING=ON"
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      args << "-DHAVE_CLOCK_GETTIME:INTERNAL=0"
+    end
+
     mkdir "build" do
-      system "cmake", "..", "-DUNIT_TESTING=On", *std_cmake_args
+      system "cmake", "..", *args
       system "make"
       system "make", "install"
     end

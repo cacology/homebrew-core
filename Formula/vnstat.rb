@@ -1,59 +1,48 @@
 class Vnstat < Formula
   desc "Console-based network traffic monitor"
   homepage "http://humdi.net/vnstat/"
-  url "http://humdi.net/vnstat/vnstat-1.14.tar.gz"
-  sha256 "f8462a47d85d0890493dc9eaeafbc725ae631aa5b103fb7f8af4ddb2314e8386"
+  url "http://humdi.net/vnstat/vnstat-1.17.tar.gz"
+  sha256 "18e4c53576ca9e1ef2f0e063a6d83b0c44e3b1cf008560d658745df5c9aa7971"
   head "https://github.com/vergoh/vnstat.git"
 
   bottle do
-    cellar :any
-    revision 1
-    sha256 "649f48180888b9dc1cb3fd60fac3d1dcdf56ff5a0f2b57a831c08fcad201b0ab" => :el_capitan
-    sha256 "ef27ae97c7a698631fef3f78cbe334d7347d40e06e697f012ab9fa925b7daf93" => :yosemite
-    sha256 "80d5c778de2d86d77761abf2a2eaa53707989287ce157085f11cad350d7ef0e1" => :mavericks
+    sha256 "9b2212cdc237d29d06c910ee437119f94097024e60e6a6aaf958293ffb6425ad" => :sierra
+    sha256 "35c444da5787d627847714dc9ef119f9a8501ead341782c2deb18c74432d59c4" => :el_capitan
+    sha256 "826ea7fb876a6d71aecdcea85bdaf5fcea55e63e97457bc6afb755518c9c1843" => :yosemite
   end
 
   depends_on "gd"
 
   def install
-    inreplace "src/cfg.c", "/etc/vnstat.conf", "#{etc}/vnstat.conf"
-
-    inreplace "man/vnstat.1" do |s|
-      s.gsub! "/etc/vnstat.conf", "#{etc}/vnstat.conf"
-      s.gsub! "/var/lib/vnstat", "#{var}/db/vnstat"
+    inreplace %w[src/cfg.c src/common.h man/vnstat.1 man/vnstatd.1 man/vnstati.1
+                 man/vnstat.conf.5].each do |s|
+      s.gsub! "/etc/vnstat.conf", "#{etc}/vnstat.conf", false
+      s.gsub! "/var/", "#{var}/", false
+      s.gsub! "var/lib", "var/db", false
+      s.gsub! "\"eth0\"", "\"en0\"", false
     end
 
-    inreplace "man/vnstatd.1" do |s|
-      s.gsub! "/etc/vnstat.conf", "#{etc}/vnstat.conf"
-      s.gsub! "/var/lib/vnstat", "#{var}/db/vnstat"
-      s.gsub! "/var/log/vnstat.log", "#{var}/log/vnstat/vnstat.log"
-      s.gsub! "/var/run/vnstat.pid", "#{var}/run/vnstat/vnstat.pid"
-    end
-
-    inreplace "man/vnstati.1" do |s|
-      s.gsub! "/etc/vnstat.conf", "#{etc}/vnstat.conf"
-      s.gsub! "/var/lib/vnstat", "#{var}/db/vnstat"
-    end
-
-    inreplace "man/vnstat.conf.5", "/etc/vnstat.conf", "#{etc}/vnstat.conf"
-
-    inreplace "cfg/vnstat.conf" do |c|
-      c.gsub! 'Interface "eth0"', %(Interface "en0")
-      c.gsub! 'DatabaseDir "/var/lib/vnstat"', %(DatabaseDir "#{var}/db/vnstat")
-      c.gsub! 'LogFile "/var/log/vnstat/vnstat.log"', %(LogFile "#{var}/log/vnstat/vnstat.log")
-      c.gsub! 'PidFile "/var/run/vnstat/vnstat.pid"', %(PidFile "#{var}/run/vnstat/vnstat.pid")
-    end
-
-    (var/"db/vnstat").mkpath
-
-    system "make", "all", "-C", "src", "CFLAGS=#{ENV.cflags}", "CC=#{ENV.cc}"
-    etc.install "cfg/vnstat.conf"
-    bin.install "src/vnstat", "src/vnstatd", "src/vnstati"
-    man1.install "man/vnstat.1", "man/vnstatd.1", "man/vnstati.1"
-    man5.install "man/vnstat.conf.5"
+    system "./configure", "--disable-dependency-tracking",
+                          "--disable-silent-rules",
+                          "--prefix=#{prefix}",
+                          "--sysconfdir=#{etc}",
+                          "--sbindir=#{bin}",
+                          "--localstatedir=#{var}"
+    system "make", "install"
   end
 
-  plist_options :startup => true
+  def post_install
+    (var/"db/vnstat").mkpath
+    (var/"log/vnstat").mkpath
+    (var/"run/vnstat").mkpath
+  end
+
+  def caveats; <<-EOS.undent
+    To monitor interfaces other than "en0" edit #{etc}/vnstat.conf
+    EOS
+  end
+
+  plist_options :startup => true, :manual => "#{HOMEBREW_PREFIX}/opt/vnstat/bin/vnstatd --nodaemon --config #{HOMEBREW_PREFIX}/etc/vnstat.conf"
 
   def plist; <<-EOS.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -73,25 +62,12 @@ class Vnstat < Formula
         <true/>
         <key>RunAtLoad</key>
         <true/>
-        <key>UserName</key>
-        <string>$USER</string>
-        <key>GroupName</key>
-        <string>staff</string>
         <key>WorkingDirectory</key>
         <string>#{var}</string>
         <key>ProcessType</key>
         <string>Background</string>
       </dict>
     </plist>
-    EOS
-  end
-
-  def post_install
-    inreplace prefix/"homebrew.mxcl.vnstat.plist", "$USER", ENV["USER"]
-  end
-
-  def caveats; <<-EOS.undent
-    To monitor interfaces other than "en0" edit #{etc}/vnstat.conf
     EOS
   end
 

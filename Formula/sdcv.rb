@@ -1,13 +1,15 @@
 class Sdcv < Formula
   desc "StarDict Console Version"
-  homepage "http://sdcv.sourceforge.net/"
-  url "http://svn.code.sf.net/p/sdcv/code/trunk", :revision => "76"
-  version "0.5-2013-09-10"
+  homepage "https://dushistov.github.io/sdcv/"
+  url "https://github.com/Dushistov/sdcv/archive/v0.5.1.tar.gz"
+  sha256 "d0c64429547adb127d5ff9f0f0db8c4bc663bc413dfb5b5d32c924a67171c247"
+  version_scheme 1
+  head "https://github.com/Dushistov/sdcv.git"
 
   bottle do
-    sha256 "4d90fd23226a42bad21b652dc061feaf17d9340d35800e9806c00fa39161ae05" => :el_capitan
-    sha256 "36c6097ca4bf57f0d84235d9143a3ab5ec6e542e122e94dc83cf88af0b3fd187" => :yosemite
-    sha256 "c45cafd202569c4be52a68089a7fe1531dc7edc2a7b9bdd84b0749e7141cc6c6" => :mavericks
+    sha256 "e028819ccfe5e4f702cfc9853124380a5f4523de3f680f04a5cc6613ee720b4b" => :sierra
+    sha256 "d6ca2ae4117abc66cb6c9bc771114edcae9a62240e452e79caf02ea90f5e923b" => :el_capitan
+    sha256 "2a2b5cec3b4ec59d1b07d67a35cd69b13aa53a96a449a13031aeb9f1936385e5" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -25,5 +27,9 @@ class Sdcv < Formula
       system "make", "lang"
       system "make", "install"
     end
+  end
+
+  test do
+    system bin/"sdcv", "-h"
   end
 end

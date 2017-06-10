@@ -6,6 +6,7 @@ class UserspaceRcu < Formula
 
   bottle do
     cellar :any_skip_relocation
+    sha256 "933037283d61c47bf57df657d15cb9ad787be3150a93baf79e81f7c07d11d7c2" => :sierra
     sha256 "d0b393a777b07767cef195b897777e9b65d9186e4307a2ce5a20989082a97976" => :el_capitan
     sha256 "2842341210131cff185ace17b10599eaa002fc60407267322749191ae5fa1fdc" => :yosemite
     sha256 "03e24c928b31060eecb8de113be45f0ae8d70ee20073d481a2244d10ae4d1825" => :mavericks
@@ -17,9 +18,7 @@ class UserspaceRcu < Formula
             "--prefix=#{prefix}"]
     # workaround broken upstream detection of build platform
     # marked as wontfix: https://bugs.lttng.org/issues/578#note-1
-    if MacOS.prefer_64_bit?
-      args << "--build=#{Hardware::CPU.arch_64_bit}"
-    end
+    args << "--build=#{Hardware::CPU.arch_64_bit}" if MacOS.prefer_64_bit?
 
     # workaround broken syscall.h detection
     inreplace "urcu/syscall-compat.h", "defined(__sun__)", "defined(__APPLE__)"

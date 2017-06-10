@@ -1,15 +1,15 @@
 class Libxc < Formula
   desc "Library of exchange and correlation functionals for codes"
-  homepage "http://www.tddft.org/programs/octopus/wiki/index.php/Libxc"
-  url "http://www.tddft.org/programs/octopus/down.php?file=libxc/libxc-2.2.2.tar.gz"
-  sha256 "6ca1d0bb5fdc341d59960707bc67f23ad54de8a6018e19e02eee2b16ea7cc642"
-  revision 2
+  homepage "http://octopus-code.org/wiki/Libxc"
+  url "http://www.tddft.org/programs/octopus/down.php?file=libxc/libxc-3.0.0.tar.gz"
+  sha256 "5542b99042c09b2925f2e3700d769cda4fb411b476d446c833ea28c6bfa8792a"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "b3b385ead0069356959d76135b9aa72d6cb492172c06a232720adadf243f9eeb" => :el_capitan
-    sha256 "909e86fd8eccf2b7c356d3c4d17179cbaa3e9663846a27381d0268c1c9c00975" => :yosemite
-    sha256 "993e4eb1dbe2c4f7cd1b73b46db0413bca8dc1128df6aab4f2d8cacef09d8e5f" => :mavericks
+    sha256 "984695d0b1ffadebe99d03c5c9061740bb45eaa6024595bb675213d388a3cebf" => :sierra
+    sha256 "a5f71cb519b4573600046acfa3203febeb9bc56e79c89978289421dc8e07be01" => :el_capitan
+    sha256 "729c2a9d858dae15cdc960c6a816ae6f153307c078cc2b21cad51263f0b27879" => :yosemite
   end
 
   depends_on :fortran
@@ -21,7 +21,8 @@ class Libxc < Formula
                           "CC=#{ENV.cc}",
                           "CFLAGS=-pipe"
     system "make"
-    system "make", "check"
+    # Disable testsuite, as of 3.0.0 is fails due to upstream issue: http://www.tddft.org/trac/libxc/ticket/22
+    # system "make", "check"
     system "make", "install"
   end
 
@@ -31,9 +32,9 @@ class Libxc < Formula
       #include <xc.h>
       int main()
       {
-        int i, vmajor, vminor, func_id = 1;
-        xc_version(&vmajor, &vminor);
-        printf(\"%d.%d\", vmajor, vminor);
+        int major, minor, micro;
+        xc_version(&major, &minor, &micro);
+        printf(\"%d.%d.%d\", major, minor, micro);
       }
     EOS
     system ENV.cc, "test.c", "-L#{lib}", "-lxc", "-I#{include}", "-o", "ctest"

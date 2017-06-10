@@ -3,14 +3,13 @@ class Ledger < Formula
   homepage "http://ledger-cli.org"
   url "https://github.com/ledger/ledger/archive/v3.1.1.tar.gz"
   sha256 "90f06561ab692b192d46d67bc106158da9c6c6813cc3848b503243a9dfd8548a"
-  revision 2
-
+  revision 5
   head "https://github.com/ledger/ledger.git"
 
   bottle do
-    sha256 "1bddc195a2c4ef372d49514909b7bbd64854df93f001b83afa84308473865a0c" => :el_capitan
-    sha256 "d4b22fcc93fdc38bab12ea3599879ff1115fbc6ecbc635ec96873c37504e9aa7" => :yosemite
-    sha256 "3f37ce737a1eee0c8bb538620b0e9d8d7141512bc2e878ba84aaad807b50644f" => :mavericks
+    sha256 "abc57061514dc9adac0f0d12d714801c849379ee2877c61c63a7124cdd59184d" => :sierra
+    sha256 "505cd191fd460a03ec74f1f4ccffa476afe217474d3a0ecdc8943573872a2f5f" => :el_capitan
+    sha256 "85b6d65d8aee2bfc70fd79aac9f88728587ea9fe73bf661dfe09edfae140afa2" => :yosemite
   end
 
   deprecated_option "debug" => "with-debug"
@@ -34,7 +33,7 @@ class Ledger < Formula
   def install
     ENV.cxx11
 
-    flavor = (build.with? "debug") ? "debug" : "opt"
+    flavor = build.with?("debug") ? "debug" : "opt"
 
     args = %W[
       --jobs=#{ENV.make_jobs}

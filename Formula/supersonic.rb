@@ -1,27 +1,22 @@
 class Supersonic < Formula
   desc "C++ library providing a column oriented query engine"
-  homepage "https://code.google.com/p/supersonic/"
-  url "https://supersonic.googlecode.com/files/supersonic-0.9.4.tar.gz"
+  homepage "https://code.google.com/archive/p/supersonic/"
+  url "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/supersonic/supersonic-0.9.4.tar.gz"
   sha256 "1592dfd2dc73f0b97298e0d25e51528dc9a94e9e7f4ab525569f63db0442d769"
+  revision 5
 
   bottle do
-    revision 1
-    sha256 "cd76e23c748ec6cfb520800a1890e691680921efa4e6e1bf1dd991b0557e6d33" => :el_capitan
-    sha256 "75c8903d7d637aa495c83eb3a3569b627fbdf9799e907a7d0fff536cf3ddb155" => :yosemite
-    sha256 "c72cb21c7f1efc5a790be376e55dcc4a1edc76cda6686c2ba7d3d7f8c2937321" => :mavericks
-    sha256 "2869dba7bb685f7f6e4df504b87e01a7dda685afc3f27fa1c6010c150982317f" => :mountain_lion
-  end
-
-  if MacOS.version < :mavericks
-    depends_on "protobuf" => "c++11"
-    depends_on "boost" => "c++11"
-  else
-    depends_on "protobuf"
-    depends_on "boost"
+    cellar :any
+    sha256 "bcd421072c798bffb2a25452c2da9bccfede7f667613dca93b176985c6bceef2" => :sierra
+    sha256 "6c4a699c942caf9ea8db918150439175b3cbb96932065814b053ed17f5a839ff" => :el_capitan
+    sha256 "695a0c33541d27112415cc74aab5cc9a6e6f4ddfbf9b9f12dee165f62461bd96" => :yosemite
   end
 
   depends_on "pkg-config" => :build
+  depends_on "boost"
   depends_on "glog"
+  depends_on "gflags"
+  depends_on "protobuf"
 
   needs :cxx11
 

@@ -1,33 +1,28 @@
 class Sleuthkit < Formula
   desc "Forensic toolkit"
-  homepage "http://www.sleuthkit.org/"
-  url "https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.3.0.tar.gz"
-  sha256 "64a57a44955e91300e1ae69b34e8702afda0fb5bd72e2116429875c9f5f28980"
-  head "https://github.com/sleuthkit/sleuthkit.git", :branch => "develop"
+  homepage "https://www.sleuthkit.org/"
+  url "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.4.0/sleuthkit-4.4.0.tar.gz"
+  sha256 "7d252562622f657001e080777c5fe1fd919b952fa3d658c86a62e57b6ad70f57"
 
   bottle do
     cellar :any
-    sha256 "94a181b0a105afdf4540c13427df2a082d80130ceed8f5b2e3bc840d4d9d282f" => :el_capitan
-    sha256 "f5b10d0269c943ea948386d2fe82ab7b5e8bf10d961889f1c5960c5eff0f08cc" => :yosemite
-    sha256 "c6045be0a652903ab303584e521aaae53a7fdb82af2b008408017749a22beacb" => :mavericks
+    sha256 "0b72a29c6fd822efd9a0185a9f5e144919b3e470e30fc7c8ce9313e7b7943e3f" => :sierra
+    sha256 "d6c18c4e452c01c2cc451c4cbd7f2553ae338749448836913303bdf7cb1afff2" => :el_capitan
+    sha256 "69843bf2119ca3851d07b79e5cde093eb9ac4ace1d3237a54e91c62212fdc680" => :yosemite
   end
-
-  conflicts_with "irods", :because => "both install `ils`"
 
   option "with-jni", "Build Sleuthkit with JNI bindings"
   option "with-debug", "Build debug version"
+
+  depends_on "afflib" => :optional
+  depends_on "libewf" => :optional
 
   if build.with? "jni"
     depends_on :java
     depends_on :ant => :build
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "afflib" => :optional
-  depends_on "libewf" => :optional
-
+  conflicts_with "irods", :because => "both install `ils`"
   conflicts_with "ffind",
     :because => "both install a 'ffind' executable."
 
@@ -35,10 +30,10 @@ class Sleuthkit < Formula
     ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
     ENV.java_cache if build.with? "jni"
 
-    system "./bootstrap"
-    system "./configure", "--disable-dependency-tracking",
-                          if build.without? "jni" then "--disable-java" end,
-                          "--prefix=#{prefix}"
+    args = ["--disable-dependency-tracking", "--prefix=#{prefix}"]
+    args << "--disable-java" if build.without? "jni"
+
+    system "./configure", *args
     system "make"
     system "make", "install"
 

@@ -7,7 +7,8 @@ class Nacl < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 2
+    rebuild 2
+    sha256 "86e5ef1c0a14b029d1ed3f63df48fde9c302adbbc3e1dcacd1bb7617bf547615" => :sierra
     sha256 "e08c93b814989405fa3b7db9e3a9c4f149e36aaab32aba44e9a2f1659d2d3efd" => :el_capitan
     sha256 "1a1a7fffc6d41f2f7bcc393375f2907f63b5a13f9414fe0827daef96246301e7" => :yosemite
     sha256 "44bbb2d7cb0daa6eb06c79e5881ae827786a04dece9b4a34cb0a6ea06cddb1e1" => :mavericks
@@ -26,17 +27,14 @@ class Nacl < Formula
 
     system "./do" # This takes a while since it builds *everything*
 
-    # NaCL has an odd compilation model (software by djb, who'da thunk it?)
-    # and installs the resulting binaries in a directory like:
+    # NaCL has an odd compilation model and installs the resulting
+    # binaries in a directory like:
     #    <nacl source>/build/<hostname>/lib/<arch>/libnacl.a
     #    <nacl source>/build/<hostname>/include/<arch>/crypto_box.h
-    # etc. Each of these is optimized for the specific hardware it's
-    # compiled on.
     #
     # It also builds both x86 and x86_64 copies if your compiler can
-    # handle it. Here we only install one copy, based on if you're a
-    # 64bit system or not. A --universal could come later though I guess.
-    archstr = Hardware.is_64_bit? ? "amd64" : "x86"
+    # handle it, but we install only one.
+    archstr = Hardware::CPU.is_64_bit? ? "amd64" : "x86"
 
     # Don't include cpucycles.h
     include.install Dir["build/brew/include/#{archstr}/crypto_*.h"]

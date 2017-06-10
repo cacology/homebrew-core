@@ -1,31 +1,33 @@
 class Cayley < Formula
   desc "Graph database inspired by Freebase and Knowledge Graph"
-  homepage "https://github.com/google/cayley"
-  url "https://github.com/google/cayley/archive/v0.5.0.tar.gz"
-  sha256 "2f48445377bc73b125a7f65c01307fa301e4996e536fa83b42a2fcbaa2141e82"
+  homepage "https://github.com/cayleygraph/cayley"
+  url "https://github.com/cayleygraph/cayley/archive/v0.6.1.tar.gz"
+  sha256 "33cfa8ef35813cf833ae79ba8ac2fab7f4c63afaf6103a54d969265e283d3399"
   head "https://github.com/google/cayley.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "534940e21466304d1cd3f41bcd6c16b428567dc568f9ab6fb50b1141eae9d2b6" => :el_capitan
-    sha256 "75b8e3c300a50bf85e9d6aa394313aeed9a5e12d39258343dcb3c6dbad2fc013" => :yosemite
-    sha256 "b4e736e73826c1c1caafc5b6fca77be722bb6f0d7b30c8d8e77646bf6e621269" => :mavericks
+    sha256 "742760d4a2fb4275a0d719df7a700e7ad4b826165a29dfb201ff09a8bfeba0fb" => :sierra
+    sha256 "4fd6749b962972990f870fc88556c48a21eb27dcc176149c0c8e0f2cf796c61e" => :el_capitan
+    sha256 "0094bc69ee5b69af082b1c73269df76956535b45fcd4984cc1bf0c90c69a3420" => :yosemite
   end
 
   option "without-samples", "Don't install sample data"
 
   depends_on "bazaar" => :build
   depends_on :hg => :build
+  depends_on "glide" => :build
   depends_on "go" => :build
-  depends_on "godep" => :build
 
   def install
     ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/google/cayley").install buildpath.children
-    cd "src/github.com/google/cayley" do
-      system "godep", "restore"
-      system "go", "build", "-ldflags=-X main.Version=#{version}", "cmd/cayley/cayley.go"
-      bin.install "cayley"
+    ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
+
+    (buildpath/"src/github.com/cayleygraph/cayley").install buildpath.children
+    cd "src/github.com/cayleygraph/cayley" do
+      system "glide", "install"
+      system "go", "build", "-o", bin/"cayley", "-ldflags",
+             "-X main.Version=#{version}", ".../cmd/cayley"
 
       inreplace "cayley.cfg.example", "/tmp/cayley_test", var/"cayley"
       etc.install "cayley.cfg.example" => "cayley.conf"

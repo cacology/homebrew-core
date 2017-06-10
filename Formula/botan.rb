@@ -1,24 +1,14 @@
 class Botan < Formula
   desc "Cryptographic algorithms and formats library in C++"
   homepage "https://botan.randombit.net/"
-
-  stable do
-    url "https://botan.randombit.net/releases/Botan-1.10.12.tgz"
-    sha256 "affc3a79919577943f896e64d3e4a4dcc4970c5bf80cc98c7f3a3144745eac27"
-    # upstream ticket: https://bugs.randombit.net/show_bug.cgi?id=267
-    patch :DATA
-  end
+  url "https://botan.randombit.net/releases/Botan-2.1.0.tgz"
+  sha256 "460f2d7205aed113f898df4947b1f66ccf8d080eec7dac229ef0b754c9ad6294"
+  head "https://github.com/randombit/botan.git"
 
   bottle do
-    cellar :any
-    sha256 "b7d45a848fead326d2e0a1dfbcacfd3c73bf0ad4b2ab62611cf78912db4053a7" => :el_capitan
-    sha256 "8dad1bfd83f841d095102056e3b4b769041b4abcb7bd126528f75259cd24f5ff" => :yosemite
-    sha256 "521e1f6578e799f5738c28bfd635cba3f210d777d019a240092bbf912ef83699" => :mavericks
-  end
-
-  devel do
-    url "https://botan.randombit.net/releases/Botan-1.11.30.tgz"
-    sha256 "8daf3adc8eb3b046ab4678beca5aef07af900c7781ddc88b10d1d966de66a125"
+    sha256 "b40addf39ec157733de0b941ddea7c2b91af994b18c28565ccf307d141d9a9b4" => :sierra
+    sha256 "5b3337a48e4ffb9d3134d776af7e265e9979903d7ba7a9507aca38708ed41918" => :el_capitan
+    sha256 "b5209d8069b0b3832be573a3109b63347cea6e8be90f01546cf0915755fd8c5b" => :yosemite
   end
 
   option "with-debug", "Enable debug build of Botan"
@@ -28,10 +18,10 @@ class Botan < Formula
   depends_on "pkg-config" => :build
   depends_on "openssl"
 
-  needs :cxx11 if build.devel?
+  needs :cxx11
 
   def install
-    ENV.cxx11 if build.devel?
+    ENV.cxx11
 
     args = %W[
       --prefix=#{prefix}
@@ -53,26 +43,8 @@ class Botan < Formula
   end
 
   test do
-    # stable version doesn't have `botan` executable
-    if !File.exist? bin/"botan"
-      assert_match "lcrypto", shell_output("#{bin}/botan-config-1.10 --libs")
-    else
-      assert_match /\A-----BEGIN PRIVATE KEY-----/,
-       shell_output("#{bin}/botan keygen")
-    end
+    (testpath/"test.txt").write "Homebrew"
+    (testpath/"testout.txt").write Utils.popen_read("#{bin}/botan base64_enc test.txt")
+    assert_match "Homebrew", shell_output("#{bin}/botan base64_dec testout.txt")
   end
 end
-
-__END__
---- a/src/build-data/makefile/unix_shr.in
-+++ b/src/build-data/makefile/unix_shr.in
-@@ -57,8 +57,8 @@
- LIBNAME       = %{lib_prefix}libbotan
- STATIC_LIB    = $(LIBNAME)-$(SERIES).a
-
--SONAME        = $(LIBNAME)-$(SERIES).%{so_suffix}.%{so_abi_rev}
--SHARED_LIB    = $(SONAME).%{version_patch}
-+SONAME        = $(LIBNAME)-$(SERIES).%{so_abi_rev}.%{so_suffix}
-+SHARED_LIB    = $(LIBNAME)-$(SERIES).%{so_abi_rev}.%{version_patch}.%{so_suffix}
-
- SYMLINK       = $(LIBNAME)-$(SERIES).%{so_suffix}

@@ -1,15 +1,14 @@
 class ThePlatinumSearcher < Formula
   desc "Multi-platform code-search similar to ack and ag"
   homepage "https://github.com/monochromegane/the_platinum_searcher"
-  url "https://github.com/monochromegane/the_platinum_searcher/archive/v2.1.3.tar.gz"
-  sha256 "b12f259fcb51ff9d9770b3c3693fa31fd4f9aaac140ed09fe4617c53a6329771"
+  url "https://github.com/monochromegane/the_platinum_searcher/archive/v2.1.5.tar.gz"
+  sha256 "dfed3b92f35501d063a2c646d5dfd51f2ee12cee53dd9e1d04a6c7710b71050f"
   head "https://github.com/monochromegane/the_platinum_searcher.git"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "b869dd3e8f0bb6441c192f5354b0ba9276ab8d76cf56318b5e5739f1f7622735" => :el_capitan
-    sha256 "17487b135f34dc5dd659dd88675a91027f03e95d7522acfb71b2700561230e74" => :yosemite
-    sha256 "78b98b1cedce81d3b508c7f00aa4c6b475f1a1c51989426f9298c48f5fb679d3" => :mavericks
+    sha256 "081c4a087043d368597933f4ccea9e85d8302a3961940527780138e19ea1648a" => :sierra
+    sha256 "087aaf0fc00872ca2f764fcc44d474f4dd03b3f78eace1b60fa269761ccfb7da" => :el_capitan
+    sha256 "3421b685e500033f24120ae6b80ca7f932eb476b4a85cfb4813447f36ec6bcb6" => :yosemite
   end
 
   depends_on "go" => :build
@@ -18,11 +17,11 @@ class ThePlatinumSearcher < Formula
   def install
     ENV["GOPATH"] = buildpath
     dir = buildpath/"src/github.com/monochromegane/the_platinum_searcher"
-    dir.install Dir["*"]
-    ln_s buildpath/"src", dir
+    dir.install buildpath.children
     cd dir do
       system "godep", "restore"
-      system "go", "build", "-o", bin/"pt", "cmd/pt/main.go"
+      system "go", "build", "-o", bin/"pt", ".../cmd/pt"
+      prefix.install_metafiles
     end
   end
 

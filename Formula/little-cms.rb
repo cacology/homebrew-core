@@ -6,21 +6,19 @@ class LittleCms < Formula
 
   bottle do
     cellar :any
-    revision 1
+    rebuild 1
+    sha256 "9d7cd298c7d0b89d2cc33ac73c87104bda7ed42ebf7ef55ec26079eda5c29db5" => :sierra
     sha256 "c1dd6107f2d5e565f35e8358bd968ba7161ad3809d1b5bab4a412d3f01ec874f" => :el_capitan
     sha256 "48da368fcf57745e933d4022dbd1d64b79a66eeaa76064ceb6f6c4e792fde776" => :yosemite
     sha256 "175c804307189d9d0d700a423d6daa9d839ec5d3038145f311f436bd1aa71392" => :mavericks
     sha256 "0d2af3b585f79b60e617301d5251a19114e14f82b5b75f3feda5be11c09404da" => :mountain_lion
   end
 
-  option :universal
-
   depends_on :python => :optional
   depends_on "jpeg" => :recommended
   depends_on "libtiff" => :recommended
 
   def install
-    ENV.universal_binary if build.universal?
     args = %W[--disable-dependency-tracking --disable-debug --prefix=#{prefix}]
     args << "--without-tiff" if build.without? "libtiff"
     args << "--without-jpeg" if build.without? "jpeg"

@@ -1,21 +1,17 @@
 class Jansson < Formula
   desc "C library for encoding, decoding, and manipulating JSON"
   homepage "http://www.digip.org/jansson/"
-  url "http://www.digip.org/jansson/releases/jansson-2.7.tar.gz"
-  sha256 "7905e6590fb316c0ff943df3dc6a21cd81a59cff7a6d12514054c359d04d78d7"
+  url "http://www.digip.org/jansson/releases/jansson-2.10.tar.gz"
+  sha256 "78215ad1e277b42681404c1d66870097a50eb084be9d771b1d15576575cf6447"
 
   bottle do
     cellar :any
-    sha256 "dfcc2f484a285f9a0119e7011702363c5516aaed22a9e4de4d83279e543c98cf" => :el_capitan
-    sha256 "6b677bb3c1c65b8aae38bec61cdd469c1e3795e89490a3d534ca54034e6fce28" => :yosemite
-    sha256 "458c67bd7a25098a2bebd907d8b3271b8044899eaf6ecfc7af55389e23540f91" => :mavericks
-    sha256 "b83b62962a3d35669812dc83572860cf783b8eec6974887963a7e0f1c65fb138" => :mountain_lion
+    sha256 "701c9253fb60487c94b4840a57621d5faf6ad1a8d0659ae6a419e57b5bd94ced" => :sierra
+    sha256 "a51789b3b30f9e70232f9e872b08b5367caa5d027f7a8a72ed92c2ef68c432b7" => :el_capitan
+    sha256 "4fabfb2143c27b4460560af12a459180221f097ad69ed95e86cf082b436d4950" => :yosemite
   end
 
-  option :universal
-
   def install
-    ENV.universal_binary if build.universal?
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "install"

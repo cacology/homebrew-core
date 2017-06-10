@@ -1,15 +1,16 @@
 class Offlineimap < Formula
   desc "Synchronizes emails between two repositories"
   homepage "http://offlineimap.org/"
-  url "https://github.com/OfflineIMAP/offlineimap/archive/v7.0.6.tar.gz"
-  sha256 "f50002d0760794f1190526b74e2010becc16d2ff541526aadc95ec11cb064fd7"
+  url "https://github.com/OfflineIMAP/offlineimap/archive/v7.1.1.tar.gz"
+  sha256 "a624f8a77eae664dd458be47c5306c28911d4a1f788ff5641d7bb37e01ecb703"
+  revision 1
   head "https://github.com/OfflineIMAP/offlineimap.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "884d3b223bcba745bce8f6f430cbd5ce2bddef7c4d594f8685288eee8b957462" => :el_capitan
-    sha256 "8653dd2abfa332cf39003da977720115d71adb57ea75529269ab6cd9a4574292" => :yosemite
-    sha256 "8653dd2abfa332cf39003da977720115d71adb57ea75529269ab6cd9a4574292" => :mavericks
+    sha256 "99db47aadb9ba9ae42127cbe7c549d8ed3e2276f50d122375a1c7488b213a8ab" => :sierra
+    sha256 "b743e423432e73d384c743af6391714c686baf5dc90d7c40920546e82538fb00" => :el_capitan
+    sha256 "b743e423432e73d384c743af6391714c686baf5dc90d7c40920546e82538fb00" => :yosemite
   end
 
   resource "six" do
@@ -58,6 +59,8 @@ class Offlineimap < Formula
         <key>ProgramArguments</key>
         <array>
           <string>#{opt_bin}/offlineimap</string>
+          <string>-u</string>
+          <string>basic</string>
         </array>
         <key>StartInterval</key>
         <integer>300</integer>

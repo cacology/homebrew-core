@@ -1,20 +1,20 @@
 class Snapraid < Formula
   desc "Backup program for disk arrays"
-  homepage "http://snapraid.sourceforge.net/"
-  url "https://github.com/amadvance/snapraid/releases/download/v10.0/snapraid-10.0.tar.gz"
-  sha256 "f7dcf19480256fc2c1db9ab976aa12f786e76da6044cc397f0451524e8031ad6"
+  homepage "https://snapraid.sourceforge.io/"
+  url "https://github.com/amadvance/snapraid/releases/download/v11.1/snapraid-11.1.tar.gz"
+  sha256 "b9acafeb6cece61fd426f08362b596ba89eea0564231955b82156fd09c0e6884"
+
+  bottle do
+    sha256 "ee0f9a795f2fa1af515eee0733f7e9d20e10fe2971057264d54f748faebbb845" => :sierra
+    sha256 "ccff98a96d5136cbe1e8e64f50190100e909fa194ff623b4adf7e18b3dc201fd" => :el_capitan
+    sha256 "fcf97bda192b15c62638304046aef135f23766f6b9cfd0fa75e643fe69005251" => :yosemite
+  end
 
   head do
     url "https://github.com/amadvance/snapraid.git"
+
     depends_on "automake" => :build
     depends_on "autoconf" => :build
-  end
-
-  bottle do
-    cellar :any_skip_relocation
-    sha256 "ffa69724c9970b59d658a9c5dafd59b2cce7180219da4960de215dd106a20001" => :el_capitan
-    sha256 "4cc74d39c187216544ebb319b1ed6537198456551725b8f15e5397be687854af" => :yosemite
-    sha256 "bb60bddade2e2b5cfa7df974c7d8aabc1819c00ab2a98694c87d86ed9abbf804" => :mavericks
   end
 
   def install

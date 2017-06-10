@@ -1,10 +1,12 @@
 class Antlr < Formula
-  desc "ANTLR: ANother Tool for Language Recognition"
+  desc "ANother Tool for Language Recognition"
   homepage "http://www.antlr.org/"
-  url "http://www.antlr.org/download/antlr-4.5.2-complete.jar"
-  sha256 "23e975fac2c464f4366c50288151d66efc1c13552c123aeb77c9e1e695772e4e"
+  url "http://www.antlr.org/download/antlr-4.7-complete.jar"
+  sha256 "cd8bc38c2b72426f8d5922843c1b8ffcd0238fa34722597a944a153d8c570864"
 
   bottle :unneeded
+
+  depends_on :java
 
   def install
     prefix.install "antlr-#{version}-complete.jar"

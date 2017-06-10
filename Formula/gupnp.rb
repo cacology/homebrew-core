@@ -1,13 +1,13 @@
 class Gupnp < Formula
   desc "Framework for creating UPnP devices and control points"
   homepage "https://wiki.gnome.org/Projects/GUPnP"
-  url "https://download.gnome.org/sources/gupnp/0.20/gupnp-0.20.18.tar.xz"
-  sha256 "c5e0e11061f8d0ff9c8dccc196f39c45a49c0153c9a72abf6290ab34d1cbb021"
+  url "https://download.gnome.org/sources/gupnp/1.0/gupnp-1.0.2.tar.xz"
+  sha256 "5173fda779111c6b01cd4a5e41b594322be9d04f8c74d3361f0a0c2069c77610"
 
   bottle do
-    sha256 "d001100930682f16f02be41260e241eb36293917cd04e2ebf51ebdf17565e8f3" => :el_capitan
-    sha256 "b4cfe76606af6c4742552451854828bf4878af685c76c7702b5fa7cf92a67c38" => :yosemite
-    sha256 "79e1a069bf64d7281e09bd21b3ffee1155aab0760e733d18d0f15a6c5fd94e8c" => :mavericks
+    sha256 "28afff235b826e62bfd7133394b91a4b3746c3bf591efb5eb35767978e6e5f9a" => :sierra
+    sha256 "122ab1bd5cd7864e3ba5e8242d62fc4d1a46fe3827801751c967c4877958a19d" => :el_capitan
+    sha256 "c75c47821df5392618b6ce7f438f509e5c6833fe7f60f6657b3081adf537da37" => :yosemite
   end
 
   head do
@@ -26,13 +26,6 @@ class Gupnp < Formula
   depends_on "glib"
   depends_on "libsoup"
   depends_on "gssdp"
-
-  # REVIEW: if patch was applied in the next release
-  # https://github.com/GNOME/gupnp/pull/1
-  patch :p0 do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/51584eb/gupnp/patch-osx-uuid.diff"
-    sha256 "9cca169cc830c331ac4246e0e87f5c0b47a85b045c4a0de7cd4999d89d2ab5ce"
-  end
 
   def install
     args = %W[
@@ -76,7 +69,7 @@ class Gupnp < Formula
     EOS
     system ENV.cc, "-I#{include}/gupnp-1.0", "-L#{lib}", "-lgupnp-1.0",
            "-I#{Formula["gssdp"].opt_include}/gssdp-1.0",
-           "-I#{Formula["gssdp"].opt_lib}", "-lgssdp-1.0",
+           "-L#{Formula["gssdp"].opt_lib}", "-lgssdp-1.0",
            "-I#{Formula["glib"].opt_include}/glib-2.0",
            "-I#{Formula["glib"].opt_lib}/glib-2.0/include",
            "-lglib-2.0", "-lgobject-2.0",

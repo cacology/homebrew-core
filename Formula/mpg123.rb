@@ -1,15 +1,14 @@
 class Mpg123 < Formula
   desc "MP3 player for Linux and UNIX"
   homepage "https://www.mpg123.de/"
-  url "https://www.mpg123.de/download/mpg123-1.23.6.tar.bz2"
-  mirror "https://mpg123.orgis.org/download/mpg123-1.23.6.tar.bz2"
-  sha256 "4073d9c60a43872f6f5a3a322f5ea21ab7f0869d2ed25e79c3eb8521fa3c32d4"
+  url "https://www.mpg123.de/download/mpg123-1.25.0.tar.bz2"
+  mirror "https://mpg123.orgis.org/download/mpg123-1.25.0.tar.bz2"
+  sha256 "552e3e1db045e00f474252917007795ac295863fc8b13891859b3382d2f24e48"
 
   bottle do
-    cellar :any
-    sha256 "bdf3414a597053ca410a5fcecf26b83db90f5af841016b20a4d7346c97ef5632" => :el_capitan
-    sha256 "35ce9d91de57ed29a6e97212fc106af5c3d3f73797133889d18d091137ec3443" => :yosemite
-    sha256 "d7951ac7646e779ba5a2c7a35bc48a788e1b4e435480d9e2aeef858ca27835fa" => :mavericks
+    sha256 "53e98bf1310af7848cf88bb67d85d625e60f1418a61861a5c65d7751c3659591" => :sierra
+    sha256 "58c6414620f1d4f5a139ab7355071818478f0f1994a471e6ab0ec2f8d85d95bf" => :el_capitan
+    sha256 "641ddef48874cdff2f03c6e2d827df76a8a9b4b5824a394962a7c9c519c5decf" => :yosemite
   end
 
   def install
@@ -32,6 +31,6 @@ class Mpg123 < Formula
   end
 
   test do
-    system bin/"mpg123", test_fixtures("test.mp3")
+    system bin/"mpg123", "--test", test_fixtures("test.mp3")
   end
 end

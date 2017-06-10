@@ -1,26 +1,45 @@
+class CodesignRequirement < Requirement
+  include FileUtils
+  fatal true
+
+  satisfy(:build_env => false) do
+    mktemp do
+      cp "/usr/bin/false", "radare2_check"
+      quiet_system "/usr/bin/codesign", "-f", "-s", "org.radare.radare2", "--dryrun", "radare2_check"
+    end
+  end
+
+  def message
+    <<-EOS.undent
+      org.radare.radare2 identity must be available to build with automated signing.
+      See: https://github.com/radare/radare2/blob/master/doc/osx.md
+    EOS
+  end
+end
+
 class Radare2 < Formula
   desc "Reverse engineering framework"
-  homepage "http://radare.org"
+  homepage "https://radare.org"
 
   stable do
-    url "http://www.radare.org/get/radare2-0.10.5.tar.xz"
-    sha256 "e534e89b1ddc06b962766fab1d9a8c6957ce1eeac4b6babdd0cd3345c6d14ca5"
+    url "http://cloud.radare.org/get/1.5.0/radare2-1.5.0.tar.gz"
+    sha256 "cf79fa776a37bc835481c235df740900c1e7b5fbd1fb9029383cc4268c3c85aa"
 
     resource "bindings" do
-      url "http://www.radare.org/get/radare2-bindings-0.10.5.tar.xz"
-      sha256 "04eb9a31e752d393e240a5d2e77f6313f1e5b7ccf7471e6fea2d346781173fb1"
+      url "http://cloud.radare.org/get/1.5.0/radare2-bindings-1.5.0.tar.gz"
+      sha256 "466ec7c80f849b0a0460943bdf0a4ae0f1195f7e0cd6173a350c0e25b370a262"
     end
 
     resource "extras" do
-      url "http://www.radare.org/get/radare2-extras-0.10.5.tar.xz"
-      sha256 "2dd23a4ab8f787f47b22cdd0df76d7b575a80e9afaf0ee95a553deaaba65e6f6"
+      url "http://cloud.radare.org/get/1.5.0/radare2-extras-1.5.0.tar.gz"
+      sha256 "fe7ba0b85101b65fc9c7dea2206729094b1bfc4c88a45478c7869f9f590bd815"
     end
   end
 
   bottle do
-    sha256 "9eb9eb34f22803323480de1af7ca57336cda9d51429901772b94d1d223a0d10f" => :el_capitan
-    sha256 "9795fb8f8091df0cb505767d6cb9c2f6c7b9f9a0b3d19d99778cf0c86c2bfa46" => :yosemite
-    sha256 "faef9e723a152abaf0e1e11dba293a203a1801fd7e2c8420ce59fc83ad5546c7" => :mavericks
+    sha256 "1142a0e06c2821dfcb22b82597d5c816ef651e919aaa4b6c9fd97ad565dd4161" => :sierra
+    sha256 "b53dcc14175d61c058805bd89b5c3d6d961471241b1b9db3adfc87cf80ad9fdb" => :el_capitan
+    sha256 "0331eca2d40eb729c3d05a6865a14a6dcd9d9287d9d63b9d15dcbda93c65d957" => :yosemite
   end
 
   head do
@@ -35,6 +54,8 @@ class Radare2 < Formula
     end
   end
 
+  option "with-code-signing", "Codesign executables to provide unprivileged process attachment"
+
   depends_on "pkg-config" => :build
   depends_on "valabind" => :build
   depends_on "swig" => :build
@@ -42,14 +63,22 @@ class Radare2 < Formula
   depends_on "gmp"
   depends_on "libewf"
   depends_on "libmagic"
-  depends_on "lua51" # It seems to latch onto Lua51 rather than Lua. Enquire this upstream.
+  depends_on "lua"
   depends_on "openssl"
   depends_on "yara"
+
+  depends_on CodesignRequirement if build.with? "code-signing"
 
   def install
     # Build Radare2 before bindings, otherwise compile = nope.
     system "./configure", "--prefix=#{prefix}", "--with-openssl"
     system "make", "CS_PATCHES=0"
+    if build.with? "code-signing"
+      # Brew changes the HOME directory which breaks codesign
+      home = `eval printf "~$USER"`
+      system "make", "HOME=#{home}", "-C", "binr/radare2", "osxsign"
+      system "make", "HOME=#{home}", "-C", "binr/radare2", "osx-sign-libs"
+    end
     system "make", "install"
 
     resource("extras").stage do
@@ -67,7 +96,7 @@ class Radare2 < Formula
 
       # Language versions.
       perl_version = `/usr/bin/perl -e 'printf "%vd", $^V;'`
-      lua_version = "5.1"
+      lua_version = Formula["lua"].version.to_s.match(/\d\.\d/)
 
       # Lazily bind to Python.
       inreplace "do-swig.sh", "VALABINDFLAGS=\"\"", "VALABINDFLAGS=\"--nolibpython\""

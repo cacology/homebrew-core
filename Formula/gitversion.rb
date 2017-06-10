@@ -1,8 +1,8 @@
 class Gitversion < Formula
   desc "Easy semantic versioning for projects using Git"
   homepage "https://github.com/GitTools/GitVersion"
-  url "https://www.nuget.org/api/v2/package/GitVersion.CommandLine/3.6.2"
-  sha256 "db05ebacfb76ddca26180f0c70060fbb89800e434d3d55b524785d0da37dbac8"
+  url "https://github.com/GitTools/GitVersion/releases/download/v3.6.5/GitVersion_3.6.5.zip"
+  sha256 "6f119c065a6bd9a3298a6d2a3cd97c83278d9031b5171f74d032eea38e090f13"
 
   bottle :unneeded
 
@@ -12,7 +12,7 @@ class Gitversion < Formula
     libexec.install Dir["*"]
     (bin/"gitversion").write <<-EOS.undent
       #!/bin/sh
-      exec "mono" "#{libexec}/tools/GitVersion.exe" "$@"
+      exec "mono" "#{libexec}/GitVersion.exe" "$@"
     EOS
   end
 

@@ -1,42 +1,19 @@
-require "language/go"
-
 class Oauth2Proxy < Formula
   desc "Reverse proxy for authenticating users via OAuth 2 providers"
   homepage "https://github.com/bitly/oauth2_proxy"
-  url "https://github.com/bitly/oauth2_proxy/archive/v2.0.1.tar.gz"
-  sha256 "febc33244d63f69a4c973e4ff2556fea2bc414308ce9979fb43db5863da87b5a"
-  revision 1
-
+  url "https://github.com/bitly/oauth2_proxy/archive/v2.2.tar.gz"
+  sha256 "dae9bae213ccf2a98bf36177e04c1edf4688989c58c383525258956679ddcc19"
   head "https://github.com/bitly/oauth2_proxy.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "98d6783ca3f454f8945ee7c7883fbcfdaaec905b214574d69877e73377de6808" => :el_capitan
-    sha256 "62eb8eb999d08ef5fcbf2fc29880fe8a630dd96d68065d88ed3753f046914b86" => :yosemite
-    sha256 "3da19e1f136c42d9cac3c0a7b3807b113f4c66323fd5b073bd3459749d630907" => :mavericks
+    sha256 "48fde51ae6c8f7c1ea348526117953ced48616c0e9a7678867c31998fdc13612" => :sierra
+    sha256 "56c173bc0afde492037cd5c572ae600562058ae0c9c0dc8b0155d902332bbe37" => :el_capitan
+    sha256 "bf940346696e4c891da94647640886d5aa78c261649730ddb08bc7efc3bea63e" => :yosemite
   end
 
   depends_on "go" => :build
-
-  go_resource "github.com/BurntSushi/toml" do
-    url "https://github.com/BurntSushi/toml.git",
-      :revision => "056c9bc7be7190eaa7715723883caffa5f8fa3e4"
-  end
-
-  go_resource "github.com/bitly/go-simplejson" do
-    url "https://github.com/bitly/go-simplejson.git",
-      :revision => "18db6e68d8fd9cbf2e8ebe4c81a78b96fd9bf05a"
-  end
-
-  go_resource "github.com/mreiferson/go-options" do
-    url "https://github.com/mreiferson/go-options.git",
-      :revision => "7c174072188d0cfbe6f01bb457626abb22bdff52"
-  end
-
-  go_resource "gopkg.in/fsnotify.v1" do
-    url "https://gopkg.in/fsnotify.v1.git",
-      :revision => "96c060f6a6b7e0d6f75fddd10efeaca3e5d1bcb0"
-  end
+  depends_on "gpm" => :build
 
   def install
     mkdir_p "#{buildpath}/src/github.com/bitly"
@@ -44,9 +21,8 @@ class Oauth2Proxy < Formula
 
     ENV["GOPATH"] = buildpath
 
-    Language::Go.stage_deps resources, buildpath/"src"
+    system "gpm", "install"
     system "go", "build", "-o", "#{bin}/oauth2_proxy"
-    doc.install "README.md"
     (etc/"oauth2_proxy").install "contrib/oauth2_proxy.cfg.example"
   end
 
@@ -55,37 +31,7 @@ class Oauth2Proxy < Formula
     EOS
   end
 
-  test do
-    require "socket"
-    require "timeout"
-
-    # Get an unused TCP port.
-    server = TCPServer.new(0)
-    port = server.addr[1]
-    server.close
-
-    pid = fork do
-      exec "#{bin}/oauth2_proxy",
-        "--client-id=testing",
-        "--client-secret=testing",
-        "--cookie-secret=testing",
-        "--http-address=127.0.0.1:#{port}",
-        "--upstream=127.0.0.1:1234"
-    end
-
-    begin
-      Timeout.timeout(10) do
-        loop do
-          Utils.popen_read "curl", "-s", "http://127.0.0.1:#{port}"
-          break if $?.exitstatus == 0
-          sleep 1
-        end
-      end
-    ensure
-      Process.kill("TERM", pid)
-      Process.wait(pid)
-    end
-  end
+  plist_options :manual => "oauth2_proxy"
 
   def plist; <<-EOS.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -108,5 +54,38 @@ class Oauth2Proxy < Formula
       </dict>
     </plist>
     EOS
+  end
+
+  test do
+    require "socket"
+    require "timeout"
+
+    # Get an unused TCP port.
+    server = TCPServer.new(0)
+    port = server.addr[1]
+    server.close
+
+    pid = fork do
+      exec "#{bin}/oauth2_proxy",
+        "--client-id=testing",
+        "--client-secret=testing",
+        "--cookie-secret=testing",
+        "--http-address=127.0.0.1:#{port}",
+        "--upstream=file:///tmp",
+        "-email-domain=*"
+    end
+
+    begin
+      Timeout.timeout(10) do
+        loop do
+          Utils.popen_read "curl", "-s", "http://127.0.0.1:#{port}"
+          break if $?.exitstatus.zero?
+          sleep 1
+        end
+      end
+    ensure
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+    end
   end
 end

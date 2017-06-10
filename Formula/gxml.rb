@@ -1,13 +1,13 @@
 class Gxml < Formula
   desc "GObject-based XML DOM API"
   homepage "https://wiki.gnome.org/GXml"
-  url "https://download.gnome.org/sources/gxml/0.8/gxml-0.8.0.tar.xz"
-  sha256 "fb255f09eefce063a94c3e9b46dbd9d87aca48ee443adf749ea0ced0ddaaf833"
+  url "https://download.gnome.org/sources/gxml/0.14/gxml-0.14.3.tar.xz"
+  sha256 "b4f9739f924fefc90dd5d54da7680a50377bfba1342bd16436ab387c631e3b41"
 
   bottle do
-    sha256 "4114add97335434a435451824cd470ee2d958b991ad76be4b100afb5173a0b84" => :el_capitan
-    sha256 "d6fabfe3e414d468938b5a2fbb93dabd7693be318daf98cfd7ff1baf69175836" => :yosemite
-    sha256 "e2e1625a88c4d8c1a275f9b1f1735ee407da98c84ce85234c07843de07f317e6" => :mavericks
+    sha256 "0822d594967ff897b5da4f78312bcb4acaa0ffa7e2ac046e4c1e07569d6726f7" => :sierra
+    sha256 "ab52ecbdd84a6213ac2d96ed167d4e367b3f980360e1aa5b0cfd3e118717dd38" => :el_capitan
+    sha256 "c515994080f2dab325b5777142a785bb6ba8c42a0c0a5bf89f5a6d25e1fd8bd1" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -48,26 +48,28 @@ class Gxml < Formula
         return 0;
       }
     EOS
-    ENV.libxml2
+    libxml2 = Formula["libxml2"]
     gettext = Formula["gettext"]
     glib = Formula["glib"]
     libgee = Formula["libgee"]
     flags = %W[
       -I#{gettext.opt_include}
+      -I#{libxml2.opt_include}/libxml2
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/gxml-0.6
+      -I#{include}/gxml-0.14
       -I#{libgee.opt_include}/gee-0.8
       -D_REENTRANT
       -L#{gettext.opt_lib}
       -L#{glib.opt_lib}
       -L#{libgee.opt_lib}
+      -L#{libxml2.opt_lib}
       -L#{lib}
       -lgee-0.8
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lgxml-0.6
+      -lgxml-0.14
       -lintl
       -lxml2
     ]

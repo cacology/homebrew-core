@@ -1,14 +1,14 @@
 class Diffoscope < Formula
   desc "In-depth comparison of files, archives, and directories."
   homepage "https://diffoscope.org"
-  url "https://pypi.python.org/packages/source/d/diffoscope/diffoscope-42.tar.gz"
-  sha256 "c0241acf5de7eb0e9e209e43dbf389beca722ddfb8b5d5630fd40569f1f465e2"
+  url "https://files.pythonhosted.org/packages/44/23/dabf575ea14c723ca01759738c6857f5de42d55cd5a458277264a7ddc31c/diffoscope-82.tar.gz"
+  sha256 "e90c5d99a7c750c1f2c8baa5a34c8f2640d79d9c0837b8e10831bbc8ad350637"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "e3da95ec12e2ceb498269d4cca444cc0a74c97ea9ba5dce7f0eafd12e55b2970" => :el_capitan
-    sha256 "d11689783435f77d5e00c2b3477dee5189063c76359dc17528b59b9c7d793f60" => :yosemite
-    sha256 "4c2c9c24fc2c7d02b0ddd5db7cf2f0f84d36df801b72e14a058d0b3ad9c76544" => :mavericks
+    sha256 "8433aa5e2a048b8a79b35dc8ada9ea52f76084cc2d734ff0505add96d349b4f5" => :sierra
+    sha256 "a8624f901191e616aeb1553a54fdd56ae7fb66123beade667b2612b4febe9879" => :el_capitan
+    sha256 "a8624f901191e616aeb1553a54fdd56ae7fb66123beade667b2612b4febe9879" => :yosemite
   end
 
   depends_on "libmagic"
@@ -16,24 +16,17 @@ class Diffoscope < Formula
   depends_on "gnu-tar"
   depends_on :python3
 
-  patch do
-    url "https://anonscm.debian.org/cgit/reproducible/diffoscope.git/patch/?id=261be7"
-    sha256 "aeaffa34a774e05477c9ef78df35174b006670b2963b9064c9c4c13484825b0b"
-  end
-
   resource "libarchive-c" do
-    url "https://pypi.python.org/packages/source/l/libarchive-c/libarchive-c-2.2.tar.gz"
-    sha256 "5d54aa6f6ab21e3bd12c2f8b6c4e80316b049c2b60ab0a4418cb34d8c63e997c"
+    url "https://files.pythonhosted.org/packages/1f/4a/7421e8db5c7509cf75e34b92a32b69c506f2b6f6392a909c2f87f3e94ad2/libarchive-c-2.7.tar.gz"
+    sha256 "56eadbc383c27ec9cf6aad3ead72265e70f80fa474b20944328db38bab762b04"
   end
 
   resource "python-magic" do
-    url "https://pypi.python.org/packages/source/p/python-magic/python-magic-0.4.10.tar.gz"
-    sha256 "79fd2865ec96074749825f9e9562953995d5bf12b6793f24d75c37479ad4a2c3"
+    url "https://files.pythonhosted.org/packages/65/0b/c6b31f686420420b5a16b24a722fe980724b28d76f65601c9bc324f08d02/python-magic-0.4.13.tar.gz"
+    sha256 "604eace6f665809bebbb07070508dfa8cabb2d7cb05be9a56706c60f864f1289"
   end
 
   def install
-    inreplace "diffoscope/comparators/tar.py", "'tar'", "'gtar'"
-
     pyver = Language::Python.major_minor_version "python3"
     ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python#{pyver}/site-packages"
 

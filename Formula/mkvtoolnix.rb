@@ -1,14 +1,13 @@
 class Mkvtoolnix < Formula
   desc "Matroska media files manipulation tools"
   homepage "https://www.bunkus.org/videotools/mkvtoolnix/"
-  url "https://www.bunkus.org/videotools/mkvtoolnix/sources/mkvtoolnix-9.3.1.tar.xz"
-  sha256 "f3695761bf0a5fdcd6144cfb0a624094c10c9d66d43a340ebb917b7c6a8b39a2"
-  revision 1
+  url "https://www.bunkus.org/videotools/mkvtoolnix/sources/mkvtoolnix-12.0.0.tar.xz"
+  sha256 "5c2401d1cc36d8a2d57cb791a5a22f3cda69cb0824c6cee35326b35e7f94b536"
 
   bottle do
-    sha256 "fcd6de3848574a16b8c5e6b0ab242b71069b3ab6ee8933779dc2374b2fc4bc78" => :el_capitan
-    sha256 "cdc987d0bff9db70d08a7bef44e0ed60fbe1f706f71e976e0cdd20ef71a243b0" => :yosemite
-    sha256 "970d80a3f613bb0f2c380fdc3ab0748074eb0f3c908aaa2c1128f93d31c2b25c" => :mavericks
+    sha256 "76d928c1cc2674571a48240dc01a845575cb217f496012add6fc55947afceccd" => :sierra
+    sha256 "461b6991b49ff54634bb97a68b5797b991a01ea95256b5808a5e8f85fd345ee3" => :el_capitan
+    sha256 "6d1f2dad93caf2d942ea179f907473ed7e3176b6e585476e8329bb06f6e2ebb4" => :yosemite
   end
 
   head do
@@ -18,56 +17,57 @@ class Mkvtoolnix < Formula
     depends_on "libtool" => :build
   end
 
-  option "with-qt5", "Build with QT GUI"
+  option "with-qt", "Build with Qt GUI"
 
+  deprecated_option "with-qt5" => "with-qt"
+
+  depends_on "docbook-xsl" => :build
   depends_on "pkg-config" => :build
+  depends_on "pugixml" => :build
   depends_on :ruby => ["1.9", :build]
+  depends_on "boost"
+  depends_on "libebml"
+  depends_on "libmatroska"
   depends_on "libogg"
   depends_on "libvorbis"
   depends_on "flac" => :recommended
   depends_on "libmagic" => :recommended
-  depends_on "lzo" => :optional
-  depends_on "qt5" => :optional
+  depends_on "qt" => :optional
   depends_on "gettext" => :optional
-
-  # On Mavericks, the bottle (without c++11) can be used
-  # because mkvtoolnix is linked against libc++ by default
-  if MacOS.version >= "10.9"
-    depends_on "boost"
-    depends_on "libmatroska"
-    depends_on "libebml"
-  else
-    depends_on "boost" => "c++11"
-    depends_on "libmatroska" => "c++11"
-    depends_on "libebml" => "c++11"
-  end
 
   needs :cxx11
 
   def install
     ENV.cxx11
 
-    boost = Formula["boost"]
-    ogg = Formula["libogg"]
-    vorbis = Formula["libvorbis"]
-    ebml = Formula["libebml"]
-    matroska = Formula["libmatroska"]
+    features = %w[libogg libvorbis libebml libmatroska]
+    features << "flac" if build.with? "flac"
+    features << "libmagic" if build.with? "libmagic"
+
+    extra_includes = ""
+    extra_libs = ""
+    features.each do |feature|
+      extra_includes << "#{Formula[feature].opt_include};"
+      extra_libs << "#{Formula[feature].opt_lib};"
+    end
+    extra_includes.chop!
+    extra_libs.chop!
 
     args = %W[
       --disable-debug
       --prefix=#{prefix}
-      --without-curl
-      --with-boost=#{boost.opt_prefix}
-      --with-extra-includes=#{ogg.opt_include};#{vorbis.opt_include};#{ebml.opt_include};#{matroska.opt_include}
-      --with-extra-libs=#{ogg.opt_lib};#{vorbis.opt_lib};#{ebml.opt_lib};#{matroska.opt_lib}
+      --with-boost=#{Formula["boost"].opt_prefix}
+      --with-docbook-xsl-root=#{Formula["docbook-xsl"].opt_prefix}/docbook-xsl
+      --with-extra-includes=#{extra_includes}
+      --with-extra-libs=#{extra_libs}
     ]
 
-    if build.with?("qt5")
-      qt5 = Formula["qt5"]
+    if build.with?("qt")
+      qt = Formula["qt"]
 
-      args << "--with-moc=#{qt5.opt_bin}/moc"
-      args << "--with-uic=#{qt5.opt_bin}/uic"
-      args << "--with-rcc=#{qt5.opt_bin}/rcc"
+      args << "--with-moc=#{qt.opt_bin}/moc"
+      args << "--with-uic=#{qt.opt_bin}/uic"
+      args << "--with-rcc=#{qt.opt_bin}/rcc"
       args << "--enable-qt"
     else
       args << "--disable-qt"
@@ -77,8 +77,8 @@ class Mkvtoolnix < Formula
 
     system "./configure", *args
 
-    system "./drake", "-j#{ENV.make_jobs}"
-    system "./drake", "install"
+    system "rake", "-j#{ENV.make_jobs}"
+    system "rake", "install"
   end
 
   test do

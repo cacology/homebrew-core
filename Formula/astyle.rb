@@ -1,16 +1,15 @@
 class Astyle < Formula
   desc "Source code beautifier for C, C++, C#, and Java"
-  homepage "http://astyle.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/astyle/astyle/astyle%202.05.1/astyle_2.05.1_macosx.tar.gz"
-  sha256 "de66da286dee2b9de1dc1c05092cbf5368c0889f25d1e2ee8b51766aff8e4baf"
-  head "svn://svn.code.sf.net/p/astyle/code/trunk/AStyle"
+  homepage "https://astyle.sourceforge.io/"
+  url "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.0/astyle_3.0_macos.tar.gz"
+  sha256 "d113aa5942219699262ceddd1dde35c66b20bf6cc5eac04d27d398ca7a460eb3"
+  head "https://svn.code.sf.net/p/astyle/code/trunk/AStyle"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "700aa3b6cb02fc702795c9f198553b01f944bf4f7eb4d706042979b6f432cad2" => :el_capitan
-    sha256 "b0eaa29cb1899f79cdf30bc301754e50167471bd3e0427fc01e943bca2e2cdb2" => :yosemite
-    sha256 "ce0c6f4c815d5eeaf547fcc7efb5e869ccba36ae80ebc30c6b96470ba73f02ff" => :mavericks
-    sha256 "706419e9e1d02f93c67c68dbe10db43e1701c45106749ce79f952c3ddde73e98" => :mountain_lion
+    sha256 "49ed8641bb284828c0e753b6d2570c317f4275a9ee5845c33ac90835dd319258" => :sierra
+    sha256 "b5da4fab0010f84a6623585c99e5468492e0a2c8dd1a77680bd4c51b900c0272" => :el_capitan
+    sha256 "69819972ffefb908f5186f01b688d32c28e9ea2ca2a0d62c5b2850e686e1aefa" => :yosemite
   end
 
   def install

@@ -1,15 +1,15 @@
 class TranslateShell < Formula
   desc "Command-line translator using Google Translate and more"
   homepage "https://www.soimort.org/translate-shell"
-  url "https://github.com/soimort/translate-shell/archive/v0.9.4.tar.gz"
-  sha256 "bfc04124d2fde7924e6b5c3a11fdce7fbd2fdb1819c0b78c3fd0a7d36e330164"
+  url "https://github.com/soimort/translate-shell/archive/v0.9.6.4.tar.gz"
+  sha256 "5ac8fd1a6b772750942f92665966ddf2b825594eb969770aabf16d7a83b3e6b9"
   head "https://github.com/soimort/translate-shell.git", :branch => "develop"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "4513243a0aea812f29a47b5a6c173a45e388513915e6f594a147f84acd2b8fd7" => :el_capitan
-    sha256 "bb2fca4291a3cc52d1ed9752d2691003df4537b371c96201ff5bf0eafa63db6b" => :yosemite
-    sha256 "614777663d78a3f0284d1ffbaa55b992c55ccbe28bdb99dba387eceb74390331" => :mavericks
+    sha256 "1a717f10cb42e97e8cdb7b9725fb376d2bec1f57dcc2c14ddfb52b07d93eebb2" => :sierra
+    sha256 "88a2ed1d6e5a8728c332c5da83da61692058c5664dcc88f7f28806d23c43b6ee" => :el_capitan
+    sha256 "88a2ed1d6e5a8728c332c5da83da61692058c5664dcc88f7f28806d23c43b6ee" => :yosemite
   end
 
   depends_on "fribidi"
@@ -23,7 +23,7 @@ class TranslateShell < Formula
   end
 
   def caveats; <<-EOS.undent
-    By default, text-to-speech functionality is provided by OS X's builtin
+    By default, text-to-speech functionality is provided by macOS's builtin
     `say' command. This functionality may be improved in certain cases by
     installing one of mplayer, mpv, or mpg123, all of which are available
     through `brew install'.
@@ -31,6 +31,7 @@ class TranslateShell < Formula
   end
 
   test do
-    assert_equal "Hello\n", shell_output("#{bin}/trans -no-init -b -s fr -t en bonjour")
+    assert_equal "hello\n",
+      shell_output("#{bin}/trans -no-init -b -s fr -t en bonjour").downcase
   end
 end

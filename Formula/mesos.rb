@@ -1,55 +1,50 @@
 class Mesos < Formula
   desc "Apache cluster manager"
   homepage "https://mesos.apache.org"
-  url "https://www.apache.org/dyn/closer.cgi?path=mesos/1.0.0/mesos-1.0.0.tar.gz"
-  mirror "https://archive.apache.org/dist/mesos/1.0.0/mesos-1.0.0.tar.gz"
-  sha256 "dabca5b60604fd672aaa34e4178bb42c6513eab59a07a98ece1e057eb34c28b2"
+  url "https://www.apache.org/dyn/closer.cgi?path=mesos/1.2.0/mesos-1.2.0.tar.gz"
+  mirror "https://archive.apache.org/dist/mesos/1.2.0/mesos-1.2.0.tar.gz"
+  sha256 "60dfd06cd1eec6f69af4ff77f7a92043fe7ead60bedf5605eecd14ffa7a3fb41"
 
   bottle do
-    sha256 "8a4d45b766546eb80be55bb65c50b66a6d1e3b0f655646b222e5252384330b0f" => :el_capitan
-    sha256 "3ba5bc60511694dc4cdebbacc8f409fd4dc17ba12961bc78eccc2d1d3dfc7ade" => :yosemite
-    sha256 "2b0aab36735f07c2db20b45b8b381003d93898213c41ff6ed071cdd26da54346" => :mavericks
+    sha256 "7f95b0ae80c39d56f8f2e34a93f80c92a9dc9c9edddd61a6d4171c256bb1994e" => :sierra
+    sha256 "eb52e6eedd7fd1096ee4a06efbfab78cf29cc8a13fa92c1a41f30037f45fbf95" => :el_capitan
+    sha256 "e0d594640d1aba3594feee8e158137fc0d9e1631636889844c681d84c42523e1" => :yosemite
   end
 
   depends_on :java => "1.7+"
   depends_on :macos => :mountain_lion
-  depends_on :apr => :build
+  depends_on "apr-util" => :build
   depends_on "maven" => :build
   depends_on "subversion"
 
-  resource "boto" do
-    url "https://pypi.python.org/packages/6f/ce/3447e2136c629ae895611d946879b43c19346c54876dea614316306b17dd/boto-2.40.0.tar.gz"
-    sha256 "e12d5fca11fcabfd0acd18f78651e0f0dba60f958a0520ff4e9b73e35cd9928f"
-  end
-
   resource "protobuf" do
-    url "https://pypi.python.org/packages/source/p/protobuf/protobuf-2.6.1.tar.gz"
-    sha256 "8faca1fb462ee1be58d00f5efb4ca4f64bde92187fe61fde32615bbee7b3e745"
+    url "https://pypi.python.org/packages/e0/2f/690a5f047e2cfef40c9c5eec0877b496dc1f5a0625ca6b0ac1cd11f12f6a/protobuf-3.2.0.tar.gz"
+    sha256 "a48475035c42d13284fd7bf3a2ffa193f8c472ad1e8539c8444ea7e2d25823a1"
   end
 
   # build dependencies for protobuf
   resource "six" do
-    url "https://pypi.python.org/packages/source/s/six/six-1.9.0.tar.gz"
-    sha256 "e24052411fc4fbd1f672635537c3fc2330d9481b18c0317695b46259512c91d5"
+    url "https://files.pythonhosted.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz"
+    sha256 "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"
   end
 
   resource "python-dateutil" do
-    url "https://pypi.python.org/packages/source/p/python-dateutil/python-dateutil-2.4.0.tar.gz"
-    sha256 "439df33ce47ef1478a4f4765f3390eab0ed3ec4ae10be32f2930000c8d19f417"
+    url "https://files.pythonhosted.org/packages/51/fc/39a3fbde6864942e8bb24c93663734b74e281b984d1b8c4f95d64b0c21f6/python-dateutil-2.6.0.tar.gz"
+    sha256 "62a2f8df3d66f878373fd0072eacf4ee52194ba302e00082828e0d263b0418d2"
   end
 
   resource "pytz" do
-    url "https://pypi.python.org/packages/source/p/pytz/pytz-2014.10.tar.bz2"
-    sha256 "387f968fde793b142865802916561839f5591d8b4b14c941125eb0fca7e4e58d"
+    url "https://files.pythonhosted.org/packages/f7/c7/08e54702c74baf9d8f92d0bc331ecabf6d66a56f6d36370f0a672fc6a535/pytz-2016.6.1.tar.bz2"
+    sha256 "b5aff44126cf828537581e534cc94299b223b945a2bb3b5434d37bf8c7f3a10c"
   end
 
   resource "python-gflags" do
-    url "https://pypi.python.org/packages/source/p/python-gflags/python-gflags-2.0.tar.gz"
-    sha256 "0dff6360423f3ec08cbe3bfaf37b339461a54a21d13be0dd5d9c9999ce531078"
+    url "https://files.pythonhosted.org/packages/ea/30/b8469c0d1837ce58fe3706e1f7169cbf6ca1fb87d1f84cece5182b67cb0b/python-gflags-3.1.1.tar.gz"
+    sha256 "aaff6449ca74320c709052e4664a52337832b2338f4a4267088564f3e98f6c63"
   end
 
   resource "google-apputils" do
-    url "https://pypi.python.org/packages/source/g/google-apputils/google-apputils-0.4.2.tar.gz"
+    url "https://files.pythonhosted.org/packages/69/66/a511c428fef8591c5adfa432a257a333e0d14184b6c5d03f1450827f7fe7/google-apputils-0.4.2.tar.gz"
     sha256 "47959d0651c32102c10ad919b8a0ffe0ae85f44b8457ddcf2bdc0358fb03dc29"
   end
 
@@ -58,13 +53,20 @@ class Mesos < Formula
   def install
     ENV.java_cache
 
-    boto_path = libexec/"boto/lib/python2.7/site-packages"
-    ENV.prepend_create_path "PYTHONPATH", boto_path
-    resource("boto").stage do
-      system "python", *Language::Python.setup_install_args(libexec/"boto")
+    # Disable optimizing as libc++ does not play well with optimized clang
+    # builds (see https://llvm.org/bugs/show_bug.cgi?id=28469 and
+    # https://issues.apache.org/jira/browse/MESOS-5745).
+    #
+    # NOTE: We cannot use `--disable-optimize` since we also pass e.g.,
+    # CXXFLAGS via environment variables. Since compiler flags are passed via
+    # environment variables the Mesos build will silently ignore flags like
+    # `--[disable|enable]-optimize`.
+    ENV.O0 unless DevelopmentTools.clang_build_version >= 900
+
+    # work around to avoid `_clock_gettime` symbol not found error.
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      ENV["ac_have_clock_syscall"] = "no"
     end
-    (lib/"python2.7/site-packages").mkpath
-    (lib/"python2.7/site-packages/homebrew-mesos-boto.pth").write "#{boto_path}\n"
 
     # work around distutils abusing CC instead of using CXX
     # https://issues.apache.org/jira/browse/MESOS-799
@@ -105,7 +107,7 @@ class Mesos < Formula
     ]
 
     unless MacOS::CLT.installed?
-      args << "--with-apr=#{Formula["apr"].opt_libexec}"
+      args << "--with-apr=#{Formula["apr-util"].opt_libexec}"
     end
 
     ENV.cxx11
@@ -146,6 +148,23 @@ class Mesos < Formula
   test do
     require "timeout"
 
+    # Make sure we are not affected by MESOS-6910 and related issues.
+    agent = fork do
+      exec "#{sbin}/mesos-agent",
+          "--master=127.0.0.1:5050",
+          "--work_dir=/tmp/mesos.slave.brew",
+          "--image_providers=docker"
+    end
+    begin
+      Timeout.timeout(2) do
+        Process.wait agent
+      end
+    rescue Timeout::Error
+      Process.kill "TERM", agent
+    end
+    assert $?.exitstatus, "agent process died, check MESOS-6606-related behavior"
+
+    # Make tests for minimal functionality.
     master = fork do
       exec "#{sbin}/mesos-master", "--ip=127.0.0.1",
                                    "--registry=in_memory"

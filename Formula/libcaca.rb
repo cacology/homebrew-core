@@ -7,21 +7,28 @@ class Libcaca < Formula
 
   bottle do
     cellar :any
-    revision 1
+    rebuild 1
+    sha256 "728b8bb277ef92bdf90f91ce445c7b8f1259db898a33ae36b4de9988b786de47" => :sierra
     sha256 "ba475a145203197f637059f20dfcb5d8cfb34615ce30bfe342fbe7887ebcad41" => :el_capitan
     sha256 "1d02b3264c1665a8f6af5d88ba944bc1009ee7e553ae8decfff89615b7dc79d9" => :yosemite
     sha256 "511f48aa84b45eb509de89296102517bd77c25347999cf1d733bc8593c95a00b" => :mavericks
+  end
+
+  head do
+    url "https://github.com/cacalabs/libcaca.git"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
   end
 
   depends_on "pkg-config" => :build
   depends_on "imlib2" => :optional
   depends_on :x11 if build.with? "imlib2"
 
-  fails_with :llvm do
-    cause "Unsupported inline asm: input constraint with a matching output constraint of incompatible type"
-  end
-
   def install
+    system "./bootstrap" if build.head?
+
     # Some people can't compile when Java is enabled. See:
     # https://github.com/Homebrew/homebrew/issues/issue/2049
 
@@ -45,7 +52,7 @@ class Libcaca < Formula
 
     system "./configure", *args
     system "make"
-    ENV.j1 # Or install can fail making the same folder at the same time
+    ENV.deparallelize # Or install can fail making the same folder at the same time
     system "make", "install"
   end
 

@@ -1,30 +1,30 @@
 class RakudoStar < Formula
   desc "Perl 6 compiler"
   homepage "http://rakudo.org/"
-  url "http://rakudo.org/downloads/star/rakudo-star-2016.07.tar.gz"
-  sha256 "6aa2c73da1c5c89e7495eaa0b572f07a3184b13df3e8eb6f452038c8023ffd33"
+  url "http://rakudo.org/downloads/star/rakudo-star-2017.04.tar.gz"
+  sha256 "731ddb63f17bf211b2bf2681fdb7aefc6fe1161dbaab0831d93de4a854153018"
 
   bottle do
-    sha256 "c740b4227959695513023785d528290e6dbb3f88767f41855bccbb4987285b05" => :el_capitan
-    sha256 "6c4b31f795b03ff581ccad8aff5da60ec108474b8d88db40560384c6a63f5afc" => :yosemite
-    sha256 "83bb7e869fa7b2dc2a6677523c351fffb14f7900167091c8fa32baaa349d542d" => :mavericks
+    sha256 "b816c1150120abc3d5acc4d1ca233b7e5ce6daabb302f152cd6ce51e8a0b68b6" => :sierra
+    sha256 "495e76ed9c925686a0a7d5487dbb4ad47ac21351c425255735b6efee88742b4d" => :el_capitan
+    sha256 "9c8d50de0cd4441d44458657be33779027d12da855da32fc0d516c812340770c" => :yosemite
   end
 
   option "with-jvm", "Build also for jvm as an alternate backend."
-
-  conflicts_with "parrot"
 
   depends_on "gmp" => :optional
   depends_on "icu4c" => :optional
   depends_on "pcre" => :optional
   depends_on "libffi"
 
+  conflicts_with "parrot"
+
   def install
     libffi = Formula["libffi"]
     ENV.remove "CPPFLAGS", "-I#{libffi.include}"
     ENV.prepend "CPPFLAGS", "-I#{libffi.lib}/libffi-#{libffi.version}/include"
 
-    ENV.j1 # An intermittent race condition causes random build failures.
+    ENV.deparallelize # An intermittent race condition causes random build failures.
 
     backends = ["moar"]
     generate = ["--gen-moar"]
@@ -41,9 +41,7 @@ class RakudoStar < Formula
     # Move the man pages out of the top level into share.
     # Not all backends seem to generate man pages at this point (moar does not, parrot does),
     # so we need to check if the directory exists first.
-    if File.directory?("#{prefix}/man")
-      mv "#{prefix}/man", share
-    end
+    mv "#{prefix}/man", share if File.directory?("#{prefix}/man")
   end
 
   test do

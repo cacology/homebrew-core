@@ -1,13 +1,14 @@
 class Xplanet < Formula
   desc "Create HQ wallpapers of planet Earth"
-  homepage "http://xplanet.sourceforge.net/"
+  homepage "https://xplanet.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/xplanet/xplanet/1.3.1/xplanet-1.3.1.tar.gz"
   sha256 "4380d570a8bf27b81fb629c97a636c1673407f4ac4989ce931720078a90aece7"
+  revision 1
 
   bottle do
-    sha256 "ecf69cdfcddd72c2237eb141a045abf062e1d25e89b58732a86c09e868ab66f3" => :el_capitan
-    sha256 "eb4c003f5a3d278afd4dc2498a4e667a0aed4a97df07288c9246ca42002b1b76" => :yosemite
-    sha256 "7cb1c47183147d061ab589073be7ff1b8be4cf78f96b240f27d164cddcb16858" => :mavericks
+    sha256 "204dc9eb811edbcfe10eebdf392e42c09703d0c795846efa366830d33f145973" => :sierra
+    sha256 "be72abaab555adb3ba64cbcae042daa4c8f35d52629912e6de8242086ee206c5" => :el_capitan
+    sha256 "d13f3080e5a22a1a2f87c11b1e0d534249a0376a1e7a8e0149fc7c86261e5568" => :yosemite
   end
 
   option "with-x11", "Build for X11 instead of Aqua"
@@ -35,6 +36,20 @@ class Xplanet < Formula
 
   depends_on "freetype"
   depends_on :x11 => :optional
+
+  # patches bug in 1.3.1 with flag -num_times=2 (1.3.2 will contain fix, when released)
+  # https://sourceforge.net/p/xplanet/code/208/tree/trunk/src/libdisplay/DisplayOutput.cpp?diff=5056482efd48f8457fc7910a:207
+  patch :p2 do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/f952f1d/xplanet/xplanet-1.3.1-ntimes.patch"
+    sha256 "3f95ba8d5886703afffdd61ac2a0cd147f8d659650e291979f26130d81b18433"
+  end
+
+  # Fix compilation with giflib 5
+  # https://xplanet.sourceforge.io/FUDforum2/index.php?t=msg&th=592
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/master/xplanet/xplanet-1.3.1-giflib5.patch"
+    sha256 "0a88a9c984462659da37db58d003da18a4c21c0f4cd8c5c52f5da2b118576d6e"
+  end
 
   def install
     args = %W[

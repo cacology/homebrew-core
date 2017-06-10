@@ -1,17 +1,16 @@
 class Glide < Formula
   desc "Simplified Go project management, dependency management, and vendoring"
   homepage "https://github.com/Masterminds/glide"
-  url "https://github.com/Masterminds/glide/archive/v0.11.1.tar.gz"
-  sha256 "3c4958d1ab9446e3d7b2dc280cd43b84c588d50eb692487bcda950d02b9acc4c"
-  revision 1
+  url "https://github.com/Masterminds/glide/archive/v0.12.3.tar.gz"
+  sha256 "a304c29267cf7e00b7299b6ac8da0317f2f4f4096acb6cf817d4c745e0dee8b4"
 
   head "https://github.com/Masterminds/glide.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "5cebce9a6e81e7437bfd49ffd3b3f52a3c48f553b47799ef23e05484088e02c0" => :el_capitan
-    sha256 "d506965814408a048221407f6887232c3f56b46ce26afc20f381c15980b514f3" => :yosemite
-    sha256 "0d9df029068f96c13c5d64a4b5e0141f18e675c9b637e5f93a7a335194b4965f" => :mavericks
+    sha256 "ffe9893d80a07efb04e55922b14ea86e8a2eb480bbab0c2122ae6797c0465040" => :sierra
+    sha256 "13484c8842708784a077477dbdc6c5b39836ddbcbf00d2ffdfe15044e4772812" => :el_capitan
+    sha256 "fb569cf720820ae1e11d027b730d11244a5f7fe3ecff1c8bb6533209b03053a4" => :yosemite
   end
 
   depends_on "go"
@@ -29,8 +28,7 @@ class Glide < Formula
   end
 
   test do
-    version = pipe_output("#{bin}/glide --version")
-    assert_match version.to_s, version
+    assert_match version.to_s, shell_output("#{bin}/glide --version")
     system bin/"glide", "create", "--non-interactive", "--skip-import"
     assert File.exist?("glide.yaml")
   end

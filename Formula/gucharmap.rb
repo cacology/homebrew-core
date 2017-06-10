@@ -1,24 +1,24 @@
 class Gucharmap < Formula
   desc "GNOME Character Map, based on the Unicode Character Database"
   homepage "https://live.gnome.org/Gucharmap"
-  url "https://download.gnome.org/sources/gucharmap/9.0/gucharmap-9.0.0.tar.xz"
-  sha256 "d698ce4bba5486f7e32e9a4ec0ecd916926fb876640856746121d8ae8012765c"
+  url "https://download.gnome.org/sources/gucharmap/9.0/gucharmap-9.0.4.tar.xz"
+  sha256 "1588b2b183b843b24eb074fd0661bddb54f18876870ba475d65f35b7a9c677a0"
 
   bottle do
-    sha256 "06abacb72154449f80feb8dae2521c3fdd47259d522601bd89b388da6cf49242" => :el_capitan
-    sha256 "6bf708291779f24d1629d5aa7b19b09f901c62b316bfc0752e6b4aec4e560b87" => :yosemite
-    sha256 "c5676b389e475bc90073eb0534dc0687f4056b0c83a40fd877d61e4b36346a81" => :mavericks
+    sha256 "e480d0b42e959069a5c6ac5e0971832025432a7af8366782b79cf207dac6b6da" => :sierra
+    sha256 "bc417d1c6ad0caf34495a1be3cfae59f070adb529af9a637a1806910e109177c" => :el_capitan
+    sha256 "564bfe6886ff9f646bbdd3406ace12181f01fb1f0290f8778adbf082a1fd7791" => :yosemite
   end
 
   depends_on "pkg-config" => :build
   depends_on "intltool" => :build
   depends_on "itstool" => :build
   depends_on "desktop-file-utils" => :build
-  depends_on "wget" => :build
   depends_on "coreutils" => :build
   depends_on "gtk+3"
 
   def install
+    ENV["WGET"] = "curl"
     ENV.append_path "PYTHONPATH", "#{Formula["libxml2"].opt_lib}/python2.7/site-packages"
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
@@ -26,8 +26,9 @@ class Gucharmap < Formula
                           "--prefix=#{prefix}",
                           "--disable-Bsymbolic",
                           "--disable-schemas-compile",
-                          "--enable-introspection=no"
-    system "make"
+                          "--enable-introspection=no",
+                          "--with-unicode-data=download"
+    system "make", "WGETFLAGS=--remote-name --remote-time --connect-timeout 30 --retry 8"
     system "make", "install"
   end
 

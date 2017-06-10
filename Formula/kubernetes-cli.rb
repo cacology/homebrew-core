@@ -1,37 +1,51 @@
 class KubernetesCli < Formula
   desc "Kubernetes command-line interface"
-  homepage "http://kubernetes.io/"
-  url "https://github.com/kubernetes/kubernetes/archive/v1.3.5.tar.gz"
-  sha256 "f7c1dca76fab3580a9e47eb0617b5747d134fb432ee3c0a93623bd85d7aec1d1"
+  homepage "https://kubernetes.io/"
+  url "https://github.com/kubernetes/kubernetes.git",
+      :tag => "v1.6.4",
+      :revision => "d6f433224538d4f9ca2f7ae19b252e6fcb66a3ae"
   head "https://github.com/kubernetes/kubernetes.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "9aee8751286305857c51d1635ffc75f220833603777122d71186a9ce65bfcb9f" => :el_capitan
-    sha256 "588a1f3255532659f0cc5b01c1456d6022410f86b828121eaa4ded35abc9d372" => :yosemite
-    sha256 "a60297807f4ec6bb884e610b2ca54d1c6d1dcffb52be461ae8bf815039b29e2c" => :mavericks
-  end
-
-  devel do
-    url "https://github.com/kubernetes/kubernetes/archive/v1.4.0-alpha.0.tar.gz"
-    sha256 "7530fabf418fccf7bef08281efa9a51d86921726c8efac4f0e63ba1e87d83482"
-    version "1.4.0-alpha.0"
+    sha256 "c75434193dbeef5aa056672149fd5e11e9ec7ddc72f4d139658370cef1657f37" => :sierra
+    sha256 "1568c4630728384e2b95510e313090f788478ff39f873ab7c83b43be94864691" => :el_capitan
+    sha256 "57eb0506413dc457a71d2246f4b22a83f4e9e92208003ff92f1fffd5b6384e4c" => :yosemite
   end
 
   depends_on "go" => :build
 
   def install
+    ENV["GOPATH"] = buildpath
     arch = MacOS.prefer_64_bit? ? "amd64" : "x86"
+    dir = buildpath/"src/k8s.io/kubernetes"
+    dir.install buildpath.children - [buildpath/".brew_home"]
 
-    system "make", "all", "WHAT=cmd/kubectl", "GOFLAGS=-v"
+    cd dir do
+      # Race condition still exists in OSX Yosemite
+      # Filed issue: https://github.com/kubernetes/kubernetes/issues/34635
+      ENV.deparallelize { system "make", "generated_files" }
 
-    dir = "_output/local/bin/darwin/#{arch}"
-    bin.install "#{dir}/kubectl"
-    (bash_completion/"kubectl").write Utils.popen_read("#{bin}/kubectl completion bash")
+      # Make binary
+      system "make", "kubectl"
+      bin.install "_output/local/bin/darwin/#{arch}/kubectl"
+
+      # Install bash completion
+      output = Utils.popen_read("#{bin}/kubectl completion bash")
+      (bash_completion/"kubectl").write output
+
+      # Install zsh completion
+      output = Utils.popen_read("#{bin}/kubectl completion zsh")
+      (zsh_completion/"kubectl").write output
+    end
   end
 
   test do
-    output = shell_output("#{bin}/kubectl 2>&1")
-    assert_match "kubectl controls the Kubernetes cluster manager.", output
+    run_output = shell_output("#{bin}/kubectl 2>&1")
+    assert_match "kubectl controls the Kubernetes cluster manager.", run_output
+
+    version_output = shell_output("#{bin}/kubectl version --client 2>&1")
+    assert_match "GitTreeState:\"clean\"", version_output
+    assert_match stable.instance_variable_get(:@resource).instance_variable_get(:@specs)[:revision], version_output if build.stable?
   end
 end

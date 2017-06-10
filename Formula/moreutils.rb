@@ -1,25 +1,27 @@
 class Moreutils < Formula
   desc "Collection of tools that nobody wrote when UNIX was young"
   homepage "https://joeyh.name/code/moreutils/"
-  url "git://git.kitenet.net/moreutils",
-      :tag => "0.60",
-      :revision => "1173bd9f10d731485f3b63f1c7ff55eb9c58a605"
+  url "git://git.joeyh.name/moreutils",
+      :tag => "0.61",
+      :revision => "01d1b22f22fae647cbfd855dc82f8d9548607ab0"
   head "git://git.joeyh.name/moreutils"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b9865588c4d434d5e35d19cdf2b39b36031d6b6cd77835e182fd5e76fa7cba48" => :el_capitan
-    sha256 "b39209ebca05c0aa733dbf01c615be42db78f9438431e82df52f7f3914c9788a" => :yosemite
-    sha256 "512b618f6a652f673485616677c6207a8645a3dcfe98b619787e58c3cb5a5811" => :mavericks
+    sha256 "54ce8fa9a91115d36ac2cc272ba332e52fe04512d896f1e40b917d6fa4bc8b12" => :sierra
+    sha256 "7dce0f11e1219a6ee585caba77d9d1c949a83c3d251d5cd373b25374e0be81d1" => :el_capitan
+    sha256 "629be4e3aa6af9b9bc9eaddf519227f20271470d750a27418984e0bcffd2bd04" => :yosemite
   end
 
   option "without-parallel", "Build without the 'parallel' tool."
+  option "without-errno", "Build without the 'errno' tool, for compatibility with 'pwntools'."
+  option "without-ts", "Build without the 'ts' tool, for compatibility with 'task-spooler'."
 
   depends_on "docbook-xsl" => :build
 
-  conflicts_with "parallel", :because => "Both install a `parallel` executable."
-  conflicts_with "pwntools", :because => "Both install an `errno` executable."
-  conflicts_with "task-spooler", :because => "Both install a `ts` executable."
+  conflicts_with "parallel", :because => "Both install a `parallel` executable." if build.with? "parallel"
+  conflicts_with "pwntools", :because => "Both install an `errno` executable." if build.with? "errno"
+  conflicts_with "task-spooler", :because => "Both install a `ts` executable." if build.with? "ts"
 
   resource "Time::Duration" do
     url "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Time-Duration-1.20.tar.gz"
@@ -46,17 +48,20 @@ class Moreutils < Formula
       system "make", "install"
     end
 
-    inreplace "Makefile",
-              "/usr/share/xml/docbook/stylesheet/docbook-xsl",
+    inreplace "Makefile" do |s|
+      s.gsub! "/usr/share/xml/docbook/stylesheet/docbook-xsl",
               "#{Formula["docbook-xsl"].opt_prefix}/docbook-xsl"
-    if build.without? "parallel"
-      inreplace "Makefile", /^BINS=.*\Kparallel/, ""
-      inreplace "Makefile", /^MANS=.*\Kparallel\.1/, ""
+      %w[parallel errno ts].each do |util|
+        next if build.with? util
+        s.gsub! /^BINS=.*\K#{util}/, "", false
+        s.gsub! /^MANS=.*\K#{util}\.1/, ""
+        s.gsub! /^PERLSCRIPTS=.*\K#{util}/, "", false
+      end
     end
     system "make", "all"
     system "make", "check"
     system "make", "install", "PREFIX=#{prefix}"
-    bin.env_script_all_files(libexec+"bin", :PERL5LIB => ENV["PERL5LIB"])
+    bin.env_script_all_files(libexec/"bin", :PERL5LIB => ENV["PERL5LIB"])
   end
 
   test do

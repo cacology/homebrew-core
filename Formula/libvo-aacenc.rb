@@ -1,11 +1,12 @@
 class LibvoAacenc < Formula
   desc "VisualOn AAC encoder library"
-  homepage "http://opencore-amr.sourceforge.net/"
+  homepage "https://opencore-amr.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
   sha256 "e51a7477a359f18df7c4f82d195dab4e14e7414cbd48cf79cc195fc446850f36"
 
   bottle do
     cellar :any
+    sha256 "9430e86c9f25aa9fcccf0a19cc6125c9397c23b311b993b1adf83cbe330cd9b4" => :sierra
     sha256 "e9a59439f8eec4cdc4d273afb49cbd8f8357862d4d8c7c5d9d9d38588ec6d810" => :el_capitan
     sha256 "cf63ddcb79e40b79264507393ed4fa1b223feecf4638f0e58fef464db722b554" => :yosemite
     sha256 "645f4294e8512add5c5f263cd8273c93e22eab565307ada5f8804ef7b9d41d8d" => :mavericks

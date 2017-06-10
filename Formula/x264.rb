@@ -2,35 +2,24 @@ class X264 < Formula
   desc "H.264/AVC encoder"
   homepage "https://www.videolan.org/developers/x264.html"
   # the latest commit on the stable branch
-  url "https://git.videolan.org/git/x264.git", :revision => "fd2c324731c2199e502ded9eff723d29c6eafe0b"
-  version "r2668"
-
+  url "https://git.videolan.org/git/x264.git", :revision => "97eaef2ab82a46d13ea5e00270712d6475fbe42b"
+  version "r2748"
   head "https://git.videolan.org/git/x264.git"
 
   bottle do
     cellar :any
-    sha256 "8dd89dfa62eb8837f1a49450e7f6069502f49426ec4ea79357e980f534ea3e7a" => :el_capitan
-    sha256 "edc6732b61f996968cc07c591cb17a5b4358a0db400c69e881c0559f6cf41ef8" => :yosemite
-    sha256 "a64a08088aef050f6fc27f97a5bb411c9d75d94c0b9c1f0c8dfd99cdb7f1f4c9" => :mavericks
-  end
-
-  devel do
-    # the latest commit on the master branch
-    url "https://git.videolan.org/git/x264.git", :revision => "3b70645597bea052d2398005bc723212aeea6875"
-    version "r2694"
+    sha256 "e7b49d928421526258edb4021324a9c5bc6c9823e25c4f06070ffb4dbf9ce3c5" => :sierra
+    sha256 "59c336f951b9fc03a26574dc29da0ee6e6e45cbf4e3245de7529271c134f149c" => :el_capitan
+    sha256 "92ba46544181c3f7039fb62e6dd6e730e214dece3a3866f2a3bb8eb824701cbf" => :yosemite
   end
 
   option "with-10-bit", "Build a 10-bit x264 (default: 8-bit)"
-  option "with-mp4=", "Select mp4 output: none (default), l-smash or gpac"
+  option "with-l-smash", "Build CLI with l-smash mp4 output"
 
   depends_on "yasm" => :build
+  depends_on "l-smash" => :optional
 
   deprecated_option "10-bit" => "with-10-bit"
-
-  case ARGV.value "with-mp4"
-  when "l-smash" then depends_on "l-smash"
-  when "gpac" then depends_on "gpac"
-  end
 
   def install
     args = %W[
@@ -39,11 +28,7 @@ class X264 < Formula
       --enable-static
       --enable-strip
     ]
-    if Formula["l-smash"].installed?
-      args << "--disable-gpac"
-    elsif Formula["gpac"].installed?
-      args << "--disable-lsmash"
-    end
+    args << "--disable-lsmash" if build.without? "l-smash"
     args << "--bit-depth=10" if build.with? "10-bit"
 
     system "./configure", *args

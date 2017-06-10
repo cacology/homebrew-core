@@ -1,14 +1,15 @@
 class Peco < Formula
   desc "Simplistic interactive filtering tool"
   homepage "https://github.com/peco/peco"
-  url "https://github.com/peco/peco/archive/v0.4.1.tar.gz"
-  sha256 "7ed3b7b695e1e7da62f1ee5c8b8f0a716860f0e1101cede28eed0760edf94da0"
+  url "https://github.com/peco/peco/archive/v0.5.1.tar.gz"
+  sha256 "1acbf8f7f077208a8d4406a37be88783432455d6ff905e0a19168c7c2a34f1c8"
   head "https://github.com/peco/peco.git"
 
   bottle do
-    sha256 "53ce81be646850aa03e5616c50f0fd9daf60037c9ca414c4bda1bded412327fc" => :el_capitan
-    sha256 "2bb5b860e62080f5aff73da7ce862f3f368e0c12066cd4d358a15d9a9cbd36dd" => :yosemite
-    sha256 "b3d8490e24a46b6e8935a988eddf5ccbc494371c6e85b8b729501df4650cefae" => :mavericks
+    cellar :any_skip_relocation
+    sha256 "78e54d92559b862a2620392cd0274e59693718a69c1a133d2b0d932889bad2c6" => :sierra
+    sha256 "d91fdde06f21ab5d27ff2fba0118facfbda8f77d9d3cdfb8368bb1a4678e2470" => :el_capitan
+    sha256 "0740fec8c778247f3bbeac76376fff7097cc8ed756d0c029f106c21fa105705e" => :yosemite
   end
 
   depends_on "glide" => :build
@@ -16,6 +17,7 @@ class Peco < Formula
 
   def install
     ENV["GOPATH"] = buildpath
+    ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
     (buildpath/"src/github.com/peco/peco").install buildpath.children
     cd "src/github.com/peco/peco" do
       system "glide", "install"

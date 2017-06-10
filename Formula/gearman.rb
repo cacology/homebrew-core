@@ -1,25 +1,23 @@
 class Gearman < Formula
   desc "Application framework to farm out work to other machines or processes"
   homepage "http://gearman.org/"
-  url "https://launchpad.net/gearmand/1.2/1.1.12/+download/gearmand-1.1.12.tar.gz"
-  sha256 "973d7a3523141a84c7b757c6f243febbc89a3631e919b532c056c814d8738acb"
+  url "https://github.com/gearman/gearmand/releases/download/1.1.16/gearmand-1.1.16.tar.gz"
+  sha256 "d0207fa3004318af3c65d4ac8c9a1dddd547acf104fccd1280013a7f091da2c8"
 
   bottle do
-    revision 2
-    sha256 "4977f65c0c52786302c488161a924c489974b477c53f9bd5232382aa9fce753d" => :el_capitan
-    sha256 "2e9369c68765bf5db8350a0e985ee97489c7a6920f34e85011b20a12ac8c1d49" => :yosemite
-    sha256 "3d5297489058f3817c9ac02d57dd6325db751240c030dc7ffffa4dda22af4841" => :mavericks
+    sha256 "90236fe0c61400d6dd1be7240bdd0d7ac3bd69569aa9e024254e6c0eb6471872" => :sierra
+    sha256 "d0edc86b1b307dbe7f08d89670c4dc5d8f56d2ed10160f64622704bd938974b4" => :el_capitan
+    sha256 "b94d3876a9e730ac1230e460043bb58a5c5f69fe547aea68124e76006d10708a" => :yosemite
   end
 
   option "with-mysql", "Compile with MySQL persistent queue enabled"
   option "with-postgresql", "Compile with Postgresql persistent queue enabled"
 
-  # https://bugs.launchpad.net/gearmand/+bug/1318151 - Still ongoing as of 1.1.12
-  # https://bugs.launchpad.net/gearmand/+bug/1236815 - Still ongoing as of 1.1.12
-  # https://github.com/Homebrew/homebrew/issues/33246 - Still ongoing as of 1.1.12
+  # https://github.com/Homebrew/homebrew/issues/33246
   patch :DATA
 
   depends_on "pkg-config" => :build
+  depends_on "sphinx-doc" => :build
   depends_on "boost"
   depends_on "libevent"
   depends_on "libpqxx" if build.with? "postgresql"
@@ -34,7 +32,7 @@ class Gearman < Formula
   def install
     # https://bugs.launchpad.net/gearmand/+bug/1368926
     Dir["tests/**/*.cc", "libtest/main.cc"].each do |test_file|
-      next unless /std::unique_ptr/ === File.read(test_file)
+      next unless /std::unique_ptr/ =~ File.read(test_file)
       inreplace test_file, "std::unique_ptr", "std::auto_ptr"
     end
 
@@ -98,28 +96,15 @@ class Gearman < Formula
     </plist>
     EOS
   end
+
+  test do
+    assert_match /gearman\s*Error in usage/, shell_output("#{bin}/gearman --version 2>&1", 1)
+  end
 end
 
 __END__
-diff --git a/libgearman-1.0/gearman.h b/libgearman-1.0/gearman.h
-index 7f6d5e7..8f7a8f0 100644
---- a/libgearman-1.0/gearman.h
-+++ b/libgearman-1.0/gearman.h
-@@ -50,7 +50,11 @@
- #endif
- 
- #ifdef __cplusplus
-+#ifdef _LIBCPP_VERSION
- #  include <cinttypes>
-+#else
-+#  include <tr1/cinttypes>
-+#endif
- #  include <cstddef>
- #  include <cstdlib>
- #  include <ctime>
-
 diff --git a/libgearman/byteorder.cc b/libgearman/byteorder.cc
-index 674fed9..96f0650 100644
+index 674fed9..b2e2182 100644
 --- a/libgearman/byteorder.cc
 +++ b/libgearman/byteorder.cc
 @@ -65,6 +65,8 @@ static inline uint64_t swap64(uint64_t in)
@@ -137,35 +122,3 @@ index 674fed9..96f0650 100644
  }
 +
 +#endif
-\ No newline at end of file
-diff --git a/libgearman/client.cc b/libgearman/client.cc
-index 3db2348..4363b36 100644
---- a/libgearman/client.cc
-+++ b/libgearman/client.cc
-@@ -599,7 +599,7 @@ gearman_return_t gearman_client_add_server(gearman_client_st *client_shell,
-   {
-     Client* client= client_shell->impl();
- 
--    if (gearman_connection_create(client->universal, host, port) == false)
-+    if (gearman_connection_create(client->universal, host, port) == NULL)
-     {
-       assert(client->error_code() != GEARMAN_SUCCESS);
-       return client->error_code();
-@@ -614,7 +614,7 @@ gearman_return_t gearman_client_add_server(gearman_client_st *client_shell,
- 
- gearman_return_t Client::add_server(const char *host, const char* service_)
- {
--  if (gearman_connection_create(universal, host, service_) == false)
-+  if (gearman_connection_create(universal, host, service_) == NULL)
-   {
-     assert(error_code() != GEARMAN_SUCCESS);
-     return error_code();
-@@ -946,7 +946,7 @@ gearman_return_t gearman_client_job_status(gearman_client_st *client_shell,
-       *denominator= do_task->impl()->denominator;
-     }
- 
--    if (is_known == false and is_running == false)
-+    if (! is_known and ! is_running)
-     {
-       if (do_task->impl()->options.is_running) 
-       {

@@ -1,33 +1,26 @@
 class Binwalk < Formula
   desc "Searches a binary image for embedded files and executable code"
-  homepage "http://binwalk.org/"
+  homepage "https://github.com/devttys0/binwalk"
   url "https://github.com/devttys0/binwalk/archive/v2.1.1.tar.gz"
   sha256 "1b70a5b03489d29f60fef18008a2164974234874faab48a4f47ec53d461d284a"
-  revision 1
+
+  revision 3
   head "https://github.com/devttys0/binwalk.git"
 
   bottle do
-    sha256 "7d923d9f5f12dad8e3a082b79e767d0bfb2178b3ae379a8f4451d231afa30923" => :el_capitan
-    sha256 "2f3890c8e50521c7987f963bc7a600c95477288d0a5f2a4edd696d4b9b461cfe" => :yosemite
-    sha256 "70c17ab802c7b2f7f01683aee7e787c8a20500d2f477b573228fc3a047a5a07c" => :mavericks
+    sha256 "7ea9cbc89c26df4a50a13b882a077311c123b4b86a5343a5187c896d7a5d747e" => :sierra
+    sha256 "d34e3ebcb6aa8fefd6d2807f5c47b5a7708200201a14bd66022cbdab20c9aeaa" => :el_capitan
+    sha256 "aca94d246fb634eb189b1146bd999d6777996283fde07f1d943112af7cbff802" => :yosemite
   end
 
-  option "with-matplotlib", "Check for presence of matplotlib, which is required for entropy graphing support"
   option "with-capstone", "Enable disasm options via capstone"
 
   depends_on "swig" => :build
   depends_on :fortran
-  depends_on "matplotlib" => :python if build.with? "matplotlib"
-  depends_on "pyside"
   depends_on :python if MacOS.version <= :snow_leopard
   depends_on "p7zip"
   depends_on "ssdeep"
   depends_on "xz"
-
-  resource "pyqtgraph" do
-    url "http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.10.tar.gz"
-    sha256 "4c0589774e3c8b0c374931397cf6356b9cc99a790215d1917bb7f015c6f0729a"
-  end
 
   resource "numpy" do
     url "https://pypi.python.org/packages/source/n/numpy/numpy-1.10.2.tar.gz"
@@ -46,7 +39,7 @@ class Binwalk < Formula
 
   def install
     ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
-    res = %w[numpy scipy pyqtgraph]
+    res = %w[numpy scipy]
     res += %w[capstone] if build.with? "capstone"
     res.each do |r|
       resource(r).stage do

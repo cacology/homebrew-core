@@ -4,71 +4,55 @@ class Kibana < Formula
   desc "Analytics and search dashboard for Elasticsearch"
   homepage "https://www.elastic.co/products/kibana"
   url "https://github.com/elastic/kibana.git",
-    :tag => "v4.5.1",
-    :revision => "addb28966a74b61791ceda352cd5b8b1200f2b2a"
-
+      :tag => "v5.4.1",
+      :revision => "725943bf9e3ca6f5e7d286ded25b0207fc68caaa"
   head "https://github.com/elastic/kibana.git"
 
   bottle do
-    sha256 "2a4de8b9c0223d3e7ef17e776ab79401e8c0e5ba78ba238f6d8159d8d16fb9be" => :el_capitan
-    sha256 "ec01418d4941f836cd7afcdfb79919ba1d8eae6ddf32ec5df4b7d49d6e5781c2" => :yosemite
-    sha256 "58dd7c70a51d0410ef7b3622e4022f2cc15a2060bc6a393bc29e1d79505084fb" => :mavericks
-  end
-
-  devel do
-    url "https://github.com/elastic/kibana.git",
-      :tag => "v5.0.0-alpha3",
-      :revision => "b6190c95064a7c48c390c4566e82b5a562ca744f"
-    version "5.0.0-alpha3"
+    sha256 "4740e799c140ee9f49a8051bd335186906e2fa886bfdf39f5b9dd2a50132d074" => :sierra
+    sha256 "17732a62d8727afb2c28674b839717c4a7ff9dc7eb4c4336f4e4e25f7df2f06c" => :el_capitan
+    sha256 "2628de60f25dfba79280763b6d8539a4c67b17aa2138f601be4bb24c9fc883bb" => :yosemite
   end
 
   resource "node" do
-    url "https://nodejs.org/dist/v4.4.4/node-v4.4.4.tar.gz"
-    sha256 "53c694c203ee18e7cd393612be08c61ed6ab8b2a165260984a99c014d1741414"
+    url "https://nodejs.org/dist/v6.10.2/node-v6.10.2.tar.xz"
+    sha256 "80aa11333da99813973a99646e2113c6be5b63f665c0731ed14ecb94cbe846b6"
   end
 
   def install
-    resource("node").stage buildpath/"node"
-    cd buildpath/"node" do
+    resource("node").stage do
       system "./configure", "--prefix=#{libexec}/node"
+      system "make", "test"
       system "make", "install"
     end
 
-    # do not download binary installs of Node.js
-    inreplace buildpath/"tasks/build/index.js", /('_build:downloadNodeBuilds:\w+',)/, "// \\1"
-
     # do not build packages for other platforms
-    platforms = Set.new(["darwin-x64", "linux-x64", "linux-x86", "windows"])
-    if OS.mac? && Hardware::CPU.is_64_bit?
+    platforms = Set.new(["darwin-x64", "linux-x64", "windows-x64"])
+    if MacOS.prefer_64_bit?
       platform = "darwin-x64"
-    elsif OS.linux?
-      platform = Hardware::CPU.is_64_bit? ? "linux-x64" : "linux-x86"
     else
-      raise "Installing Kibana via Homebrew is only supported on Darwin x86_64, Linux i386, Linux i686, and Linux x86_64"
+      raise "Installing Kibana via Homebrew is only supported on macOS x86_64"
     end
     platforms.delete(platform)
     sub = platforms.to_a.join("|")
     inreplace buildpath/"tasks/config/platforms.js", /('(#{sub})',?(?!;))/, "// \\1"
 
-    # do not build zip package
-    inreplace buildpath/"tasks/build/archives.js", /(await exec\('zip'.*)/, "// \\1"
+    # trick the build into thinking we've already downloaded the Node.js binary
+    mkdir_p buildpath/".node_binaries/#{resource("node").version}/#{platform}"
 
     # set npm env and fix cache edge case (https://github.com/Homebrew/brew/pull/37#issuecomment-208840366)
     ENV.prepend_path "PATH", prefix/"libexec/node/bin"
     Pathname.new("#{ENV["HOME"]}/.npmrc").write Language::Node.npm_cache_config
     system "npm", "install", "--verbose"
-    system "npm", "run", "build"
-    mkdir "tar" do
-      system "tar", "--strip-components", "1", "-xf", Dir[buildpath/"target/kibana-*-#{platform}.tar.gz"].first
+    system "npm", "run", "build", "--", "--release", "--skip-os-packages", "--skip-archives"
 
-      rm_f Dir["bin/*.bat"]
-      prefix.install "bin", "config", "node_modules", "optimize", "package.json", "src", "webpackShims"
-    end
+    prefix.install Dir["build/kibana-#{version}-#{platform.sub("x64", "x86_64")}/{bin,config,node_modules,optimize,package.json,src,ui_framework,webpackShims}"]
 
     inreplace "#{bin}/kibana", %r{/node/bin/node}, "/libexec/node/bin/node"
+    inreplace "#{bin}/kibana-plugin", %r{/node/bin/node}, "/libexec/node/bin/node"
 
     cd prefix do
-      inreplace "config/kibana.yml", %(/var/run/kibana.pid), var/"run/kibana.pid"
+      inreplace "config/kibana.yml", "/var/run/kibana.pid", var/"run/kibana.pid"
       (etc/"kibana").install Dir["config/*"]
       rm_rf "config"
     end
@@ -76,13 +60,14 @@ class Kibana < Formula
 
   def post_install
     ln_s etc/"kibana", prefix/"config"
-    (prefix/"installedPlugins").mkdir
+    (prefix/"data").mkdir
+    (prefix/"plugins").mkdir
   end
 
   def caveats; <<-EOS.undent
     Config: #{etc}/kibana/
     If you wish to preserve your plugins upon upgrade, make a copy of
-    #{prefix}/installedPlugins before upgrading, and copy it into the
+    #{opt_prefix}/plugins before upgrading, and copy it into the
     new keg location after upgrading.
     EOS
   end

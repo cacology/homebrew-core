@@ -1,14 +1,14 @@
 class MinimalRacket < Formula
   desc "Modern programming language in the Lisp/Scheme family"
   homepage "https://racket-lang.org/"
-  url "https://mirror.racket-lang.org/installers/6.6/racket-minimal-6.6-src-builtpkgs.tgz"
-  version "6.6"
-  sha256 "f0666dbf0c7fc446f103b0c16eed508225addb09596f9c44a87b9d546422b1e9"
+  url "https://mirror.racket-lang.org/installers/6.9/racket-minimal-6.9-src-builtpkgs.tgz"
+  version "6.9"
+  sha256 "0b8eb43c16e2380ff47fd7883d7886a1d34935ead3546cde9e292318ddefba87"
 
   bottle do
-    sha256 "939710efd3662a6dacecec89d3097eeb38b5d880abc6100e542ea804057e0de4" => :el_capitan
-    sha256 "75813d0858f9d7a6f71a31e7e73e8ee0df6a0d5e794f288a948377fd44d20a14" => :yosemite
-    sha256 "cc3c79837045ed6bc4a7991e5e5a8a024ea0c449a4b841f71394f3c4347cdcc0" => :mavericks
+    sha256 "7133142df6b9e7566ea07c712dbb45bb9850b31907f54fe085c07798201a9933" => :sierra
+    sha256 "4890d69b52d566006ee8d131b9eb52645bebd6c0031227f0fcd1c1af2a6086ed" => :el_capitan
+    sha256 "4475b33381fa8d074e5a7eac3df416fffcb2296163674385e6ed8935a554ee2f" => :yosemite
   end
 
   # these two files are amended when (un)installing packages
@@ -37,11 +37,11 @@ class MinimalRacket < Formula
     inreplace etc/"racket/config.rktd" do |s|
       s.gsub!(
         /\(bin-dir\s+\.\s+"#{Regexp.quote(bin)}"\)/,
-        "(bin-dir . \"#{HOMEBREW_PREFIX}/bin\")"
+        "(bin-dir . \"#{HOMEBREW_PREFIX}/bin\")",
       )
       s.gsub!(
         /\n\)$/,
-        "\n      (default-scope . \"installation\")\n)"
+        "\n      (default-scope . \"installation\")\n)",
       )
     end
   end

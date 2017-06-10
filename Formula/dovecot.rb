@@ -1,14 +1,15 @@
 class Dovecot < Formula
   desc "IMAP/POP3 server"
-  homepage "http://dovecot.org/"
-  url "http://dovecot.org/releases/2.2/dovecot-2.2.24.tar.gz"
-  mirror "https://fossies.org/linux/misc/dovecot-2.2.24.tar.gz"
-  sha256 "71c86891ea8deb5703d3dbbc3ea31ce2cbf7638f1aa395d9e8794d3ff7aebeb7"
+  homepage "https://dovecot.org/"
+  url "https://dovecot.org/releases/2.2/dovecot-2.2.29.1.tar.gz"
+  mirror "https://fossies.org/linux/misc/dovecot-2.2.29.1.tar.gz"
+  sha256 "ccfa9ffb7eb91e9e87c21c108324b911250c9ffa838bffb64b1caafadcb0f388"
 
   bottle do
-    sha256 "6ce8e803e9928bbaa63f5e1a5bc86e035138b02fd5b8c9337eab860ed1344fb8" => :el_capitan
-    sha256 "a7edbef68eff6834c88719ff4c86c576e7267214b813f2ec7c0ca102a2ca46f4" => :yosemite
-    sha256 "9cc3b02b610622cf9fffa4c882b0731e1d9e3e4e08fc62ba788463f23dd61858" => :mavericks
+    rebuild 1
+    sha256 "2f6605d8254d0024e6a04a18a3cdc0197c2590329b1d670132c5881b953ceb0b" => :sierra
+    sha256 "0638bed9c81e8686b1b4fa41d50d22d4f4f694261a9564d8b408301fcc71973c" => :el_capitan
+    sha256 "e9c52148ec2b06a35d7a65339ce27d7513ee7dfed777f6f49caa15c14572e318" => :yosemite
   end
 
   option "with-pam", "Build with PAM support"
@@ -20,13 +21,13 @@ class Dovecot < Formula
   depends_on "clucene" => :optional
 
   resource "pigeonhole" do
-    url "http://pigeonhole.dovecot.org/releases/2.2/dovecot-2.2-pigeonhole-0.4.13.tar.gz"
-    sha256 "7fd187b8393a5048b302f90ad84adc7bf6e73bf79fd8d22a1c1aaa71f836a910"
+    url "https://pigeonhole.dovecot.org/releases/2.2/dovecot-2.2-pigeonhole-0.4.18.tar.gz"
+    sha256 "dd871bb57fad22795460f613f3c9484a8bf229272ac00956d837a34444f1c3a9"
   end
 
   resource "stemmer" do
     url "https://github.com/snowballstem/snowball.git",
-      :revision => "3b1f4c2ac4b924bb429f929d9decd3f50662a6e0"
+      :revision => "304e1160341275565e032b00a9855d272f0c2a51"
   end
 
   def install
@@ -102,6 +103,16 @@ class Dovecot < Formula
         <string>#{var}/log/dovecot/dovecot.log</string>
         <key>StandardOutPath</key>
         <string>#{var}/log/dovecot/dovecot.log</string>
+        <key>SoftResourceLimits</key>
+        <dict>
+        <key>NumberOfFiles</key>
+        <integer>1000</integer>
+        </dict>
+        <key>HardResourceLimits</key>
+        <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+        </dict>
       </dict>
     </plist>
     EOS

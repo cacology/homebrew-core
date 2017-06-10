@@ -1,13 +1,14 @@
 class Arangodb < Formula
   desc "The Multi-Model NoSQL Database."
   homepage "https://www.arangodb.com/"
-  url "https://www.arangodb.com/repositories/Source/ArangoDB-3.0.4.tar.gz"
-  sha256 "7c0d977a1fb72389e5dd90a791b27a3b4ac07e7d0e849a910d9c786fdc9d5c93"
+  url "https://www.arangodb.com/repositories/Source/ArangoDB-3.1.22.tar.gz"
+  sha256 "dfc42439ab3864769589349825f8b423a768419c3b8379180a94d5aeb1e9b3e0"
   head "https://github.com/arangodb/arangodb.git", :branch => "unstable"
 
   bottle do
-    sha256 "a6addb72ea7bab4c28bc1d95f878efa827539386807ffaf783f1ed06b7d6f63f" => :el_capitan
-    sha256 "591c9ba528b58ccdb78efabe0a21cf341723fdb209520e6ad633b3d405256dd9" => :yosemite
+    sha256 "ecb61dfd8109e539a6132ec3cb65eed92d66078b483d26a5049e6f6e385da8d4" => :sierra
+    sha256 "4b0c1bf7839d9948172a55fe99f750ea8f597a5cba123744da9be191a0ed89d1" => :el_capitan
+    sha256 "9393569037d6af11cfb7b712d17a14463f33653916db9e19970a6dd8238393ea" => :yosemite
   end
 
   depends_on :macos => :yosemite
@@ -22,40 +23,8 @@ class Arangodb < Formula
     cause "Fails with compile errors"
   end
 
-  resource "arangodb2" do
-    url "https://www.arangodb.com/repositories/Source/ArangoDB-2.8.10.tar.gz"
-    sha256 "3a455e9d6093739660ad79bd3369652db79f3dabd9ae02faca1b014c9aa220f4"
-  end
-
-  resource "upgrade" do
-    url "https://www.arangodb.com/repositories/Source/upgrade3-1.0.0.tar.gz"
-    sha256 "965f899685e420530bb3c68ada903c815ebd0aa55e477d6949abba9506574011"
-  end
-
   def install
     ENV.cxx11
-
-    (libexec/"arangodb2/bin").install resource("upgrade")
-
-    resource("arangodb2").stage do
-      ENV.cxx11
-
-      args = %W[
-        --disable-dependency-tracking
-        --prefix=#{libexec}/arangodb2
-        --disable-relative
-        --localstatedir=#{var}
-        --program-suffix=-2.8
-      ]
-
-      if ENV.compiler == "gcc-6"
-        ENV.append "CXXFLAGS", "-O2 -g -fno-delete-null-pointer-checks"
-        inreplace "3rdParty/Makefile.v8", "CXXFLAGS=\"", "CXXFLAGS=\"-fno-delete-null-pointer-checks "
-      end
-
-      system "./configure", *args
-      system "make", "install"
-    end
 
     mkdir "build" do
       args = std_cmake_args + %W[
@@ -63,8 +32,9 @@ class Arangodb < Formula
         -DUSE_OPTIMIZE_FOR_ARCHITECTURE=OFF
         -DASM_OPTIMIZATIONS=OFF
         -DCMAKE_INSTALL_DATADIR=#{share}
-        -DETCDIR=#{etc}
-        -DVARDIR=#{var}
+        -DCMAKE_INSTALL_DATAROOTDIR=#{share}
+        -DCMAKE_INSTALL_SYSCONFDIR=#{etc}
+        -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
       ]
 
       if ENV.compiler == "gcc-6"
@@ -81,32 +51,12 @@ class Arangodb < Formula
   end
 
   def post_install
-    oldpath_prefix = "#{HOMEBREW_PREFIX}/Cellar/arangodb/3.0."
-    oldpath_regexp = /#{Regexp.escape(oldpath_prefix)}[12]/
-
-    %w[arangod arango-dfdb arangosh foxx-manager].each do |f|
-      inreplace etc/"arangodb3/#{f}.conf", oldpath_regexp, opt_prefix, false
-    end
-
     (var/"lib/arangodb3").mkpath
     (var/"log/arangodb3").mkpath
-
-    args = %W[
-      #{libexec}/arangodb2
-      #{var}/lib/arangodb
-      #{opt_prefix}
-      #{var}/lib/arangodb3
-    ]
-
-    system libexec/"arangodb2/bin/upgrade.sh", *args
   end
 
   def caveats
     s = <<-EOS.undent
-      The database format between ArangoDB 2.x and ArangoDB 3.x has
-      been changed, please checkout
-      https://docs.arangodb.com/3.0/Manual/Administration/Upgrading/index.html
-
       An empty password has been set. Please change it by executing
         #{opt_sbin}/arango-secure-installation
     EOS

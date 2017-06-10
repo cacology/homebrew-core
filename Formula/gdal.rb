@@ -1,13 +1,14 @@
 class Gdal < Formula
-  desc "GDAL: Geospatial Data Abstraction Library"
+  desc "Geospatial Data Abstraction Library"
   homepage "http://www.gdal.org/"
   url "http://download.osgeo.org/gdal/1.11.5/gdal-1.11.5.tar.gz"
   sha256 "49f99971182864abed9ac42de10545a92392d88f7dbcfdb11afe449a7eb754fe"
+  revision 2
 
   bottle do
-    sha256 "1df44c4117d5077cbb32a94e987e14a05b5cf7ad8f1f3bab8245bedf9b0f3b39" => :el_capitan
-    sha256 "31aaaae5286143afdd887e97f65d0c73b4f2e820d3d8ea9853437c5a805813a9" => :yosemite
-    sha256 "22cb34fdedb04658419f412c0ade1f83e01202e9e569fc0b6baf4fe2e3878307" => :mavericks
+    sha256 "aff01d6c7b092145c820bc2cd55f68e14f7c576c1641f4b725523688757f96dc" => :sierra
+    sha256 "4958dc9b921f68ab7de5fc1dde52ce1ee16ea280a29d2b4683909cf1cfc325b8" => :el_capitan
+    sha256 "cea3dc8fef27b6a19e43d642fbf9d2a6c62706acd9400499d735d4c36e6ea6a2" => :yosemite
   end
 
   head do
@@ -22,6 +23,7 @@ class Gdal < Formula
   option "with-mdb", "Build with Access MDB driver (requires Java 1.6+ JDK/JRE, from Apple or Oracle)."
   option "with-libkml", "Build with Google's libkml driver (requires libkml --HEAD or >= 1.3)"
   option "with-swig-java", "Build the swig java bindings"
+  option "without-python", "Build without python2 support"
 
   deprecated_option "enable-opencl" => "with-opencl"
   deprecated_option "enable-armadillo" => "with-armadillo"
@@ -36,7 +38,9 @@ class Gdal < Formula
   depends_on "libgeotiff"
   depends_on "proj"
   depends_on "geos"
-
+  depends_on "json-c"
+  depends_on "libxml2"
+  depends_on "pcre"
   depends_on "sqlite" # To ensure compatibility with SpatiaLite.
   depends_on "freexl"
   depends_on "libspatialite"
@@ -57,13 +61,13 @@ class Gdal < Formula
     depends_on "homebrew/science/netcdf" # Also brings in HDF5
     depends_on "jasper"
     depends_on "webp"
-    depends_on "cfitsio"
+    depends_on "homebrew/science/cfitsio"
     depends_on "epsilon"
     depends_on "libdap"
     depends_on "libxml2"
 
     # Vector libraries
-    depends_on "unixodbc" # OS X version is not complete enough
+    depends_on "unixodbc" # macOS version is not complete enough
     depends_on "xerces-c"
 
     # Other libraries
@@ -80,7 +84,6 @@ class Gdal < Formula
     depends_on "swig" => :build
   end
 
-  option "without-python", "Build without python2 support"
   depends_on :python => :optional if MacOS.version <= :snow_leopard
   depends_on :python3 => :optional
   depends_on :fortran => :build if build.with?("python") || build.with?("python3")
@@ -125,7 +128,7 @@ class Gdal < Formula
       "--with-grib",
       "--with-pam",
 
-      # Backends supported by OS X.
+      # Backends supported by macOS.
       "--with-libiconv-prefix=/usr",
       "--with-libz=/usr",
       "--with-png=#{Formula["libpng"].opt_prefix}",
@@ -240,6 +243,10 @@ class Gdal < Formula
   end
 
   def install
+    inreplace "frmts/jpeg2000/jpeg2000_vsil_io.cpp",
+      "stream->bufbase_ = JAS_CAST(uchar *, buf);",
+      "stream->bufbase_ = JAS_CAST(u_char *, buf);"
+
     if build.with? "libkml"
       resource("libkml").stage do
         # See main `libkml` formula for info on patches

@@ -1,27 +1,27 @@
 class Osh < Formula
   desc "Two ports of /bin/sh from V6 UNIX (circa 1975)"
-  homepage "http://v6shell.org"
-  url "http://v6shell.org/src/osh-4.2.1.tar.gz"
-  # TODO: fix this when epochs exist
-  version "20160515"
-  sha256 "2e2855c58b88d96146accbdc60f39a5745dea571b620b5f38ebf3e43d9b0ca74"
-  head "https://github.com/JNeitzel/v6shell.git"
+  homepage "https://v6shell.org/"
+  url "https://v6shell.org/src/osh-4.4.0.tar.gz"
+  sha256 "65a77c73a92c282159f455e04cc0b4de6bd7e1c3db99405e0cb7fe281fd88e81"
+  version_scheme 1
+  head "https://github.com/JNeitzel/v6shell.git", :branch => "current"
 
   bottle do
-    sha256 "cedd57af18833fdca6996438d708c5b6e90a2a332c5e3e3e0795d40842e090c7" => :el_capitan
-    sha256 "b905743bf8cdd83730ef394e45b5f6d98f6ec0af06559589012a307fde957a06" => :yosemite
-    sha256 "0f0d9e240615dabed38ecaac5ec85d5eab948a29afb70f5a845e802cd8bc6392" => :mavericks
+    sha256 "3981b2b01455ff2f689feb0355ca0f2b8eea7049cf2dd81943d83f8c58bd586a" => :sierra
+    sha256 "e4ad8a13f302abac406b9c948965574237afa06a7a9b62c854bfdf6afb4465a8" => :el_capitan
+    sha256 "ffba74a1d76e0234e60877c6472f72dceab8c23771cd7b1c04bccff798d6628c" => :yosemite
   end
 
   option "with-examples", "Build with shell examples"
 
   resource "examples" do
-    url "http://v6shell.org/v6scripts/v6scripts-20160128.tar.gz"
+    url "https://v6shell.org/v6scripts/v6scripts-20160128.tar.gz"
     sha256 "c23251137de67b042067b68f71cd85c3993c566831952af305f1fde93edcaf4d"
   end
 
   def install
-    system "make", "install", "PREFIX=#{prefix}", "SYSCONFDIR=#{etc}"
+    system "./configure", "osh", "sh6"
+    system "make", "install", "PREFIX=#{prefix}", "SYSCONFDIR=#{etc}", "MANDIR=#{man1}"
 
     if build.with? "examples"
       resource("examples").stage do
@@ -32,11 +32,11 @@ class Osh < Formula
   end
 
   test do
-    assert_match /Homebrew!/, shell_output("#{bin}/osh -c 'echo Homebrew!'").strip
+    assert_match "brew!", shell_output("#{bin}/osh -c 'echo brew!'").strip
 
     if build.with? "examples"
       ENV.prepend_path "PATH", libexec
-      assert_match /1 3 5 7 9 11 13 15 17 19/, shell_output("#{libexec}/counts").strip
+      assert_match "1 3 5 7 9 11 13 15 17 19", shell_output("#{libexec}/counts").strip
     end
   end
 end

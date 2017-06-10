@@ -5,17 +5,16 @@ class HaskellStack < Formula
 
   desc "The Haskell Tool Stack"
   homepage "https://haskellstack.org/"
-  url "https://github.com/commercialhaskell/stack/releases/download/v1.1.2/stack-1.1.2-sdist-2.tar.gz"
-  version "1.1.2"
-  sha256 "8197e055451437218e964ff4a53936a497a2c1ed4818c17cf290c9a59fff9424"
-  revision 3
+  url "https://github.com/commercialhaskell/stack/releases/download/v1.4.0/stack-1.4.0-sdist-0.tar.gz"
+  version "1.4.0"
+  sha256 "edad1b32eb44acc7632a6b16726cd634f74383fd1c05757dccca1744d1ca3642"
   head "https://github.com/commercialhaskell/stack.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "e8e2343689c99d85bb1c930d83cbafc8ca7be4fc64faaeb844771a1511a0ff3d" => :el_capitan
-    sha256 "fe0aa6086ec90d711ebf0cd0169f5a3dc76f6f1a8c81b357ba6c81d0a22a86af" => :yosemite
-    sha256 "06a004b35c817fc17b0496aa06a886d5d1a69e9436bb9e8aa5e039f3148212c2" => :mavericks
+    sha256 "624a68d132c3f89e9b4f5b089915b40aa612577097d13dd64ac9e2310a50050c" => :sierra
+    sha256 "e71e0d344e7e23d407c4bba77289083d8328f9a1e93c733e1f1c1b88f3c37745" => :el_capitan
+    sha256 "086d41db9d06a816a2b9ec44d2d580e2bba078abc5fc9863dfbc948ee263434a" => :yosemite
   end
 
   option "without-bootstrap", "Don't bootstrap a stage 2 stack"
@@ -23,20 +22,36 @@ class HaskellStack < Formula
   depends_on "ghc" => :build
   depends_on "cabal-install" => :build
 
+  # Remove when stack-8.0.yaml is the default
+  resource "source_archive" do
+    url "https://github.com/commercialhaskell/stack/archive/v1.4.0.tar.gz"
+    sha256 "595d311ad117e41ad908b7065743917542b40f343d1334673e98171ee74d36e6"
+  end
+
   def install
-    if build.with? "bootstrap"
-      cabal_sandbox do
+    cabal_sandbox do
+      if build.with? "bootstrap"
         cabal_install
+
         # Let `stack` handle its own parallelization
         # Prevents "install: mkdir ... ghc-7.10.3/lib: File exists"
+        ENV.deparallelize
         jobs = ENV.make_jobs
-        ENV.deparallelize do
+
+        if MacOS.version >= :sierra
+          (buildpath/"source_archive").install resource("source_archive")
+          cd "source_archive" do
+            system "stack", "-j#{jobs}", "--stack-yaml=stack-8.0.yaml", "setup"
+            system "stack", "-j#{jobs}", "--stack-yaml=stack-8.0.yaml",
+                            "--local-bin-path=#{bin}", "install"
+          end
+        else
           system "stack", "-j#{jobs}", "setup"
           system "stack", "-j#{jobs}", "--local-bin-path=#{bin}", "install"
         end
+      else
+        install_cabal_package
       end
-    else
-      install_cabal_package
     end
   end
 

@@ -1,14 +1,13 @@
 class Gjs < Formula
-  desc "Javascript Bindings for GNOME"
+  desc "JavaScript Bindings for GNOME"
   homepage "https://wiki.gnome.org/Projects/Gjs"
-  url "https://download.gnome.org/sources/gjs/1.44/gjs-1.44.0.tar.xz"
-  sha256 "88c960f6ad47a6931d123f5d6317d13704f58572f68a4391913a254ff27dce80"
+  url "https://download.gnome.org/sources/gjs/1.48/gjs-1.48.3.tar.xz"
+  sha256 "669b7d78ad98390a762eec50d7cc637e25f196d986c0200d9f1c3a0e0cd90f33"
 
   bottle do
-    revision 1
-    sha256 "fb613d40633ad455a5a057d8ea196b6fd602bfd3c5920bb917783f413f0982d0" => :el_capitan
-    sha256 "dfcf484bc4ccbf5d3e6db92247d963712609d7d8d821b8046843899368f9aef1" => :yosemite
-    sha256 "dab6d6305eb3d8046b7f87659b5c3207bb309787a7f58d64a9c018fab78f6437" => :mavericks
+    sha256 "d482b9aab25ce9099e3205a438507d34a31b1c252140d034b53e015bd7490326" => :sierra
+    sha256 "7bec881a9a2f7996eee7922801f3f00cbf7db8b22ed64b7573e1cc209f6daf59" => :el_capitan
+    sha256 "ac1d5467c00620cda2bd1cde60d663c7e275298fb4b229108c14ea2cd7cf5255" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -17,35 +16,52 @@ class Gjs < Formula
   depends_on "readline"
   depends_on "gtk+3" => :recommended
 
-  resource "mozjs24" do
-    url "https://ftp.mozilla.org/pub/mozilla.org/js/mozjs-24.2.0.tar.bz2"
-    sha256 "e62f3f331ddd90df1e238c09d61a505c516fe9fd8c5c95336611d191d18437d8"
+  needs :cxx11
+
+  resource "mozjs38" do
+    url "https://archive.mozilla.org/pub/firefox/releases/38.8.0esr/source/firefox-38.8.0esr.source.tar.bz2"
+    sha256 "9475adcee29d590383c4885bc5f958093791d1db4302d694a5d2766698f59982"
   end
 
   def install
-    resource("mozjs24").stage do
+    resource("mozjs38").stage do
+      inreplace "config/rules.mk", "-install_name @executable_path/$(SHARED_LIBRARY) ", "-install_name #{lib}/$(SHARED_LIBRARY) "
       cd("js/src") do
-        # patches taken from MacPorts
-        # fixes a problem with Perl 5.22
-        inreplace "config/milestone.pl", "if (defined(@TEMPLATE_FILE)) {", "if (@TEMPLATE_FILE) {"
-        # use absolute path for install_name, don't assume will be put into an app bundle
-        inreplace "config/rules.mk", "@executable_path", "${prefix}/lib"
+        ENV["PYTHON"] = "python"
+        inreplace "configure", "'-Wl,-executable_path,$(LIBXUL_DIST)/bin'", ""
         system "./configure", "--disable-debug",
                               "--disable-dependency-tracking",
                               "--disable-silent-rules",
                               "--prefix=#{prefix}",
                               "--with-system-nspr",
+                              "--with-system-zlib",
+                              "--with-system-icu",
+                              "--enable-system-ffi",
                               "--enable-readline",
+                              "--enable-shared-js",
                               "--enable-threadsafe"
         system "make"
         system "make", "install"
         rm Dir["#{bin}/*"]
       end
+      mv "#{lib}/pkgconfig/js.pc", "#{lib}/pkgconfig/mozjs-38.pc"
+      # headers were installed as softlinks, which is not acceptable
+      cd(include.to_s) do
+        `find . -type l`.chomp.split.each do |link|
+          header = File.readlink(link)
+          rm link
+          cp header, link
+        end
+      end
       ENV.append_path "PKG_CONFIG_PATH", "#{lib}/pkgconfig"
+      # remove mozjs static lib
+      rm "#{lib}/libjs_static.ajs"
     end
+    ENV.cxx11
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--disable-silent-rules",
+                          "--without-dbus-tests",
                           "--prefix=#{prefix}"
     system "make", "install"
   end

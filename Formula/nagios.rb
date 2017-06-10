@@ -1,14 +1,13 @@
 class Nagios < Formula
   desc "Network monitoring and management system"
   homepage "https://www.nagios.org/"
-  url "https://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.6/nagios-4.0.6.tar.gz"
-  sha256 "d400190c771eb90e0ba16351f6358fa7e22e42a7be986f2066db63518a14397b"
+  url "https://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.3.2/nagios-4.3.2.tar.gz"
+  sha256 "687814b40b03b40361377aeace057dddb23459ffb8c00434bc1a95b21ccdf796"
 
   bottle do
-    cellar :any
-    sha256 "36fd9a8eda1286902fefea97a76e508e27c6cd7fd6cc2156558411f6b3f32709" => :el_capitan
-    sha256 "d577fda33880b29093628affbf7e71d9e1e37220f84b6c83cc7dbb05875fa86a" => :yosemite
-    sha256 "e5a625fae90701cbbfa97fa872c8a694d1365f04d970822e3bc8d81aa37ca667" => :mavericks
+    sha256 "ba0760140556633d7d0e6288c4c608759f45b59d1978e98faf3f48a3bf31e1ab" => :sierra
+    sha256 "6ef8d969ea7df2495432e7b2697781b599c3fb1ad838a8a14fa8a0af96154352" => :el_capitan
+    sha256 "4505f31cb8c616a7d31449150f3b1ac6c9ae21d503ae6ccb1a07641631e4ff7f" => :yosemite
   end
 
   depends_on "gd"
@@ -16,27 +15,27 @@ class Nagios < Formula
   depends_on "libpng"
 
   def nagios_sbin
-    prefix+"cgi-bin"
+    prefix/"cgi-bin"
   end
 
   def nagios_etc
-    etc+"nagios"
+    etc/"nagios"
   end
 
   def nagios_var
-    var+"lib/nagios"
+    var/"lib/nagios"
   end
 
   def htdocs
-    share+"nagios/htdocs"
+    pkgshare/"htdocs"
   end
 
   def user
-    `id -un`.chomp
+    Utils.popen_read("id -un").chomp
   end
 
   def group
-    `id -gn`.chomp
+    Utils.popen_read("id -gn").chomp
   end
 
   def install
@@ -59,36 +58,17 @@ class Nagios < Formula
     system "make", "install"
 
     # Install config
-    system "make install-config"
-    system "make install-webconf"
-    mkdir HOMEBREW_PREFIX+"var/lib/nagios/rw" unless File.exist? HOMEBREW_PREFIX+"var/lib/nagios/rw"
+    system "make", "install-config"
+    system "make", "install-webconf"
   end
 
-  plist_options :startup => true, :manual => "nagios #{HOMEBREW_PREFIX}/etc/nagios/nagios.cfg"
+  def postinstall
+    (var/"lib/nagios/rw").mkpath
 
-  def plist; <<-EOS.undent
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-    <dict>
-            <key>KeepAlive</key>
-            <true/>
-            <key>Label</key>
-            <string>#{plist_name}</string>
-            <key>ProgramArguments</key>
-            <array>
-                    <string>#{opt_bin}/nagios</string>
-                    <string>#{nagios_etc}/nagios.cfg</string>
-            </array>
-            <key>RunAtLoad</key>
-            <true/>
-            <key>StandardErrorPath</key>
-            <string>/dev/null</string>
-            <key>StandardOutPath</key>
-            <string>/dev/null</string>
-    </dict>
-    </plist>
-    EOS
+    config = etc/"nagios/nagios.cfg"
+    return unless File.exist?(config)
+    return if File.read(config).include?(ENV["USER"])
+    inreplace config, "brew", ENV["USER"]
   end
 
   def caveats; <<-EOS.undent
@@ -121,5 +101,36 @@ class Nagios < Formula
       open http://localhost/nagios
 
     EOS
+  end
+
+  plist_options :startup => true, :manual => "nagios #{HOMEBREW_PREFIX}/etc/nagios/nagios.cfg"
+
+  def plist; <<-EOS.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>KeepAlive</key>
+      <true/>
+      <key>Label</key>
+      <string>#{plist_name}</string>
+      <key>ProgramArguments</key>
+      <array>
+        <string>#{opt_bin}/nagios</string>
+        <string>#{nagios_etc}/nagios.cfg</string>
+      </array>
+      <key>RunAtLoad</key>
+      <true/>
+      <key>StandardErrorPath</key>
+      <string>/dev/null</string>
+      <key>StandardOutPath</key>
+      <string>/dev/null</string>
+    </dict>
+    </plist>
+    EOS
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/nagios --version")
   end
 end

@@ -1,20 +1,20 @@
 class Poppler < Formula
   desc "PDF rendering library (based on the xpdf-3.0 code base)"
   homepage "https://poppler.freedesktop.org/"
-  url "https://poppler.freedesktop.org/poppler-0.47.0.tar.xz"
-  sha256 "b872e7228fc34a71ce4b47a5aea2a57ae67528818fa846e1e0eda089319bd242"
+  url "https://poppler.freedesktop.org/poppler-0.55.0.tar.xz"
+  sha256 "537f2bc60d796525705ad9ca8e46899dcc99c2e9480b80051808bae265cdc658"
 
   bottle do
-    sha256 "bac96fe4712def220072bbc9f7892342a7d00aa87c8cdfb1a3cf21971468fb26" => :el_capitan
-    sha256 "cd8f70a74efb13c54a7f95338d1cb469bb355cb3b6fae1cb059362089235232e" => :yosemite
-    sha256 "4cd7dfe4ad735d84b0a1ac17815772c02d26bf086e498122283c34844170c58f" => :mavericks
+    sha256 "55bc6d2cac4f69d0f019583d19859c0d91ca0802bcc0d836b5d324c3a8d171d1" => :sierra
+    sha256 "b16c0388cebccac0aac1bc897030404fb8629b27b5281d18528e16d303a885d9" => :el_capitan
+    sha256 "e9f126d38017b290f881c6970163494f91d267034f063f3afe3cdce5417e7be3" => :yosemite
   end
 
-  option "with-qt", "Build Qt backend"
-  option "with-qt5", "Build Qt5 backend"
+  option "with-qt", "Build Qt5 backend"
   option "with-little-cms2", "Use color management system"
 
   deprecated_option "with-qt4" => "with-qt"
+  deprecated_option "with-qt5" => "with-qt"
   deprecated_option "with-lcms2" => "with-little-cms2"
 
   depends_on "pkg-config" => :build
@@ -29,18 +29,20 @@ class Poppler < Formula
   depends_on "libtiff"
   depends_on "openjpeg"
   depends_on "qt" => :optional
-  depends_on "qt5" => :optional
   depends_on "little-cms2" => :optional
 
-  conflicts_with "pdftohtml", :because => "both install `pdftohtml` binaries"
+  conflicts_with "pdftohtml", "pdf2image", "xpdf",
+    :because => "poppler, pdftohtml, pdf2image, and xpdf install conflicting executables"
 
   resource "font-data" do
     url "https://poppler.freedesktop.org/poppler-data-0.4.7.tar.gz"
     sha256 "e752b0d88a7aba54574152143e7bf76436a7ef51977c55d6bd9a48dccde3a7de"
   end
 
+  needs :cxx11 if build.with?("qt") || MacOS.version < :mavericks
+
   def install
-    ENV.cxx11 if MacOS.version < :mavericks
+    ENV.cxx11 if build.with?("qt") || MacOS.version < :mavericks
     ENV["LIBOPENJPEG_CFLAGS"] = "-I#{Formula["openjpeg"].opt_include}/openjpeg-2.1"
 
     args = %W[
@@ -50,16 +52,13 @@ class Poppler < Formula
       --enable-poppler-glib
       --disable-gtk-test
       --enable-introspection=yes
+      --disable-poppler-qt4
     ]
 
-    if build.with?("qt") && build.with?("qt5")
-      raise "poppler: --with-qt and --with-qt5 cannot be used at the same time"
-    elsif build.with? "qt"
-      args << "--enable-poppler-qt4"
-    elsif build.with? "qt5"
+    if build.with? "qt"
       args << "--enable-poppler-qt5"
     else
-      args << "--disable-poppler-qt4" << "--disable-poppler-qt5"
+      args << "--disable-poppler-qt5"
     end
 
     args << "--enable-cms=lcms2" if build.with? "little-cms2"

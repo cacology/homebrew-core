@@ -6,6 +6,7 @@ class Jython < Formula
 
   # This isn't accidental; there is actually a compile process here.
   bottle do
+    sha256 "355056444220bf1bb7bd5aeeb761c81a6632426ec2bd193270600615e5eaec44" => :sierra
     sha256 "12a261c1f35421587b21cb1e9de24dbe109716746c5393d8d2046e15aab0b821" => :el_capitan
     sha256 "2cfee4b728f3eb12528b66f53efee4fd2963c8da4103a47a1789afe75f1d5192" => :yosemite
     sha256 "a20a699bcbec43953cec0f8de72dc98ceef2264fc62744cc62d0a96c5e2b175e" => :mavericks
@@ -19,5 +20,13 @@ class Jython < Formula
   def install
     system "java", "-jar", cached_download, "-s", "-d", libexec
     bin.install_symlink libexec/"bin/jython"
+  end
+
+  test do
+    ENV.java_cache
+
+    jython = shell_output("#{bin}/jython -c \"from java.util import Date; print Date()\"")
+    # This will break in the year 2100. The test will need updating then.
+    assert_match jython.match(/20\d\d/).to_s, shell_output("/bin/date +%Y")
   end
 end

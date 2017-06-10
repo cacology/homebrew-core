@@ -1,14 +1,13 @@
 class Cgdb < Formula
   desc "Curses-based interface to the GNU Debugger"
   homepage "https://cgdb.github.io/"
-  url "https://cgdb.me/files/cgdb-0.6.8.tar.gz"
-  sha256 "be203e29be295097439ab67efe3dc8261f742c55ff3647718d67d52891f4cf41"
+  url "https://cgdb.me/files/cgdb-0.7.0.tar.gz"
+  sha256 "bf7a9264668db3f9342591b08b2cc3bbb08e235ba2372877b4650b70c6fb5423"
 
   bottle do
-    sha256 "8d47a315bc04053f84802069723edf9ea920c7361464992c1a657f41db52f901" => :el_capitan
-    sha256 "b105849b8556fbe4badea662619525b3c0d5d3fd46738e3c7257e6250c7107dd" => :yosemite
-    sha256 "87938fedfd548c40fd567e07e0e277f71a5ca69218e741975bcbeb104a4108d8" => :mavericks
-    sha256 "218acd2aa10e805643898b5b04da0022b9b1e7186519493c80b26a14e13203ba" => :mountain_lion
+    sha256 "a81736f1e3b84ef7de58710b815bc90d845e4b5a0330146aca1fea31a75be81f" => :sierra
+    sha256 "b2b8787372078b3d6568b232497a18da791c3197708f6814a69ced881d5c9055" => :el_capitan
+    sha256 "4957746e9d5b84d9a39b07031ae1249d244bca262caf4ce84d744ddef8956c95" => :yosemite
   end
 
   head do

@@ -8,6 +8,7 @@ class Opencolorio < Formula
 
   bottle do
     cellar :any
+    sha256 "908cdf59c8eb2dd6afba51e1a851998ae551d5b9b885da66ade3e2c7cbce7447" => :sierra
     sha256 "e3a2312a3f21ea15255903f4b030d44fbcceee36e768a070427234d9b80a46fd" => :el_capitan
     sha256 "49edcb11a59fbcdbea875024a4c2719055fc17cee5e6472fe82d30e79685ae97" => :yosemite
     sha256 "8aba1648c2c21f1054956c2d0fa7884d3882e30446785419bc429e50022d242c" => :mavericks
@@ -27,7 +28,7 @@ class Opencolorio < Formula
   # Fix build with libc++
   patch do
     url "https://github.com/imageworks/OpenColorIO/commit/ebd6efc036b6d0b17c869e3342f17f9c5ef8bbfc.diff"
-    sha256 "eab670cdd0278c610ecd6c059cb12f3042395d474259ddd18b7b8e242ad82810"
+    sha256 "732c1bd054717f7e96658f708d277a25972c164004750a9e64e583bee9f39a0c"
   end
 
   # Fix includes on recent Clang; reported upstream:

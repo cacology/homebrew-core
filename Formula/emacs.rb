@@ -1,50 +1,42 @@
 class Emacs < Formula
   desc "GNU Emacs text editor"
   homepage "https://www.gnu.org/software/emacs/"
-  url "https://ftpmirror.gnu.org/emacs/emacs-24.5.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/emacs/emacs-24.5.tar.xz"
-  sha256 "dd47d71dd2a526cf6b47cb49af793ec2e26af69a0951cc40e43ae290eacfc34e"
+  url "https://ftp.gnu.org/gnu/emacs/emacs-25.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/emacs/emacs-25.2.tar.xz"
+  sha256 "59b55194c9979987c5e9f1a1a4ab5406714e80ffcfd415cc6b9222413bc073fa"
 
   bottle do
-    revision 3
-    sha256 "7efa8afcc662120bee21e692e6721a956cb3088f91a6f73fd64252f9679bfc21" => :el_capitan
-    sha256 "77bbc9a112c6107fbcbcbf0112012831235082c6425070a5b092bf25ef84d565" => :yosemite
-    sha256 "f1539cddd0392906fbfdf99e8f20fc07620daaeceac86fa2f98b701cc4f25a3a" => :mavericks
-  end
-
-  devel do
-    url "http://alpha.gnu.org/gnu/emacs/pretest/emacs-25.1-rc1.tar.xz"
-    version "25.1-rc1"
-    sha256 "c00c50e66474359d1e24baa2a0703bc64207caffc31d0808d8b4ffa4b3826133"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
+    sha256 "b759bd107cb9b227349cb82ddbc3924ffbe8767429db426b980247fd7958b3a5" => :sierra
+    sha256 "5456aa6ba7e2e9391abca982b1647b0ba97dd6c77378decb123f8e825620c03a" => :el_capitan
+    sha256 "cffac5cdce7aa321adb820300f54e747f7beae99f030d419c825427770c10888" => :yosemite
   end
 
   head do
     url "https://github.com/emacs-mirror/emacs.git"
 
     depends_on "autoconf" => :build
-    depends_on "automake" => :build
+    depends_on "gnu-sed" => :build
+    depends_on "texinfo" => :build
   end
 
   option "with-cocoa", "Build a Cocoa version of emacs"
   option "with-ctags", "Don't remove the ctags executable that emacs provides"
   option "without-libxml2", "Don't build with libxml2 support"
+  option "with-modules", "Compile with dynamic modules support"
 
   deprecated_option "cocoa" => "with-cocoa"
   deprecated_option "keep-ctags" => "with-ctags"
   deprecated_option "with-d-bus" => "with-dbus"
+  deprecated_option "imagemagick" => "imagemagick@6"
 
   depends_on "pkg-config" => :build
   depends_on "dbus" => :optional
   depends_on "gnutls" => :optional
-  depends_on "librsvg" => :recommended
-  depends_on "imagemagick" => :optional
+  depends_on "librsvg" => :optional
+  # Emacs does not support ImageMagick 7:
+  # Reported on 2017-03-04: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25967
+  depends_on "imagemagick@6" => :optional
   depends_on "mailutils" => :optional
-  # Remove this option and the --with-file-notification=gfile line below once
-  # Emacs 25 is stable (#4048)
-  depends_on "glib" => :optional
 
   def install
     args = %W[
@@ -55,8 +47,6 @@ class Emacs < Formula
       --prefix=#{prefix}
       --without-x
     ]
-
-    args << "--with-file-notification=gfile" if build.stable? && build.with?("glib")
 
     if build.with? "libxml2"
       args << "--with-xml2"
@@ -76,11 +66,23 @@ class Emacs < Formula
       args << "--without-gnutls"
     end
 
-    args << "--with-rsvg" if build.with? "librsvg"
-    args << "--with-imagemagick" if build.with? "imagemagick"
-    args << "--without-popmail" if build.with? "mailutils"
+    # Note that if ./configure is passed --with-imagemagick but can't find the
+    # library it does not fail but imagemagick support will not be available.
+    # See: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=24455
+    if build.with? "imagemagick@6"
+      args << "--with-imagemagick"
+    else
+      args << "--without-imagemagick"
+    end
 
-    system "./autogen.sh" if build.head? || build.devel?
+    args << "--with-modules" if build.with? "modules"
+    args << "--with-rsvg" if build.with? "librsvg"
+    args << "--without-pop" if build.with? "mailutils"
+
+    if build.head?
+      ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
+      system "./autogen.sh"
+    end
 
     if build.with? "cocoa"
       args << "--with-ns" << "--disable-ns-self-contained"
@@ -93,13 +95,6 @@ class Emacs < Formula
     system "make", "install"
 
     if build.with? "cocoa"
-      # Remove when 25.1 is released
-      if build.stable?
-        chmod 0644, %w[nextstep/Emacs.app/Contents/PkgInfo
-                       nextstep/Emacs.app/Contents/Resources/Credits.html
-                       nextstep/Emacs.app/Contents/Resources/document.icns
-                       nextstep/Emacs.app/Contents/Resources/Emacs.icns]
-      end
       prefix.install "nextstep/Emacs.app"
 
       # Replace the symlink with one that avoids starting Cocoa.

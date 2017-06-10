@@ -1,20 +1,24 @@
 class Kvazaar < Formula
   desc "Ultravideo HEVC encoder"
   homepage "https://github.com/ultravideo/kvazaar"
-  url "https://github.com/ultravideo/kvazaar/archive/v0.8.2.tar.gz"
-  sha256 "1b9354a639ab6c902e974780b39112b5e75477205611f88b54562c895182b945"
-  head "https://github.com/ultravideo/kvazaar.git"
+  url "https://github.com/ultravideo/kvazaar/releases/download/v1.1.0/kvazaar-v1.1.0.tar.gz"
+  sha256 "81386b25651ad328b2b94c269eb5601096b966724e6c308ecc3096eb37ef33bb"
 
   bottle do
     cellar :any
-    sha256 "51cc24538d1978ad0dc4d52056e45a3fcf2960d6d859ec728c4edd44e267dfde" => :el_capitan
-    sha256 "165654dedd6d7bb438ea9215789bf97a8fa426b3e7f09b1f010559c680a6b7b6" => :yosemite
-    sha256 "ae000ea2d5cb4717dce904aa371813e3603c0b05bf333306948457848e22c272" => :mavericks
+    sha256 "4f7c9e10e8725fb90eaa7f49fe5dfdc6e746d346294328d6a6f9d0b4b44aebdc" => :sierra
+    sha256 "f6389f0c17f8383a575d38db1ef54337909a9654136b68016f6b14853872f03a" => :el_capitan
+    sha256 "cbc275e60845c45f968dce9e00d11124830f5a72966c6814b42f8fffaa821df0" => :yosemite
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
+  head do
+    url "https://github.com/ultravideo/kvazaar.git"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
+
   depends_on "yasm" => :build
 
   resource "videosample" do
@@ -23,7 +27,7 @@ class Kvazaar < Formula
   end
 
   def install
-    system "./autogen.sh"
+    system "./autogen.sh" if build.head?
     system "./configure", "--prefix=#{prefix}"
     system "make", "install"
   end

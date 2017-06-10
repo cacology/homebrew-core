@@ -1,13 +1,14 @@
 class MobileShell < Formula
   desc "Remote terminal application"
-  homepage "https://mosh.mit.edu/"
-  url "https://mosh.mit.edu/mosh-1.2.6.tar.gz"
-  sha256 "7e82b7fbfcc698c70f5843bb960dadb8e7bd7ac1d4d2151c9d979372ea850e85"
+  homepage "https://mosh.org"
+  url "https://mosh.org/mosh-1.3.0.tar.gz"
+  sha256 "320e12f461e55d71566597976bd9440ba6c5265fa68fbf614c6f1c8401f93376"
+  revision 1
 
   bottle do
-    sha256 "ce0722d44de6a01bb2eeb65e57913ece2e67608220f88ce88313433774b848bd" => :el_capitan
-    sha256 "58a5f78501ecfaab4111c36ef327a71f91d8a11d3cb4cacd9d72b178fe825800" => :yosemite
-    sha256 "0ea2fd16afac4835561a31de56bd4550d6d4b431611543bb2a88e1437ecb3165" => :mavericks
+    sha256 "092d47a9a6836e66597775dadca0bc78c57b04879cf6c392f7514605d8c53a50" => :sierra
+    sha256 "c406e65d8589855f49487feefea50166c5fb37395b07fa7c54f5882b2a5fbe2d" => :el_capitan
+    sha256 "435b0730e2335d91a5317219c46f703993215333f370f1c998b0122770844e7b" => :yosemite
   end
 
   head do
@@ -17,22 +18,27 @@ class MobileShell < Formula
     depends_on "automake" => :build
   end
 
-  option "without-test", "Run build-time tests"
+  option "with-test", "Run build-time tests"
 
   deprecated_option "without-check" => "without-test"
 
   depends_on "pkg-config" => :build
   depends_on "protobuf"
   depends_on :perl => "5.14" if MacOS.version <= :mountain_lion
+  depends_on "tmux" => :build if build.with?("test") || build.bottle?
 
   def install
+    # Remove for > 1.3.0
+    # Upstream commit from 29 Apr 2017 "Disable unicode-later-combining.test for now"
+    # See https://github.com/mobile-shell/mosh/commit/df4dbe0d6c9c3ac7a6a102f315090c9b7aa75ad6
+    if build.stable?
+      inreplace "src/tests/Makefile.in", /^\tunicode-later-combining.test \\$\n/, ""
+    end
+
     # teach mosh to locate mosh-client without referring
     # PATH to support launching outside shell e.g. via launcher
     inreplace "scripts/mosh.pl", "'mosh-client", "\'#{bin}/mosh-client"
 
-    # Upstream prefers O2:
-    # https://github.com/keithw/mosh/blob/master/README.md
-    ENV.O2
     system "./autogen.sh" if build.head?
     system "./configure", "--prefix=#{prefix}", "--enable-completion"
     system "make", "check" if build.with?("test") || build.bottle?
@@ -40,7 +46,6 @@ class MobileShell < Formula
   end
 
   test do
-    ENV["TERM"] = "xterm"
-    system "#{bin}/mosh-client", "-c"
+    system bin/"mosh-client", "-c"
   end
 end

@@ -1,14 +1,14 @@
 class Ganglia < Formula
   desc "Scalable distributed monitoring system"
-  homepage "http://ganglia.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.1/ganglia-3.7.1.tar.gz"
-  sha256 "e735a6218986a0ff77c737e5888426b103196c12dc2d679494ca9a4269ca69a3"
-  revision 2
+  homepage "https://ganglia.sourceforge.io/"
+  url "https://downloads.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz"
+  sha256 "042dbcaf580a661b55ae4d9f9b3566230b2232169a0898e91a797a4c61888409"
+  revision 1
 
   bottle do
-    sha256 "349f8c9d15380b37ab66eccba278a8f83537d4de091c76b1a699ea4c419131f7" => :el_capitan
-    sha256 "e09a9d76d29124ed9c1b7c9f92d43a98a43f95be498d315296300a9bb487b980" => :yosemite
-    sha256 "6aebfbaf3ebff825177eb2226d9a7d82f1543fd1ece8948eb6feea01f07b43e1" => :mavericks
+    sha256 "5ccba10d5dbce02c032a3d9537cfeef0b892829dd0e898baf0654ae4518e9b02" => :sierra
+    sha256 "a297eb4b9c39e2272fdaf4d5bedf0bfadb773ec39a2e1e00f7eca16b08fc91f3" => :el_capitan
+    sha256 "4aed737bbb6e926c3e2bdd123f2f1f51e40efa37e4c3e7e59d62d8dc1dc0ba34" => :yosemite
   end
 
   head do
@@ -19,13 +19,13 @@ class Ganglia < Formula
     depends_on "libtool" => :build
   end
 
-  conflicts_with "coreutils", :because => "both install `gstat` binaries"
-
   depends_on "pkg-config" => :build
-  depends_on :apr => :build
+  depends_on "apr"
   depends_on "confuse"
   depends_on "pcre"
   depends_on "rrdtool"
+
+  conflicts_with "coreutils", :because => "both install `gstat` binaries"
 
   def install
     if build.head?
@@ -34,7 +34,7 @@ class Ganglia < Formula
       system "./bootstrap"
     end
 
-    inreplace "configure", %(varstatedir="/var/lib"), %(varstatedir="#{var}/lib")
+    inreplace "configure", 'varstatedir="/var/lib"', %Q(varstatedir="#{var}/lib")
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
@@ -42,6 +42,7 @@ class Ganglia < Formula
                           "--sysconfdir=#{etc}",
                           "--mandir=#{man}",
                           "--with-gmetad",
+                          "--with-libapr=#{Formula["apr"].opt_bin}/apr-1-config",
                           "--with-libpcre=#{Formula["pcre"].opt_prefix}"
     system "make", "install"
 

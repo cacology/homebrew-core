@@ -1,21 +1,14 @@
 class Mldonkey < Formula
   desc "OCaml/GTK client for the eDonkey P2P network"
-  homepage "http://mldonkey.sourceforge.net/Main_Page"
-  url "https://downloads.sourceforge.net/project/mldonkey/mldonkey/3.1.5/mldonkey-3.1.5.tar.bz2"
-  sha256 "74f9d4bcc72356aa28d0812767ef5b9daa03efc5d1ddabf56447dc04969911cb"
+  homepage "https://mldonkey.sourceforge.io"
+  url "https://github.com/ygrek/mldonkey/releases/download/release-3-1-6/mldonkey-3.1.6.tar.bz2"
+  sha256 "1b36b57c05a83c2e363c085bf8e80630884c6c92ecdeffc1ad5e1c39a98e043d"
+  head "https://github.com/ygrek/mldonkey.git", :branch => "next"
 
   bottle do
-    sha256 "7f635c25dd8a70b579ad8876f5101ddc0255b009116f9f2d855ec97981eb9d52" => :el_capitan
-    sha256 "9114465cb9f08911d215ef0f582e9fd2956c311a35c8db239434670150211c41" => :yosemite
-    sha256 "ac3821871d88b51927ed95d04e32ad917be80020a03c1a46cb3e29172b54c446" => :mavericks
-    sha256 "43647a2a802978b9e6dcab2a42f4883cd679e151ed8a9775a1ceb82fa993384f" => :mountain_lion
-  end
-
-  # Fix a comment that causes an error in recent ocaml;
-  # fixed upstream, will be in the next release.
-  patch do
-    url "https://github.com/ygrek/mldonkey/commit/c91a78896526640a301f5a9eeab8b698923e285c.patch"
-    sha256 "1fb503d37eed92390eb891878a9e6d69b778bd2f1d40b9845d18aa3002f3d739"
+    sha256 "da8c1bd6176070cca2b681d5fb56888ea0704615ca75ae7c74a555f597689116" => :sierra
+    sha256 "3ffeb23b857161ecf7d48d6479f0494012f63245069591b7f3fbd728fc1a0f8c" => :el_capitan
+    sha256 "69891decdf1c9ae9b9b5b2880c6b4cbbb7ecd65792929c0672d27caeb872520a" => :yosemite
   end
 
   depends_on "camlp4" => :build
@@ -25,12 +18,16 @@ class Mldonkey < Formula
   depends_on "libpng"
 
   def install
-    ENV.j1
+    ENV.deparallelize
 
     # Fix compiler selection
     ENV["OCAMLC"] = "#{HOMEBREW_PREFIX}/bin/ocamlc.opt -cc #{ENV.cc}"
 
     system "./configure", "--prefix=#{prefix}"
     system "make", "install"
+  end
+
+  test do
+    system bin/"mlbt", "--help"
   end
 end

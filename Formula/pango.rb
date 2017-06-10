@@ -1,13 +1,13 @@
 class Pango < Formula
   desc "Framework for layout and rendering of i18n text"
   homepage "http://www.pango.org/"
-  url "https://download.gnome.org/sources/pango/1.40/pango-1.40.1.tar.xz"
-  sha256 "e27af54172c72b3ac6be53c9a4c67053e16c905e02addcf3a603ceb2005c1a40"
+  url "https://download.gnome.org/sources/pango/1.40/pango-1.40.6.tar.xz"
+  sha256 "ca152b7383a1e9f7fd74ae96023dc6770dc5043414793bfe768ff06b6759e573"
 
   bottle do
-    sha256 "36326c6d7abc459041dfbb0e0aecda5b82af131758f5d2f3219bb44b7fd13a8f" => :el_capitan
-    sha256 "611ca9423895581fd4fb5c447a83bf46c71b41daecfaab3281c479d84639f770" => :yosemite
-    sha256 "2309a2038eaba4d2501146b3fb2a11a2404d0c620e022fdcc87f39fdbd763f9b" => :mavericks
+    sha256 "9a3b7c067180b377e5caac5debdb477feda07db598602d34c9e037b6c4701402" => :sierra
+    sha256 "fda967c19a3c80effebe70dd1389ce443d662ef572ec84485c64060d60c2474c" => :el_capitan
+    sha256 "9be657bfbfb322e057022b10255fffbe3f18994e20a49de3a43ec55921fd1dd8" => :yosemite
   end
 
   head do
@@ -19,36 +19,24 @@ class Pango < Formula
     depends_on "gtk-doc" => :build
   end
 
-  option :universal
-
   depends_on "pkg-config" => :build
-  depends_on "glib"
   depends_on "cairo"
-  depends_on "harfbuzz"
   depends_on "fontconfig"
+  depends_on "glib"
   depends_on "gobject-introspection"
-
-  fails_with :llvm do
-    build 2326
-    cause "Undefined symbols when linking"
-  end
+  depends_on "harfbuzz"
 
   def install
-    ENV.universal_binary if build.universal?
-
-    args = %W[
-      --disable-dependency-tracking
-      --disable-silent-rules
-      --prefix=#{prefix}
-      --enable-man
-      --with-html-dir=#{share}/doc
-      --enable-introspection=yes
-      --without-xft
-      --enable-static
-    ]
-
     system "./autogen.sh" if build.head?
-    system "./configure", *args
+    system "./configure", "--disable-dependency-tracking",
+                          "--disable-silent-rules",
+                          "--prefix=#{prefix}",
+                          "--with-html-dir=#{share}/doc",
+                          "--enable-introspection=yes",
+                          "--enable-man",
+                          "--enable-static",
+                          "--without-xft"
+
     system "make"
     system "make", "install"
   end

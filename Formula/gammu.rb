@@ -1,15 +1,14 @@
 class Gammu < Formula
   desc "Command-line utility to control a phone"
   homepage "https://wammu.eu/gammu/"
-  url "https://dl.cihar.com/gammu/releases/gammu-1.37.4.tar.xz"
-  mirror "https://mirrors.kernel.org/debian/pool/main/g/gammu/gammu_1.37.4.orig.tar.xz"
-  sha256 "ee345d9e1a06fd055bca8a4b418778a9568178a2c34082e820f86851c535f869"
+  url "https://dl.cihar.com/gammu/releases/gammu-1.38.3.tar.xz"
+  sha256 "b2f6ee7b07d003b4fa800e72e2c3f45f16c378ec1d81b7a60253d60b14a67dab"
   head "https://github.com/gammu/gammu.git"
 
   bottle do
-    sha256 "b120f66edf3aa96dd6b934e164753b26dbaaf54bab93cd4996c5604fbbf661e5" => :el_capitan
-    sha256 "998c00a999450a91711b99534015b6f4ff4f8e48f479420370782b576982e52f" => :yosemite
-    sha256 "7818e0e49b9a6546a68a12df16fd165e902d5ddf12b41f3a8ee75580da484198" => :mavericks
+    sha256 "e736f53af8994c489428c9fac581837e9550868d94ee44d95ceb1900523cbaab" => :sierra
+    sha256 "984e40a37939c08fee6c03cd6f684750697fec6d5435a9aaece8ee10c2e6776a" => :el_capitan
+    sha256 "ebcb06dd82e11742372bc18f05fa8b9c11229011d7042daca72ed01e480b4c94" => :yosemite
   end
 
   depends_on "cmake" => :build

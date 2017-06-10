@@ -1,19 +1,20 @@
 class Pushpin < Formula
   desc "Reverse proxy for realtime web services"
   homepage "http://pushpin.org"
-  url "https://dl.bintray.com/fanout/source/pushpin-1.11.0.tar.bz2"
-  sha256 "e1c9464f3a5c5473ace17920da0defb32973a70f30cc6b29e0852b94ff8b2995"
+  url "https://dl.bintray.com/fanout/source/pushpin-1.15.0.tar.bz2"
+  sha256 "6378bd617b997d15003188a2cc3e9f4c65b5340c1666215b678d402d3a0c549e"
+  revision 1
 
   head "https://github.com/fanout/pushpin.git"
 
   bottle do
-    sha256 "4b1b453ef7ccf2d68432a4bf0784890bc3b889c86b9f324535fd02905d05d21d" => :el_capitan
-    sha256 "ef3747605a4e25e6d47c37363e359cb3d7e08df8a1fcb3a90467333b35841dbd" => :yosemite
-    sha256 "ece1b40d5fd3fc130e636a4a2ee5f09bc1b28c4db469f76fa351604ddc28028c" => :mavericks
+    sha256 "733284624506aed199058cb55f4f40f60461100176b9704a1b47285bd700f895" => :sierra
+    sha256 "f38f6a727788111c408ba84019ce8cbb2e2022abaa9b393d36a806970cbc814c" => :el_capitan
+    sha256 "9fe00cf6767ab7fd1532fae023e8a4010e3fe9df2bf42f91c223bd8d1727cb5f" => :yosemite
   end
 
   depends_on "pkg-config" => :build
-  depends_on "qt5"
+  depends_on "qt"
   depends_on "zeromq"
   depends_on "mongrel2"
   depends_on "zurl"
@@ -31,13 +32,15 @@ class Pushpin < Formula
     runfile = testpath/"test.py"
 
     cp HOMEBREW_PREFIX/"etc/pushpin/pushpin.conf", conffile
-    cp HOMEBREW_PREFIX/"etc/pushpin/routes", routesfile
 
     inreplace conffile do |s|
       s.gsub! "rundir=#{HOMEBREW_PREFIX}/var/run/pushpin", "rundir=#{testpath}/var/run/pushpin"
       s.gsub! "logdir=#{HOMEBREW_PREFIX}/var/log/pushpin", "logdir=#{testpath}/var/log/pushpin"
     end
-    inreplace routesfile, "test", "localhost:10080"
+
+    routesfile.write <<-EOS.undent
+      * localhost:10080
+    EOS
 
     runfile.write <<-EOS.undent
       import urllib2

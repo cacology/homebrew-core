@@ -1,20 +1,18 @@
 class Libuv < Formula
   desc "Multi-platform support library with a focus on asynchronous I/O"
   homepage "https://github.com/libuv/libuv"
-  url "https://github.com/libuv/libuv/archive/v1.9.1.tar.gz"
-  sha256 "a6ca9f0648973d1463f46b495ce546ddcbe7cce2f04b32e802a15539e46c57ad"
+  url "https://github.com/libuv/libuv/archive/v1.12.0.tar.gz"
+  sha256 "41ce914a88da21d3b07a76023beca57576ca5b376c6ac440c80bc581cbca1250"
   head "https://github.com/libuv/libuv.git", :branch => "v1.x"
 
   bottle do
     cellar :any
-    sha256 "68d0bcd528b8f6ee33759919f8c7f7110095a64ce6cff13ddd08d8d369220dc7" => :el_capitan
-    sha256 "c11095dcf9722f98efedfe6ba5d74b3bb2b99e34e8003f129e7fa97e8a60f391" => :yosemite
-    sha256 "31388adf64b6dcbabed5d69727a4ee7ed64de0b4cf6a5c7868992e05669990c7" => :mavericks
+    sha256 "b90231cc5adc008fd591d9ddd67fd3e16c9f0756888b73b5d13e87749cc7fc91" => :sierra
+    sha256 "c3b092d92769caee81f1152999e934f983f93da17ac882712a5a75a117b982b5" => :el_capitan
+    sha256 "b18481786a308945b5cb19f7d1ceaf94e715d59ac473d34a713c56b8eb98e507" => :yosemite
   end
 
-  option "without-docs", "Don't build and install documentation"
   option "with-test", "Execute compile time checks (Requires Internet connection)"
-  option :universal
 
   deprecated_option "with-check" => "with-test"
 
@@ -22,19 +20,15 @@ class Libuv < Formula
   depends_on "automake" => :build
   depends_on "autoconf" => :build
   depends_on "libtool" => :build
-  depends_on "sphinx-doc" => :build if build.with? "docs"
+  depends_on "sphinx-doc" => :build
 
   def install
-    ENV.universal_binary if build.universal?
-
-    if build.with? "docs"
-      # This isn't yet handled by the make install process sadly.
-      cd "docs" do
-        system "make", "man"
-        system "make", "singlehtml"
-        man1.install "build/man/libuv.1"
-        doc.install Dir["build/singlehtml/*"]
-      end
+    # This isn't yet handled by the make install process sadly.
+    cd "docs" do
+      system "make", "man"
+      system "make", "singlehtml"
+      man1.install "build/man/libuv.1"
+      doc.install Dir["build/singlehtml/*"]
     end
 
     system "./autogen.sh"

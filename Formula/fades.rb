@@ -1,16 +1,15 @@
 class Fades < Formula
   desc "Automatically handle virtualenvs for python scripts"
   homepage "https://fades.readthedocs.org/"
-  url "https://pypi.python.org/packages/source/f/fades/fades-5.tar.gz"
-  sha256 "1952f496059ba6bac535f2c07effae44a55de0654ababaa1a15879c4b3fa89c1"
-
+  url "https://files.pythonhosted.org/packages/59/18/cc80eb5c0a2e15c4b95df6a3c6158e06acb2e075ef2b811753936a6bdf57/fades-6.0.1.tar.gz"
+  sha256 "747ee3a159be1cb7512fd7ea4163d22e2734209e474aa2dbbccc29a0f0c92d09"
   head "https://github.com/PyAr/fades.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "03c99b08cf910903a08e1fdb45c8e359b419e32d5dceaa924a4731b8a9299b8d" => :el_capitan
-    sha256 "b1de3519ca9423da3344d84afcfcb9fd7d8a9ea8e65064a075d8df77da3a8d93" => :yosemite
-    sha256 "2bc897cf9b5d4c54261fff90e0fd519010de4784b8024538cc7bcd71158c2781" => :mavericks
+    sha256 "c24a39184e8fb1c487e6c579b3fd66aba3e6c13be4f86c5583ce59beaab99655" => :sierra
+    sha256 "8a6869cbb401853eff4aa5c176feebdcb0b493ec09052f9f7a516d87320d96f3" => :el_capitan
+    sha256 "8a6869cbb401853eff4aa5c176feebdcb0b493ec09052f9f7a516d87320d96f3" => :yosemite
   end
 
   depends_on :python3

@@ -1,12 +1,13 @@
 class GnuBarcode < Formula
   desc "Convert text strings to printed bars"
   homepage "https://www.gnu.org/software/barcode/"
-  url "https://ftpmirror.gnu.org/barcode/barcode-0.99.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/barcode/barcode-0.99.tar.gz"
+  url "https://ftp.gnu.org/gnu/barcode/barcode-0.99.tar.gz"
+  mirror "https://ftpmirror.gnu.org/barcode/barcode-0.99.tar.gz"
   sha256 "7c031cf3eb811242f53664379aebbdd9fae0b7b26b5e5d584c31a9f338154b64"
 
   bottle do
     cellar :any_skip_relocation
+    sha256 "7588bb4800b5c348e103ed92e8bcc2f38812b8fbf4e254315e6429b3961e9f05" => :sierra
     sha256 "1885abad5bc70c2e9952e131307ca7282d851856ebdea58dadc69f0e125a7c22" => :el_capitan
     sha256 "819af5d364f041397c7c6b768829df7fcbd617f86194a1656b5523eeaed9415a" => :yosemite
     sha256 "285a9fa2833e843765087545f778aeadc670555bcac38193788c866826a88d42" => :mavericks

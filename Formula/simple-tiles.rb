@@ -1,17 +1,15 @@
 class SimpleTiles < Formula
   desc "Image generation library for spatial data"
   homepage "https://propublica.github.io/simple-tiles/"
-  url "https://github.com/propublica/simple-tiles/archive/v0.6.0.tar.gz"
-  sha256 "336fdc04c34b85270c377d880a0d4cc2ac1a9c9e5e4c3d53e0322d43c9495ac9"
-  revision 4
-
+  url "https://github.com/propublica/simple-tiles/archive/v0.6.1.tar.gz"
+  sha256 "2391b2f727855de28adfea9fc95d8c7cbaca63c5b86c7286990d8cbbcd640d6f"
   head "https://github.com/propublica/simple-tiles.git"
 
   bottle do
     cellar :any
-    sha256 "6ba9433632bb61877b12a0e10e14fa5367808954848c6351ca189237c957d02d" => :el_capitan
-    sha256 "701c8f13570a2df44acb68949de1003a187d5f21dc2c6ab4681a0812621727ee" => :yosemite
-    sha256 "54c230c2d7cfd35c7e78cb469b174b0721c313866bb99ca1ef2defcb5d0b3cf3" => :mavericks
+    sha256 "2d3092fc48d4bc3fd7eb3679f09506bae62c6509756a55fbf6f9a3f18dd5e738" => :sierra
+    sha256 "acbf4fd455b3351d3e5188361694cba78a98dec6f91ce70862e9a7a57b3d387b" => :el_capitan
+    sha256 "42c5936f5beb15090b5199c1e97295ecf442c11ce52fe38876f2a992ffbcb160" => :yosemite
   end
 
   depends_on "pkg-config" => :build

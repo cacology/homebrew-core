@@ -1,12 +1,13 @@
 class Libquvi < Formula
   desc "C library to parse flash media stream properties"
-  homepage "http://quvi.sourceforge.net/"
+  homepage "https://quvi.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/quvi/0.4/libquvi/libquvi-0.4.1.tar.bz2"
   sha256 "f5a2fb0571634483e8a957910f44e739f5a72eb9a1900bd10b453c49b8d5f49d"
   revision 1
 
   bottle do
-    revision 2
+    rebuild 2
+    sha256 "39cc991590f691101c8c0c0e3b723a7f28b9c59d2c60b2b6562cff9baf171110" => :sierra
     sha256 "4c3c315b1e35035d53cb8e8790ba25dccbea794df755d5a28a3ce465166fa6fa" => :el_capitan
     sha256 "99375bca427fb5cc368da9b09bec8890f87896b0d2329780420e1a4d2c131e16" => :yosemite
     sha256 "b83f94653852b748d4e23a6ade9d5668a7052bf4747cb23c751d70b0698f9689" => :mavericks

@@ -1,12 +1,13 @@
 class Idutils < Formula
   desc "ID database and query tools"
   homepage "https://www.gnu.org/s/idutils/"
-  url "https://ftpmirror.gnu.org/idutils/idutils-4.6.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/idutils/idutils-4.6.tar.xz"
+  url "https://ftp.gnu.org/gnu/idutils/idutils-4.6.tar.xz"
+  mirror "https://ftpmirror.gnu.org/idutils/idutils-4.6.tar.xz"
   sha256 "8181f43a4fb62f6f0ccf3b84dbe9bec71ecabd6dfdcf49c6b5584521c888aac2"
 
   bottle do
-    revision 1
+    rebuild 1
+    sha256 "12880410526d1e4eff9530acdd23db8a3f1fc4095352e8688fe99ef445c59c2c" => :sierra
     sha256 "5b148e92b0febab9a96211449f464385be7b2b6572d79001c87acb274095a6dc" => :el_capitan
     sha256 "b965eb4579741ab5721cb99f706b0601056055b8b9aa9178695e548cb3b9bf0c" => :yosemite
     sha256 "4625ef2ac2f7b2c87010880a0c31044ef850da4faded85c957b8ae23eeb7ab85" => :mavericks
@@ -21,9 +22,7 @@ class Idutils < Formula
     # https://github.com/Homebrew/homebrew/issues/44993
     # This is thought to be an El Capitan bug:
     # https://lists.gnu.org/archive/html/bug-tar/2015-10/msg00017.html
-    if MacOS.version == :el_capitan
-      ENV["gl_cv_func_getcwd_abort_bug"] = "no"
-    end
+    ENV["gl_cv_func_getcwd_abort_bug"] = "no" if MacOS.version == :el_capitan
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",

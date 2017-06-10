@@ -1,16 +1,13 @@
 class GstPluginsBad < Formula
   desc "GStreamer plugins less supported, not fully tested"
   homepage "https://gstreamer.freedesktop.org/"
-
-  stable do
-    url "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.8.3.tar.xz"
-    sha256 "7899fcb18e6a1af2888b19c90213af018a57d741c6e72ec56b133bc73ec8509b"
-  end
+  url "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.10.4.tar.xz"
+  sha256 "23ddae506b3a223b94869a0d3eea3e9a12e847f94d2d0e0b97102ce13ecd6966"
 
   bottle do
-    sha256 "d8a499e04f3b68a46c6fcf0c6ae1b9ea06d98877570ab396b1f385776156e2b4" => :el_capitan
-    sha256 "254b0e10e9c385d13428869a551136f938ac6f6230d64702947666f1fb55d68f" => :yosemite
-    sha256 "0483f4b248db9fe5dffbee9e1d6812f7df73e2ff894253b6efdd1cd63a0a22a6" => :mavericks
+    sha256 "b4b1a648677cae5e21bf3ebac04601ec9f3ea8c6fcd3b39b85ae17e8d2876558" => :sierra
+    sha256 "7482dfde8a60574ece43e2fe5a347e43f495c8519c0852a27e62f76c423caf75" => :el_capitan
+    sha256 "92221b1c4e807c995539ebf5fd8162afbfbe92f78ded0ae74015fe30ca2fc0c8" => :yosemite
   end
 
   head do
@@ -18,14 +15,15 @@ class GstPluginsBad < Formula
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
-    depends_on "libtool" => :build
   end
 
+  depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "gettext"
   depends_on "gst-plugins-base"
   depends_on "openssl"
-
+  depends_on "jpeg" => :recommended
+  depends_on "orc" => :recommended
   depends_on "dirac" => :optional
   depends_on "faac" => :optional
   depends_on "faad2" => :optional
@@ -40,6 +38,7 @@ class GstPluginsBad < Formula
   depends_on "schroedinger" => :optional
   depends_on "sound-touch" => :optional
   depends_on "srtp" => :optional
+  depends_on "libvo-aacenc" => :optional
 
   def install
     args = %W[
@@ -50,16 +49,10 @@ class GstPluginsBad < Formula
       --disable-dependency-tracking
     ]
 
-    # upstream does not support Apple video for older SDKs
-    # error: use of undeclared identifier 'AVQueuedSampleBufferRenderingStatusFailed'
-    # https://github.com/Homebrew/legacy-homebrew/pull/35284
-    if MacOS.version <= :mavericks
-      args << "--disable-apple_media"
-    end
-
     args << "--with-gtk=3.0" if build.with? "gtk+3"
 
     if build.head?
+      # autogen is invoked in "stable" build because we patch configure.ac
       ENV["NOCONFIGURE"] = "yes"
       system "./autogen.sh"
     end

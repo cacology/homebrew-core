@@ -5,6 +5,7 @@ class Hbase < Formula
   sha256 "8c9cc9a19e3f4a3137509513b5c1b9e1b5a2283ed261d44af9af1c02c5453c20"
 
   bottle do
+    sha256 "86649e9faaa2d32bdf1d3c79bb8264afde9f7cd6196800ea4c5eb1753df7bf9e" => :sierra
     sha256 "8f1972d8b77e7f5d83cdca0fff543205cecf6f5034bfc7a5aeb32da9ef0215ae" => :el_capitan
     sha256 "2aba5a41ee729ad6a0897e317a5ddcbae9b80fbc22c9b997e1b98dbdd37aef8c" => :yosemite
     sha256 "f6f10e6ccd23fc9f9586f570aca9c27fbb6500ae9156d63ad905ecda0eb9073e" => :mavericks
@@ -18,7 +19,7 @@ class Hbase < Formula
   # 64 bit is required because of three things:
   # the lzo jar has a native extension
   # building native extensions requires a version of java that matches the architecture
-  # there is no 32 bit version of java for OS X since Java 1.7, and 1.7+ is required for hbase
+  # there is no 32 bit version of java for macOS since Java 1.7, and 1.7+ is required for hbase
 
   resource "hadoop-lzo" do
     url "https://github.com/cloudera/hadoop-lzo/archive/0.4.14.tar.gz"
@@ -76,7 +77,7 @@ class Hbase < Formula
       <configuration>
         <property>
           <name>hbase.rootdir</name>
-          <value>#{(build.with? "hadoop") ? "hdfs://localhost:9000" : "file://"+var}/hbase</value>
+          <value>#{build.with?("hadoop") ? "hdfs://localhost:9000" : "file://"+var}/hbase</value>
         </property>
         <property>
           <name>hbase.zookeeper.property.clientPort</name>
@@ -114,7 +115,7 @@ class Hbase < Formula
     <plist version="1.0">
     <dict>
       <key>KeepAlive</key>
-      #{(build.without? "hadoop") ? "<true/>" : "<dict>\n        <key>OtherJobEnabled</key>\n        <string>"+Formula["hadoop"].plist_name+"</string>\n      </dict>"}
+      #{build.without?("hadoop") ? "<true/>" : "<dict>\n        <key>OtherJobEnabled</key>\n        <string>"+Formula["hadoop"].plist_name+"</string>\n      </dict>"}
       <key>Label</key>
       <string>#{plist_name}</string>
       <key>EnvironmentVariables</key>

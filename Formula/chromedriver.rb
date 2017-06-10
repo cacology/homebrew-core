@@ -1,9 +1,9 @@
 class Chromedriver < Formula
   desc "Tool for automated testing of webapps across many browsers"
   homepage "https://sites.google.com/a/chromium.org/chromedriver/"
-  url "https://chromedriver.storage.googleapis.com/2.23/chromedriver_mac64.zip"
-  version "2.23"
-  sha256 "47a8caec6ce251f2dbaa9005e4dc783cb1fa6c09ecd76afafa41eab540a32e86"
+  url "https://chromedriver.storage.googleapis.com/2.30/chromedriver_mac64.zip"
+  version "2.30"
+  sha256 "63a6333a7e7ad8300868e04345c786ea114c13c26508cda98259a21421a09126"
 
   bottle :unneeded
 
@@ -41,8 +41,7 @@ class Chromedriver < Formula
 
   test do
     driver = fork do
-      exec bin/"chromedriver",
-             "--port=9999", "--log-path=#{testpath}/cd.log"
+      exec bin/"chromedriver", "--port=9999", "--log-path=#{testpath}/cd.log"
     end
     sleep 5
     Process.kill("TERM", driver)

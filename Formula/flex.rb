@@ -1,18 +1,18 @@
 class Flex < Formula
   desc "Fast Lexical Analyzer, generates Scanners (tokenizers)"
-  homepage "http://flex.sourceforge.net"
-  url "https://github.com/westes/flex/releases/download/v2.6.1/flex-2.6.1.tar.xz"
-  sha256 "2c7a412c1640e094cb058d9b2fe39d450186e09574bebb7aa28f783e3799103f"
+  homepage "https://github.com/westes/flex"
+  url "https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
+  sha256 "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995"
 
   bottle do
-    revision 1
-    sha256 "b9f97a19146f3086b4084e83c91c30329b3536fc3032687de724f8408c2e2e3b" => :el_capitan
-    sha256 "36715dd9edb6e16caf33e1d5e6b87447da1bd40fb49325e18d7269bc162bad81" => :yosemite
-    sha256 "0a322eea192fb9b68e869d180c9c7c0ec099d72c574505c8af1ba5485a601e95" => :mavericks
+    sha256 "89fb9ae2ac9be0f60706f40379cdfa51ced78f1638ac8729bc0074e4fcde70cf" => :sierra
+    sha256 "95c2da56e5487b53ee4afe3ed52a7f59ffe86df4508768b3e48ef042d66e6cc1" => :el_capitan
+    sha256 "c8aaca29a77a6b3e2383f7d80b12eccbbf131162e5157a4a320117d4c564a4bf" => :yosemite
   end
 
-  keg_only :provided_by_osx, "Some formulae require a newer version of flex."
+  keg_only :provided_by_osx, "some formulae require a newer version of flex"
 
+  depends_on "help2man" => :build
   depends_on "gettext"
 
   def install

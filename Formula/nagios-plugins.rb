@@ -1,19 +1,20 @@
 class NagiosPlugins < Formula
   desc "Plugins for the nagios network monitoring system"
   homepage "https://www.nagios-plugins.org/"
-  url "https://www.nagios-plugins.org/download/nagios-plugins-2.0.3.tar.gz"
-  sha256 "8f0021442dce0138f0285ca22960b870662e28ae8973d49d439463588aada04a"
+  url "https://www.nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz"
+  sha256 "647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18"
 
   bottle do
-    sha256 "df7f1e32499d1ec5f2d9f790109cce9d6e4a1e8b6a495a531fc8d9d1609c5bb7" => :el_capitan
-    sha256 "6eee15fa36584d0bf1973144ca38ba22a9607a89845b33355bd7a164412e9e90" => :yosemite
-    sha256 "a0b386cfcfb80d39aa71f151f221e8ef912169354f2c00db8b6c086b64dca1fe" => :mavericks
-    sha256 "e03df47ea1bebec1cc1941b563441b5b3f651b15de8a6c99081fc131266a1490" => :mountain_lion
+    sha256 "f88a0ce6fd30f875cc9654f3989b0728d2bd230e09bec994cdb8c2461a7f2166" => :sierra
+    sha256 "d9920741a2e4322d7c9fd55a87f3d7bf56f4abfa3a49f0fc9adcf408f891775a" => :el_capitan
+    sha256 "1fcf4d4934fe7f7793fb78d13f17f948d46a19600e02881b22695f736f327e65" => :yosemite
   end
 
   depends_on "openssl"
   depends_on "postgresql" => :optional
   depends_on :mysql => :optional
+
+  conflicts_with "monitoring-plugins", :because => "monitoring-plugins ships their plugins to the same folder."
 
   def install
     args = %W[
@@ -27,7 +28,6 @@ class NagiosPlugins < Formula
 
     system "./configure", *args
     system "make", "install"
-    system "make", "install-root" # Do we still want to support root-install Jack?
     sbin.write_exec_script Dir["#{libexec}/sbin/*"]
   end
 
@@ -36,5 +36,10 @@ class NagiosPlugins < Formula
     All plugins have been installed in:
       #{HOMEBREW_PREFIX}/sbin
     EOS
+  end
+
+  test do
+    output = shell_output("#{sbin}/check_dns -H 8.8.8.8 -t 3")
+    assert_match "google-public-dns", output
   end
 end

@@ -1,38 +1,15 @@
 class Mbedtls < Formula
   desc "Cryptographic & SSL/TLS library"
   homepage "https://tls.mbed.org/"
+  url "https://tls.mbed.org/download/mbedtls-2.4.2-apache.tgz"
+  sha256 "17dd98af7478aadacc480c7e4159e447353b5b2037c1b6d48ed4fd157fb1b018"
   head "https://github.com/ARMmbed/mbedtls.git", :branch => "development"
-  revision 1
-
-  stable do
-    url "https://tls.mbed.org/download/mbedtls-2.3.0-apache.tgz"
-    sha256 "590734c8bc8b3ac48e9123d44bf03562e91f8dce0d1ac2615c318c077f3215b2"
-
-    # https://github.com/ARMmbed/mbedtls/issues/522
-    # They are commits already applied to the upstream.
-    patch do
-      url "https://github.com/ARMmbed/mbedtls/commit/7247f99b3e068a2b90b7776a2cdd438fddb7a38b.patch"
-      sha256 "071830f9b1870ed319fcc65e34ce6d6f9b3476e81f0a204d474635e59ac08687"
-    end
-    patch do
-      url "https://github.com/ARMmbed/mbedtls/commit/b5b6af2663fdb7f57c30494607bade90810f6844.patch"
-      sha256 "859ffed5d6e4dfb386c0ee3b9f00efa904d0ee8977272def4bd787e1c9efda82"
-    end
-    patch do
-      url "https://github.com/ARMmbed/mbedtls/commit/b92834324f29768a5bf39c58c674c5f3c09b6763.patch"
-      sha256 "f48b42e10ed0462945391ac2c7eb737ed39d377d91960baeaf91fe1325b38c96"
-    end
-    patch do
-      url "https://github.com/ARMmbed/mbedtls/commit/23e9778684ba734dbfba1445e145b04dd6b59e76.patch"
-      sha256 "5f642020d7706660778a14547425c5cb5a8c99b56b92ed46514b7a43823487b7"
-    end
-  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "e7017361efd47700212fc87e609bedd7a1cb00ed448ea7131048cb47e5d8681a" => :el_capitan
-    sha256 "7a7364b2aaeb02b9542f10f5ebb1907b31e692301aa61b40d8bf0aa617d63bc9" => :yosemite
-    sha256 "aa40b81cecc451a28e4599404f113f9591101cc5f6ab66d975e0de8c0c43d912" => :mavericks
+    cellar :any
+    sha256 "b1f05011d97553b6255ffd5cf51ca0f4ae1394c7f3661165e009180916e5411e" => :sierra
+    sha256 "6757969434945c4b0fdf18835e4289b4564f935114a2cc8abebb695919f94881" => :el_capitan
+    sha256 "2e1fb7fcceb78de514711c4ebae95d1ce0af92681569b13dd292fe4c604a2332" => :yosemite
   end
 
   depends_on "cmake" => :build
@@ -47,17 +24,17 @@ class Mbedtls < Formula
       s.gsub! "//#define MBEDTLS_THREADING_C", "#define MBEDTLS_THREADING_C"
     end
 
-    system "cmake", *std_cmake_args
+    system "cmake", "-DUSE_SHARED_MBEDTLS_LIBRARY=On", *std_cmake_args
     system "make"
     system "make", "install"
 
     # Why does Mbedtls ship with a "Hello World" executable. Let's remove that.
-    rm_f "#{bin}/hello"
+    rm_f bin/"hello"
     # Rename benchmark & selftest, which are awfully generic names.
     mv bin/"benchmark", bin/"mbedtls-benchmark"
     mv bin/"selftest", bin/"mbedtls-selftest"
     # Demonstration files shouldn't be in the main bin
-    libexec.install "#{bin}/mpi_demo"
+    libexec.install bin/"mpi_demo"
   end
 
   test do

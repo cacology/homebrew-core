@@ -1,28 +1,32 @@
 class Makensis < Formula
   desc "System to create Windows installers"
-  homepage "http://nsis.sourceforge.net/"
-
-  stable do
-    url "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.0/nsis-3.0-src.tar.bz2"
-    sha256 "53a1e8ef109acd828ec909f3e6203f69d917f1a5b8bff27e93e66d0bddc5637e"
-
-    resource "nsis" do
-      url "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.0/nsis-3.0.zip"
-      sha256 "87b1d36765bb2f6e0fe531fdd8c9282b28e86b88d1f6b61842777bb791955372"
-    end
-  end
+  homepage "https://nsis.sourceforge.io/"
+  url "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.01/nsis-3.01-src.tar.bz2"
+  sha256 "604c011593be484e65b2141c50a018f1b28ab28c994268e4ecd377773f3ffba1"
+  revision 1
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b1b91ef9a80cd5857cc9e600ddf29c6ff26b5e8d95d7ed1b362519f6aa15d798" => :el_capitan
-    sha256 "3424dc5147485d37deb1c4c5569a07ab370424268bf841c77b235cc85e96d248" => :yosemite
-    sha256 "0901ab2f047cdebbabbcd4fbb382a90dcd8398a4817579548a727f1952cdf07d" => :mavericks
+    sha256 "8206444a401eff06bc19c3ecdc1b274b98ca41d016dc6c711043253d695e0e6b" => :sierra
+    sha256 "6ec50d87ec160773bc73f161243dba8c1a9f2811b41e95ea55fe9da389aa4444" => :el_capitan
+    sha256 "5c116395f0a53447856051885ef9c606e60ab8925cb9ec97a21cf72c2c90097d" => :yosemite
   end
 
+  depends_on "mingw-w64" => :build
   depends_on "scons" => :build
 
+  resource "nsis" do
+    url "https://downloads.sourceforge.net/project/nsis/NSIS%203/3.01/nsis-3.01.zip"
+    sha256 "daa17556c8690a34fb13af25c87ced89c79a36a935bf6126253a9d9a5226367c"
+  end
+
+  resource "zlib-win32" do
+    url "https://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib128-dll.zip"
+    sha256 "a03fd15af45e91964fb980a30422073bc3f3f58683e9fdafadad3f7db10762b1"
+  end
+
   # scons appears to have no builtin way to override the compiler selection,
-  # and the only options supported on OS X are 'gcc' and 'g++'.
+  # and the only options supported on macOS are 'gcc' and 'g++'.
   # Use the right compiler by forcibly altering the scons config to set these
   patch :DATA
 
@@ -32,8 +36,13 @@ class Makensis < Formula
     # https://sourceforge.net/p/nsis/bugs/1085/
     ENV.libstdcxx if ENV.compiler == :clang
 
+    # requires zlib (win32) to build utils
+    resource("zlib-win32").stage do
+      @zlib_path = Dir.pwd
+    end
+
     # Don't strip, see https://github.com/Homebrew/homebrew/issues/28718
-    scons "STRIP=0", "SKIPUTILS=all", "makensis"
+    scons "STRIP=0", "ZLIB_W32=#{@zlib_path}", "SKIPUTILS=NSIS Menu", "makensis"
     bin.install "build/urelease/makensis/makensis"
     (share/"nsis").install resource("nsis")
   end

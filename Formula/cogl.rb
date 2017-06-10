@@ -1,13 +1,14 @@
 class Cogl < Formula
   desc "Low level OpenGL abstraction library developed for Clutter"
   homepage "https://developer.gnome.org/cogl/"
-  url "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.0.tar.xz"
-  sha256 "689dfb5d14fc1106e9d2ded0f7930dcf7265d0bc84fa846b4f03941633eeaa91"
+  url "https://download.gnome.org/sources/cogl/1.22/cogl-1.22.2.tar.xz"
+  sha256 "39a718cdb64ea45225a7e94f88dddec1869ab37a21b339ad058a9d898782c00d"
 
   bottle do
-    sha256 "40e791051fe658bfef8c3fd931871e2ed3d5574b99e174eba6f0adeb514328a3" => :el_capitan
-    sha256 "8468cc80cc507b84f176286d86e143e319b0b34c50d34f8b626c36a95f670215" => :yosemite
-    sha256 "ba4d3405e3b3af0b4e40565bae7c84e72b8fe6b96e1aa26567d3c6d77a5f7904" => :mavericks
+    sha256 "59fcc7da30bf5df62481f5a469bfa2cbcd652b6e433efed593d966c32e2bbd48" => :sierra
+    sha256 "8b453f9b6f993a5e160266768b5fbdde47cdc5c21a3ab0474ff7c0992f1e762b" => :el_capitan
+    sha256 "0375322c23427755b7a3c2ca43778c6d1da2792a109cc0c9a58806078214440d" => :yosemite
+    sha256 "732b19cd457e124d4a89d6ddd6a6ed7ed8d14da2586d9a6908ccc95ad3bbaa9b" => :mavericks
   end
 
   head do
@@ -29,8 +30,8 @@ class Cogl < Formula
   # grep: Regular expression too big
   if MacOS.version == :lion
     resource "grep" do
-      url "https://ftpmirror.gnu.org/grep/grep-2.20.tar.xz"
-      mirror "https://ftp.gnu.org/gnu/grep/grep-2.20.tar.xz"
+      url "https://ftp.gnu.org/gnu/grep/grep-2.20.tar.xz"
+      mirror "https://ftpmirror.gnu.org/grep/grep-2.20.tar.xz"
       sha256 "f0af452bc0d09464b6d089b6d56a0a3c16672e9ed9118fbe37b0b6aeaf069a65"
     end
   end

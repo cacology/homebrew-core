@@ -1,17 +1,16 @@
 class Uhd < Formula
   desc "Hardware driver for all USRP devices."
-  homepage "http://files.ettus.com/manual/"
+  homepage "https://files.ettus.com/manual/"
   url "https://github.com/EttusResearch/uhd/archive/release_003_010_000_000.tar.gz"
   sha256 "9e018c069851fd68ba63908a9f9944763832ce657f5b357d4e6c64293ad0d2cd"
+  revision 3
   head "https://github.com/EttusResearch/uhd.git"
 
   bottle do
-    sha256 "73fd0a522d1e20635dcae8beaa565ff07f441ae1cb4ed7af9a1311ad224ece7c" => :el_capitan
-    sha256 "2a0a5b94a8f3c70cecfa7952855431eba304ed9509beeba5d9c892465d69d990" => :yosemite
-    sha256 "144dac9e3208b80681b6c40dc981bf28cc5938ebd4e52471f608b4a0fc1eb43b" => :mavericks
+    sha256 "9822bd7e387db89b7013730ef78648bfeb0f27570833363309d3798b3cdf93d3" => :sierra
+    sha256 "2419be46a5cfb70905fc8cfab497b646b151485bbd3910f5678166351f42e317" => :el_capitan
+    sha256 "3c3709ca944686a0b353fb8d20a174cb6c539e65f8ebf2d09d0f00f9bf4ac36c" => :yosemite
   end
-
-  option :universal
 
   depends_on "cmake" => :build
   depends_on "boost"
@@ -26,13 +25,6 @@ class Uhd < Formula
   end
 
   def install
-    args = std_cmake_args
-
-    if build.universal?
-      ENV.universal_binary
-      args << "-DCMAKE_OSX_ARCHITECTURES=#{Hardware::CPU.universal_archs.as_cmake_arch_flags}"
-    end
-
     ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
 
     resource("Mako").stage do
@@ -40,7 +32,7 @@ class Uhd < Formula
     end
 
     mkdir "host/build" do
-      system "cmake", "..", *args
+      system "cmake", "..", *std_cmake_args
       system "make"
       system "make", "test"
       system "make", "install"

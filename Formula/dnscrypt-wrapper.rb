@@ -1,15 +1,15 @@
 class DnscryptWrapper < Formula
   desc "Server-side proxy that adds dnscrypt support to name resolvers"
   homepage "https://cofyc.github.io/dnscrypt-wrapper/"
-  url "https://github.com/Cofyc/dnscrypt-wrapper/releases/download/v0.2.2/dnscrypt-wrapper-v0.2.2.tar.bz2"
-  sha256 "6fa0d2bea41a11c551d6b940bf4dffeaaa0e034fffd8c67828ee2093c1230fee"
+  url "https://github.com/Cofyc/dnscrypt-wrapper/releases/download/v0.3/dnscrypt-wrapper-v0.3.tar.bz2"
+  sha256 "ec5c290ba9b9a05536fa6ee827373ca9b3841508e6d075ae364405152446499c"
   head "https://github.com/Cofyc/dnscrypt-wrapper.git"
 
   bottle do
     cellar :any
-    sha256 "7ffa8f1939c272cef5632ad898c75f1488623da86a532261f57528e7312e64b1" => :el_capitan
-    sha256 "44306e2ec5f7b41aefebfb20489f2f4d6cb5ff3f060a4dc56fb96276d88095fb" => :yosemite
-    sha256 "f5bb409138b1444050c020f2baccc14615cdda17908b2db2094ad8105c1552d4" => :mavericks
+    sha256 "c877cf6c9d926a9414f14dbf97096001cadc1d2c2daf634e08a36003d4898e0c" => :sierra
+    sha256 "4b502c8e15050c876280cbf50c277f4e6e57609152e04a63450f5c25effd1ced" => :el_capitan
+    sha256 "ec06eb2055c8a812f08e2cb7783f431864baa77d2375775ba36bec730a1b585b" => :yosemite
   end
 
   depends_on "autoconf" => :build

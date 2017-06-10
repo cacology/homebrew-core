@@ -1,18 +1,16 @@
 class Libgcrypt < Formula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://directory.fsf.org/wiki/Libgcrypt"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.7.3.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.7.3.tar.bz2"
-  sha256 "ddac6111077d0a1612247587be238c5294dd0ee4d76dc7ba783cc55fb0337071"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.7.7.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.7.7.tar.bz2"
+  sha256 "b9b85eba0793ea3e6e66b896eb031fa05e1a4517277cc9ab10816b359254cd9a"
 
   bottle do
     cellar :any
-    sha256 "917d24c8069dc9ff48ba3cc0018b5a0740859e3dd6d344e48d00521572739f07" => :el_capitan
-    sha256 "783f5e8ebce20aae53e576a5bb4068c67999168c90f4a66e765abc2d4c94a733" => :yosemite
-    sha256 "b2d5c9c8d60afffa2983e952812ae46e566172b406806877f9675e907fc0db2e" => :mavericks
+    sha256 "3ee390e97f01b7c76598e792e70535a36f6ef8c7c17aaa53da2e85d58f8a3247" => :sierra
+    sha256 "56f8d744f774ba092ffd329221284f7cdbfbba737020a184e9836ab7b8f94ba3" => :el_capitan
+    sha256 "b72790d88a631f9d524dc2bc4604360d2bbbac8a95fe0553bef88ad070ddec82" => :yosemite
   end
-
-  option :universal
 
   depends_on "libgpg-error"
 
@@ -23,24 +21,19 @@ class Libgcrypt < Formula
   end
 
   def install
-    ENV.universal_binary if build.universal?
-    # Temporary hack to get libgcrypt building on macOS 10.12.
+    # Temporary hack to get libgcrypt building on macOS 10.12 and 10.11 with XCode 8.
     # Seems to be a Clang issue rather than an upstream one, so
     # keep checking whether or not this is necessary.
     # Should be reported to GnuPG if still an issue when near stable.
     # https://github.com/Homebrew/homebrew-core/issues/1957
-    ENV.O1 if MacOS.version >= :sierra
+    ENV.O1 if DevelopmentTools.clang_build_version >= 800
 
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
+                          "--enable-static",
                           "--prefix=#{prefix}",
                           "--disable-asm",
                           "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}"
-
-    if build.universal?
-      buildpath.install resource("config.h.ed")
-      system "ed -s - config.h <config.h.ed"
-    end
 
     # Parallel builds work, but only when run as separate steps
     system "make"
@@ -48,10 +41,10 @@ class Libgcrypt < Formula
     # normal place on >10.10 where SIP is enabled.
     # https://github.com/Homebrew/homebrew-core/pull/3004
     # https://bugs.gnupg.org/gnupg/issue2056
-    system "install_name_tool", "-change",
-                                lib/"libgcrypt.20.dylib",
-                                buildpath/"src/.libs/libgcrypt.20.dylib",
-                                buildpath/"tests/.libs/random"
+    MachO::Tools.change_install_name("#{buildpath}/tests/.libs/random",
+                                     "#{lib}/libgcrypt.20.dylib",
+                                     "#{buildpath}/src/.libs/libgcrypt.20.dylib")
+
     system "make", "check"
     system "make", "install"
 

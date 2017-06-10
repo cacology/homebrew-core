@@ -10,12 +10,13 @@ class Mongrel2 < Formula
     # ensure unit tests work on 1.11.0. remove after next release
     patch do
       url "https://github.com/mongrel2/mongrel2/commit/7cb8532e2ecc341d77885764b372a363fbc72eff.patch"
-      sha256 "b1861a49c7edff66cfd6bd898c8ce2e0ed7a5e9ecc454fdab337fb70af2346cd"
+      sha256 "46350471602726f6d0c1012f93e305dc2ca6fcdaa2187f1be3b6922c64ec7fdd"
     end
   end
 
   bottle do
     cellar :any
+    sha256 "293b0edc8bcc0b7e3a97748a6accbc5000916ed145fd467aeb809303438a207a" => :sierra
     sha256 "7a6880cbc814b084a3ac91e379b7a720438951e31a18119c232f976fded229c3" => :el_capitan
     sha256 "0b2926fe3d79ab934e95f0e5c067e8bb23b6900b99255482defee9388a0dee07" => :yosemite
     sha256 "dd07092a2384c243fcd8c54ed67f2a728f3da698276540fc1c9b201eb3c5cbbb" => :mavericks
@@ -26,7 +27,7 @@ class Mongrel2 < Formula
   def install
     # Build in serial. See:
     # https://github.com/Homebrew/homebrew/issues/8719
-    ENV.j1
+    ENV.deparallelize
 
     # Mongrel2 pulls from these ENV vars instead
     ENV["OPTFLAGS"] = "#{ENV.cflags} #{ENV.cppflags}"

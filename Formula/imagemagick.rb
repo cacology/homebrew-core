@@ -4,25 +4,25 @@ class Imagemagick < Formula
   # Please always keep the Homebrew mirror as the primary URL as the
   # ImageMagick site removes tarballs regularly which means we get issues
   # unnecessarily and older versions of the formula are broken.
-  url "https://dl.bintray.com/homebrew/mirror/imagemagick-6.9.5-7.tar.xz"
-  mirror "https://www.imagemagick.org/download/ImageMagick-6.9.5-7.tar.xz"
-  sha256 "c5f527ab5936527a23d9da2d80ebed906302f476908235ee2b31790dfd665901"
+  url "https://dl.bintray.com/homebrew/mirror/imagemagick-7.0.5-10.tar.xz"
+  mirror "https://www.imagemagick.org/download/ImageMagick-7.0.5-10.tar.xz"
+  sha256 "0058fcde533986334458a5c99600b1b9633182dd9562cbad4ba618c5ccf2a28f"
   head "http://git.imagemagick.org/repos/ImageMagick.git"
 
   bottle do
-    sha256 "1ab79cc208de98a8039926530cf93abada1aa37e360c2ef32fdbb3c815ef0df8" => :el_capitan
-    sha256 "05d72b9c0ce5ff45d0fb7196e58dc7ae254da2d0328c806b2960b4176084abd1" => :yosemite
-    sha256 "73c544e0d4c2a6316208017cd6e5e9f0cbc82bf3765608c795731f900f3531fa" => :mavericks
+    sha256 "3a81a559fd8494890c3b88ad8cfd5fd091832694e3ba04be3193d6fcf0784a79" => :sierra
+    sha256 "bd1fde79d86989901baa485ae6d03d1bc61cdf893b470d35c38685e08a27e48d" => :el_capitan
+    sha256 "db0dc309fcf0bef3cfbb6ef7e80957a48915f20c99418d3c283066dc89654067" => :yosemite
   end
 
   option "with-fftw", "Compile with FFTW support"
   option "with-hdri", "Compile with HDRI support"
+  option "with-opencl", "Compile with OpenCL support"
   option "with-openmp", "Compile with OpenMP support"
   option "with-perl", "Compile with PerlMagick"
   option "with-quantum-depth-8", "Compile with a quantum depth of 8 bit"
   option "with-quantum-depth-16", "Compile with a quantum depth of 16 bit"
   option "with-quantum-depth-32", "Compile with a quantum depth of 32 bit"
-  option "without-opencl", "Disable OpenCL"
   option "without-magick-plus-plus", "disable build/install of Magick++"
   option "without-modules", "Disable support for dynamically loadable modules"
   option "without-threads", "Disable threads support"
@@ -75,6 +75,12 @@ class Imagemagick < Formula
       args << "--with-modules"
     end
 
+    if build.with? "opencl"
+      args << "--enable-opencl"
+    else
+      args << "--disable-opencl"
+    end
+
     if build.with? "openmp"
       args << "--enable-openmp"
     else
@@ -93,7 +99,6 @@ class Imagemagick < Formula
       args << "--without-openjp2"
     end
 
-    args << "--disable-opencl" if build.without? "opencl"
     args << "--without-gslib" if build.without? "ghostscript"
     args << "--with-perl" << "--with-perl-options='PREFIX=#{prefix}'" if build.with? "perl"
     args << "--with-gs-font-dir=#{HOMEBREW_PREFIX}/share/ghostscript/fonts" if build.without? "ghostscript"
@@ -132,6 +137,11 @@ class Imagemagick < Formula
   end
 
   test do
-    system "#{bin}/identify", test_fixtures("test.png")
+    assert_match "PNG", shell_output("#{bin}/identify #{test_fixtures("test.png")}")
+    # Check support for recommended features and delegates.
+    features = shell_output("#{bin}/convert -version")
+    %w[Modules freetype jpeg png tiff].each do |feature|
+      assert_match feature, features
+    end
   end
 end

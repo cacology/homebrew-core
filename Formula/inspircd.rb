@@ -1,14 +1,14 @@
 class Inspircd < Formula
   desc "Modular C++ Internet Relay Chat daemon"
-  homepage "http://www.inspircd.org"
-  url "https://github.com/inspircd/inspircd/archive/v2.0.22.tar.gz"
-  sha256 "1e67d4e854ae2b7dc57efafb424609a51ebf11ed97d031e808dae7548ab9c03a"
+  homepage "https://www.inspircd.org/"
+  url "https://github.com/inspircd/inspircd/archive/v2.0.24.tar.gz"
+  sha256 "41f702cb84caa2db089a02f511a3da3e7fa3cdce7d2c5040b3c54c5da83c8b40"
   head "https://github.com/inspircd/inspircd.git", :branch => "insp20"
 
   bottle do
-    sha256 "9654c3351e85793a83c289257387a4fe3f4af76e8f3790115f78c6b0fac62e34" => :el_capitan
-    sha256 "f38925b809baa6282f92da6081f84a0e6e4816cb2c621440c2bc3dd279021c4d" => :yosemite
-    sha256 "da7534958d9064b93cb4aef28375aacd08d3d72ba0119241678f92e84af3ce6b" => :mavericks
+    sha256 "4965f5c4e45b8106a23bd11156cb6e1fff7164800e0805c8704921722d50586d" => :sierra
+    sha256 "48faab0b2b980c4184f9456ec7c48ab6d5d8174508e7fa114c7b0abfe93b457c" => :el_capitan
+    sha256 "8786c5b0a4452c438c13a2a7a9dc74d7d01dde665ced7ac5088d10ab909c7edd" => :yosemite
   end
 
   skip_clean "data"

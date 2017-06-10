@@ -1,14 +1,15 @@
 class Plotutils < Formula
   desc "C/C++ function library for exporting 2-D vector graphics"
   homepage "https://www.gnu.org/software/plotutils/"
-  url "https://ftpmirror.gnu.org/plotutils/plotutils-2.6.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/plotutils/plotutils-2.6.tar.gz"
+  url "https://ftp.gnu.org/gnu/plotutils/plotutils-2.6.tar.gz"
+  mirror "https://ftpmirror.gnu.org/plotutils/plotutils-2.6.tar.gz"
   sha256 "4f4222820f97ca08c7ea707e4c53e5a3556af4d8f1ab51e0da6ff1627ff433ab"
   revision 1
 
   bottle do
     cellar :any
-    revision 1
+    rebuild 1
+    sha256 "b63f4f051452f8fd9b5ddb50f9d574122c2277c9778e1a56c3f2d59e55c3da73" => :sierra
     sha256 "b734cdcbc7ce11c4a716bc96ee7671f3883a5d41dadceac28d994ad2c20292f9" => :el_capitan
     sha256 "fae89f252628820ac83a0896fa022b1c08cacca6e6234b2fb23c10554f424fd3" => :yosemite
     sha256 "e51b4b5c367e8f9ec533f54e20c9df0b887818ee35c4cde19ba8feb73d4d2ff2" => :mavericks

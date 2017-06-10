@@ -1,15 +1,17 @@
 class Reposurgeon < Formula
   desc "Edit version-control repository history"
   homepage "http://www.catb.org/esr/reposurgeon/"
-  url "http://www.catb.org/~esr/reposurgeon/reposurgeon-3.37.tar.xz"
-  sha256 "563dfffd71baa45a70796260f7851c00f9b47960678e0c7e81b00edfc9935a91"
+  url "https://gitlab.com/esr/reposurgeon.git",
+      :tag => "3.42",
+      :revision => "885502d6c8bebd4efcf680babb28d7bc4e464a2f"
   head "https://gitlab.com/esr/reposurgeon.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "8a307933a77b32ebf28fecf18257218a4d6123f91d0f467b87b55aa47d9088d3" => :el_capitan
-    sha256 "b2f4f51daf0b9a39fdc3be128e394bb6e3dcb40cef54cd99b8d6e2170d037a33" => :yosemite
-    sha256 "21220d00b6d6ccff9293e6c8517108f5efbc8abd428c188295c2b01a54bf3323" => :mavericks
+    rebuild 1
+    sha256 "c854e5ad35c59bd1c717f8f232f7e581b2423d80836541156255f44f0de6aecb" => :sierra
+    sha256 "38730f4bde6958779efb2f19096f45579920d18e926eedc9adc55311d9b05efa" => :el_capitan
+    sha256 "0aaefd3b688bdcfda7a3b53c485c97d5a7bcd50138dd84b9626da15aa07cfe38" => :yosemite
   end
 
   option "without-cython", "Build without cython (faster compile)"
@@ -17,11 +19,7 @@ class Reposurgeon < Formula
   depends_on :python if MacOS.version <= :snow_leopard
   depends_on "asciidoc" => :build
   depends_on "xmlto" => :build
-
-  resource "Cython" do
-    url "https://files.pythonhosted.org/packages/c6/fe/97319581905de40f1be7015a0ea1bd336a756f6249914b148a17eefa75dc/Cython-0.24.1.tar.gz"
-    sha256 "84808fda00508757928e1feadcf41c9f78e9a9b7167b6649ab0933b76f75e7b9"
-  end
+  depends_on "cython" => [:build, :recommended]
 
   def install
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
@@ -29,14 +27,11 @@ class Reposurgeon < Formula
     elisp.install "reposurgeon-mode.el"
 
     if build.with? "cython"
-      resource("Cython").stage do
-        system "python", *Language::Python.setup_install_args(buildpath/"vendor")
-      end
-      ENV.prepend_path "PYTHONPATH", buildpath/"vendor/lib/python2.7/site-packages"
+      pyincludes = Utils.popen_read("python-config --cflags").chomp
+      pylib = Utils.popen_read("python-config --ldflags").chomp
       system "make", "install-cyreposurgeon", "prefix=#{prefix}",
-             "CYTHON=#{buildpath}/vendor/bin/cython",
-             "pyinclude=" + `python-config --cflags`.chomp,
-             "pylib=" + `python-config --ldflags`.chomp
+                     "CYTHON=#{Formula["cython"].opt_bin}/cython",
+                     "pyinclude=#{pyincludes}", "pylib=#{pylib}"
     end
   end
 

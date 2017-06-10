@@ -1,15 +1,15 @@
 class Ocamlsdl < Formula
   desc "OCaml interface with the SDL C library"
-  homepage "http://ocamlsdl.sourceforge.net/"
+  homepage "https://ocamlsdl.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/ocamlsdl/OCamlSDL/ocamlsdl-0.9.1/ocamlsdl-0.9.1.tar.gz"
   sha256 "abfb295b263dc11e97fffdd88ea1a28b46df8cc2b196777093e4fe7f509e4f8f"
-  revision 3
+  revision 5
 
   bottle do
     cellar :any
-    sha256 "63049f59ee0cb7ecb2ec879a6ba42d0257982a5e1496f766eb7a6af434316739" => :el_capitan
-    sha256 "e3c19d6e291f992746d2e97c3359926f31d1352c4c624e390832500376123f28" => :yosemite
-    sha256 "84e41d71d0d1325233ff60d1714bc4f2790c62ec2f770fb369b2c02447c347c7" => :mavericks
+    sha256 "e3cac43ef919a0358c90ea23b472e253429e68e5f02df59ffef9b85d1d189de8" => :sierra
+    sha256 "33b4dcb486909410434a14cc34a31a002bbe8629276836778d8f767fa1471703" => :el_capitan
+    sha256 "49ea552493b5d37783182e0fe444914bef8f6e4d5bb5978f831b6c6bd375ad4a" => :yosemite
   end
 
   depends_on "sdl"

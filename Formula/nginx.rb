@@ -1,19 +1,21 @@
 class Nginx < Formula
   desc "HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server"
   homepage "https://nginx.org/"
-  url "https://nginx.org/download/nginx-1.10.1.tar.gz"
-  sha256 "1fd35846566485e03c0e318989561c135c598323ff349c503a6c14826487a801"
+  url "https://nginx.org/download/nginx-1.12.0.tar.gz"
+  sha256 "b4222e26fdb620a8d3c3a3a8b955e08b713672e1bc5198d1e4f462308a795b30"
+  revision 1
+
   head "http://hg.nginx.org/nginx/", :using => :hg
 
   bottle do
-    sha256 "2b67c86454cc67bdeb2a637d9872ae471a810d8a2dae40b6a0c1dad7b253d30d" => :el_capitan
-    sha256 "6ac0a3e07cad5efb31185998f6cd6754de6d799396ffd872814593ba3430fdb3" => :yosemite
-    sha256 "c2f67c6b720a2f2c790338e0d30103acf36c757c068bbed8cc4c79734fd3779e" => :mavericks
+    sha256 "b57e068963566e2c945f9fccf0c643b2ad650136e434b9d6dac08b7e4fca47ec" => :sierra
+    sha256 "da5b826fd1dfa5647cacdf02fa49fc0d95168912fedba13ec6214091a0216327" => :el_capitan
+    sha256 "220078c438d928056c9f3983d74a21ae1608d6c9d8a42ba68ad7dcb396da5599" => :yosemite
   end
 
   devel do
-    url "https://nginx.org/download/nginx-1.11.3.tar.gz"
-    sha256 "4a667f40f9f3917069db1dea1f2d5baa612f1fa19378aadf71502e846a424610"
+    url "https://nginx.org/download/nginx-1.13.1.tar.gz"
+    sha256 "a5856c72a6609a4dc68c88a7f3c33b79e6693343b62952e021e043fe347b6776"
   end
 
   # Before submitting more options to this formula please check they aren't
@@ -22,15 +24,18 @@ class Nginx < Formula
   option "with-passenger", "Compile with support for Phusion Passenger module"
   option "with-webdav", "Compile with support for WebDAV module"
   option "with-debug", "Compile with support for debug log"
-  option "with-http2", "Compile with support for the HTTP/2 module"
   option "with-gunzip", "Compile with support for gunzip module"
-
-  deprecated_option "with-spdy" => "with-http2"
 
   depends_on "pcre"
   depends_on "passenger" => :optional
-  depends_on "openssl" => :recommended
-  depends_on "libressl" => :optional
+
+  # passenger uses apr, which uses openssl, so need to keep
+  # crypto library choice consistent throughout the tree.
+  if build.with? "passenger"
+    depends_on "openssl"
+  else
+    depends_on "openssl@1.1"
+  end
 
   def install
     # Changes default port to 8080
@@ -40,22 +45,20 @@ class Nginx < Formula
     end
 
     pcre = Formula["pcre"]
-    openssl = Formula["openssl"]
-    libressl = Formula["libressl"]
 
-    if build.with? "libressl"
-      cc_opt = "-I#{pcre.include} -I#{libressl.include}"
-      ld_opt = "-L#{pcre.lib} -L#{libressl.lib}"
+    if build.with? "passenger"
+      openssl = Formula["openssl"]
     else
-      cc_opt = "-I#{pcre.include} -I#{openssl.include}"
-      ld_opt = "-L#{pcre.lib} -L#{openssl.lib}"
+      openssl = Formula["openssl@1.1"]
     end
+
+    cc_opt = "-I#{pcre.opt_include} -I#{openssl.opt_include}"
+    ld_opt = "-L#{pcre.opt_lib} -L#{openssl.opt_lib}"
 
     args = %W[
       --prefix=#{prefix}
       --with-http_ssl_module
       --with-pcre
-      --with-ipv6
       --sbin-path=#{bin}/nginx
       --with-cc-opt=#{cc_opt}
       --with-ld-opt=#{ld_opt}
@@ -70,6 +73,7 @@ class Nginx < Formula
       --http-log-path=#{var}/log/nginx/access.log
       --error-log-path=#{var}/log/nginx/error.log
       --with-http_gzip_static_module
+      --with-http_v2_module
     ]
 
     if build.with? "passenger"
@@ -80,7 +84,6 @@ class Nginx < Formula
     args << "--with-http_dav_module" if build.with? "webdav"
     args << "--with-debug" if build.with? "debug"
     args << "--with-http_gunzip_module" if build.with? "gunzip"
-    args << "--with-http_v2_module" if build.with? "http2"
 
     if build.head?
       system "./auto/configure", *args
@@ -94,12 +97,12 @@ class Nginx < Formula
     else
       man8.install "man/nginx.8"
     end
-
-    (etc/"nginx/servers").mkpath
-    (var/"run/nginx").mkpath
   end
 
   def post_install
+    (etc/"nginx/servers").mkpath
+    (var/"run/nginx").mkpath
+
     # nginx's docroot is #{prefix}/html, this isn't useful, so we symlink it
     # to #{HOMEBREW_PREFIX}/var/www. The reason we symlink instead of patching
     # is so the user can redirect it easily to something else if they choose.
@@ -196,6 +199,6 @@ class Nginx < Formula
         }
       }
     EOS
-    system "#{bin}/nginx", "-t", "-c", testpath/"nginx.conf"
+    system bin/"nginx", "-t", "-c", testpath/"nginx.conf"
   end
 end

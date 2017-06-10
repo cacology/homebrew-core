@@ -1,21 +1,24 @@
 class Dspdfviewer < Formula
   desc "Dual-Screen PDF Viewer for latex-beamer"
   homepage "http://dspdfviewer.danny-edel.de"
-  url "https://github.com/dannyedel/dspdfviewer/archive/v1.15.tar.gz"
-  sha256 "19986053ac4a60e086a9edd78281f1e422a64efef29e3c6604386419e9420686"
+  url "https://github.com/dannyedel/dspdfviewer/archive/v1.15.1.tar.gz"
+  sha256 "c5b6f8c93d732e65a27810286d49a4b1c6f777d725e26a207b14f6b792307b03"
+  revision 1
+
   head "https://github.com/dannyedel/dspdfviewer.git"
 
   bottle do
     cellar :any
-    sha256 "5f23135aa30bf6fae45d453d892361daef51e19ffe510f5a9e79b5ed7393d0e3" => :el_capitan
-    sha256 "69bf9e53d7b8fd5414f770baea119c7f22d1a05f752c7915cbe1f0cdc201a004" => :yosemite
-    sha256 "d2f2ad9306d3417ab848ed98ca47481242a4a4064f8a8a1e1e6cc41aa286d4aa" => :mavericks
+    sha256 "4d1956fe7d07ad07164f30c16bbf3d9b82b3dfdd439b0f3972638f3206c7dd2b" => :sierra
+    sha256 "3549976a73ab1365db19b621d0b4e1f0079c8914fff8235b1de1da53cf1e0323" => :el_capitan
+    sha256 "29e5c046cd00cb1c1982df8e36f59424ab51c9bac34d2006fe2d458936953ed3" => :yosemite
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "boost"
-  depends_on "poppler" => "with-qt5"
+  depends_on "poppler" => "with-qt"
+  depends_on "qt"
 
   def install
     args = std_cmake_args
@@ -29,6 +32,6 @@ class Dspdfviewer < Formula
   end
 
   test do
-    assert_match /#{version}/, shell_output("#{bin}/dspdfviewer --version", 0)
+    system bin/"dspdfviewer", "--help"
   end
 end

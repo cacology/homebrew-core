@@ -1,15 +1,16 @@
 class Govendor < Formula
   desc "Go vendor tool that works with the standard vendor file."
   homepage "https://github.com/kardianos/govendor"
-  url "https://github.com/kardianos/govendor/archive/v1.0.4.tar.gz"
-  sha256 "39dbf5a72617a9688f9dd82db044bd0bd0908c42dfb15e4629a5e381d078f988"
+  url "https://github.com/kardianos/govendor/archive/v1.0.8.tar.gz"
+  sha256 "7e887b84c7a9278473f39ae8a74440ffc17b329aa193e9304d170d458f8785c7"
+  revision 1
   head "https://github.com/kardianos/govendor.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "a9b538021eae35eabc09d5660454a9f838344d18a77ce32b0b378ad5074429a8" => :el_capitan
-    sha256 "a0e647d88f7a1ac1e030acb2ebf05641ba3f874c5d8f03d4ba1bed3611f4d7a1" => :yosemite
-    sha256 "d6e56e0aff8ac0e2201c1be1d86d8fbe87087dad196777aaf7baf10174bce23d" => :mavericks
+    sha256 "128c4b938687104b86e21765664ef9426710cfaa3f455a56c02af24aadb0ad51" => :sierra
+    sha256 "b5614b2cdd37dec0c5bd2e6b11bba94435127a1d2fba9cdf59451711447aec42" => :el_capitan
+    sha256 "cec9a38df63880a8c4cdea079e3f86e4712e32ed7c78c4489fe98f722b056c2e" => :yosemite
   end
 
   depends_on "go"

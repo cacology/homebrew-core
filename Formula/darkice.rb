@@ -1,32 +1,45 @@
 class Darkice < Formula
   desc "Live audio streamer"
-  homepage "https://code.google.com/p/darkice/"
-  url "https://darkice.googlecode.com/files/darkice-1.2.tar.gz"
-  sha256 "b3fba9be2d9c72f36b0659cd9ce0652c8f973b5c6498407f093da9a364fdb254"
-
-  head "http://darkice.googlecode.com/svn/darkice/branches/darkice-macosx"
+  homepage "http://www.darkice.org/"
+  url "https://downloads.sourceforge.net/project/darkice/darkice/1.3/darkice-1.3.tar.gz"
+  sha256 "2c0d0faaa627c0273b2ce8b38775a73ef97e34ef866862a398f660ad8f6e9de6"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "611c7496a751c6f921f87bd3658001a200ae03b24020209a5442b6f59d61c6bc" => :el_capitan
-    sha256 "79b49d0c9d3401382008f1cb0db86493947ebee6045621df5f19e9adb848619f" => :yosemite
-    sha256 "fd5b2765d5d93b1c81e485a7ff6cc8176f9d77db4dcfa5e837ab5803f69162df" => :mavericks
+    sha256 "f5acac754cda3888160930ff630d33d5a7f134e455b21ad21a40b41150e12f49" => :sierra
+    sha256 "a3a9604162e1dd71c1ec69cfec895e0a92329e57f478a01131a2a00a3c495544" => :el_capitan
+    sha256 "64c3ebd7486589b3e9a216a4be8158ad94b1ceafac15934f97b4b3f3d684ad05" => :yosemite
   end
 
+  depends_on "pkg-config" => :build
   depends_on "libvorbis"
   depends_on "lame"
   depends_on "two-lame"
   depends_on "faac"
+  depends_on "libsamplerate"
   depends_on "jack"
 
   def install
+    # Fixes  "invalid conversion from 'const float*' to 'float*' [-fpermissive]"
+    # Upstream issue Oct 25, 2016 https://github.com/rafael2k/darkice/issues/119
+    # Suggested fix  Oct 25, 2016 https://github.com/rafael2k/darkice/pull/120
+    ["aacPlusEncoder.cpp", "FaacEncoder.cpp", "OpusLibEncoder.cpp", "VorbisLibEncoder.cpp"].each do |f|
+      inreplace "src/#{f}", ", converterData.data_in", ", const_cast<float*>( converterData.data_in )"
+    end
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--with-lame-prefix=#{HOMEBREW_PREFIX}",
-                          "--with-vorbis-prefix=#{HOMEBREW_PREFIX}",
-                          "--with-twolame-prefix=#{HOMEBREW_PREFIX}",
-                          "--with-faac-prefix=#{HOMEBREW_PREFIX}",
-                          "--with-jack-prefix=#{HOMEBREW_PREFIX}"
+                          "--sysconfdir=#{etc}",
+                          "--with-lame-prefix=#{Formula["lame"].opt_prefix}",
+                          "--with-faac-prefix=#{Formula["faac"].opt_prefix}",
+                          "--with-twolame",
+                          "--with-jack",
+                          "--with-vorbis",
+                          "--with-samplerate"
     system "make", "install"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/darkice -h", 1)
   end
 end

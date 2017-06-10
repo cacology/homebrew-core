@@ -1,15 +1,28 @@
 class Bitlbee < Formula
   desc "IRC to other chat networks gateway"
   homepage "https://www.bitlbee.org/"
-  url "https://get.bitlbee.org/src/bitlbee-3.4.2.tar.gz"
-  sha256 "69c85554def74f314e3b6e390389a30b0e748f23ef37883e9d7545ee2c45ea57"
-
   head "https://github.com/bitlbee/bitlbee.git"
 
+  stable do
+    url "https://get.bitlbee.org/src/bitlbee-3.5.1.tar.gz"
+    sha256 "9636d7fd89ebb3756c13a9a3387736ca6d56ccf66ec0580d512f07b21db0fa69"
+
+    # Fixes a couple of bugs/potential crashes.
+    patch do
+      url "https://github.com/bitlbee/bitlbee/commit/17a58dfa.patch"
+      sha256 "c0b65656c8ba0c4df3bf422891bc8a3dc86f544c1efd5d5282573b528a93537e"
+    end
+
+    patch do
+      url "https://github.com/bitlbee/bitlbee/commit/eb73d05e.patch"
+      sha256 "2f48226cca5149f62b446101e1104b9782f3c80f0bcab6fa34a6b4f71fc2ce7c"
+    end
+  end
+
   bottle do
-    sha256 "2ae0ff3d810ba31cca377a3803dc3275e7efca34c129a35c8cf0aa3321aa4dba" => :el_capitan
-    sha256 "bb342d82cd1e019a98735f8d533e199e45c878fa727f7914dae7b90b022571c4" => :yosemite
-    sha256 "31e194c41873e9b98a00e0496156c3111720b6eba0d7a1a6f728752fee2950d5" => :mavericks
+    sha256 "a73fcc3ea892e02dff11eda82c9338230f16778d786dbcfecae89802fb0859cb" => :sierra
+    sha256 "f1e4ace83358ed1164d5d8cfbe7ffe239b5698d24211150b86dbf4d4fb589a37" => :el_capitan
+    sha256 "85eebf3ba9ee2e986ef1c54b99a8df958cf48a1d5112f765e5498d9be23b9426" => :yosemite
   end
 
   option "with-pidgin", "Use finch/libpurple for all communication with instant messaging networks"
@@ -30,8 +43,10 @@ class Bitlbee < Formula
   def install
     args = %W[
       --prefix=#{prefix}
+      --plugindir=#{HOMEBREW_PREFIX}/lib/bitlbee/
       --debug=0
       --ssl=gnutls
+      --etcdir=#{etc}/bitlbee
       --pidfile=#{var}/bitlbee/run/bitlbee.pid
       --config=#{var}/bitlbee/lib/
       --ipsocket=#{var}/bitlbee/run/bitlbee.sock
@@ -50,7 +65,9 @@ class Bitlbee < Formula
     system "make", "install-dev"
     # This build has an extra step.
     system "make", "install-etc"
+  end
 
+  def post_install
     (var/"bitlbee/run").mkpath
     (var/"bitlbee/lib").mkpath
   end
@@ -99,6 +116,6 @@ class Bitlbee < Formula
   end
 
   test do
-    shell_output("#{sbin}/bitlbee -V", 1)
+    assert_match version.to_s, shell_output("#{sbin}/bitlbee -V", 1)
   end
 end

@@ -19,13 +19,12 @@ class Wxpython < Formula
 
   bottle do
     cellar :any
-    revision 1
+    rebuild 1
+    sha256 "0e095b7b61f71c23d36bcd795b9d0ce605adb073db1dc60978dfb0481306b345" => :sierra
     sha256 "9956afc649ebc394fbae40dd55d3ce367ab42abe6be43ef01c35c1c6d0a8e225" => :el_capitan
     sha256 "04d8dfeab6dbb7a1c099c8e866f35e6d5d528ea69ef283d556c545347882abe2" => :yosemite
     sha256 "41ec8003758d804b8c426ce654a87f2d9f4be3be40fcbcb3d5686e3ecabaddbc" => :mavericks
   end
-
-  option :universal
 
   if MacOS.version <= :snow_leopard
     depends_on :python
@@ -35,12 +34,7 @@ class Wxpython < Formula
 
   def install
     ENV["WXWIN"] = buildpath
-
-    if build.universal?
-      ENV.universal_binary
-    else
-      ENV.append_to_cflags "-arch #{MacOS.preferred_arch}"
-    end
+    ENV.append_to_cflags "-arch #{MacOS.preferred_arch}"
 
     # wxPython is hardcoded to install headers in wx's prefix;
     # set it to use wxPython's prefix instead

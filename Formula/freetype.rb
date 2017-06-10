@@ -1,23 +1,19 @@
 class Freetype < Formula
   desc "Software library to render fonts"
   homepage "https://www.freetype.org/"
-  # Note: when bumping freetype's version, you must also bump revisions of
-  # formula with "full path" references to freetype in their pkgconfig.
-  # See https://github.com/Homebrew/legacy-homebrew/pull/44587
-  url "https://downloads.sf.net/project/freetype/freetype2/2.6.5/freetype-2.6.5.tar.bz2"
-  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.bz2"
-  sha256 "e20a6e1400798fd5e3d831dd821b61c35b1f9a6465d6b18a53a9df4cf441acf0"
+  url "https://downloads.sourceforge.net/project/freetype/freetype2/2.8/freetype-2.8.tar.bz2"
+  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.8.tar.bz2"
+  sha256 "a3c603ed84c3c2495f9c9331fe6bba3bb0ee65e06ec331e0a0fb52158291b40b"
 
   bottle do
     cellar :any
-    sha256 "9830f84e55635b445eb5422d7383ef37c76e71d4fcfd041eccd528f0580a6223" => :el_capitan
-    sha256 "53ffcde03d0c0ec7c31ae45de6ff699be97357276833c3b62ce0e2270f6d6b70" => :yosemite
-    sha256 "3fa3f187bca761465c8b02ccff5c4dbb13edfa9e342c246a1ca46959f37df513" => :mavericks
+    sha256 "f22537dd3f8b5638a712c7a6231f0b57359c4adef0557b6e90b92e11d930640f" => :sierra
+    sha256 "0a83ce9cb40656fd438a5475a09331c4bcc9a0e771af0d6049f002d14f02f576" => :el_capitan
+    sha256 "37d29dac299114d75abfcc1a75c6e10e1ce602072da732298a2a64438a3cedc3" => :yosemite
   end
 
   keg_only :provided_pre_mountain_lion
 
-  option :universal
   option "without-subpixel", "Disable sub-pixel rendering (a.k.a. LCD rendering, or ClearType)"
 
   depends_on "libpng"
@@ -29,14 +25,16 @@ class Freetype < Formula
           "#define FT_CONFIG_OPTION_SUBPIXEL_RENDERING"
     end
 
-    ENV.universal_binary if build.universal?
     system "./configure", "--prefix=#{prefix}", "--without-harfbuzz"
     system "make"
     system "make", "install"
+
+    inreplace [bin/"freetype-config", lib/"pkgconfig/freetype2.pc"],
+      prefix, opt_prefix
   end
 
   test do
-    system "#{bin}/freetype-config", "--cflags", "--libs", "--ftversion",
-      "--exec-prefix", "--prefix"
+    system bin/"freetype-config", "--cflags", "--libs", "--ftversion",
+                                  "--exec-prefix", "--prefix"
   end
 end

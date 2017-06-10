@@ -1,15 +1,14 @@
 class Global < Formula
   desc "Source code tag system"
   homepage "https://www.gnu.org/software/global/"
-  url "https://ftpmirror.gnu.org/global/global-6.5.4.tar.gz"
-  mirror "https://ftp.gnu.org/gnu/global/global-6.5.4.tar.gz"
-  sha256 "af16e0a686a46f759156cb685e25f345680703f43f93af1ce8d834caaf541da6"
+  url "https://ftp.gnu.org/gnu/global/global-6.5.7.tar.gz"
+  mirror "https://ftpmirror.gnu.org/global/global-6.5.7.tar.gz"
+  sha256 "d9c08fa524f9499b54241cb2d72f8a7df01453b6d5e012a63784ded08e3acd32"
 
   bottle do
-    revision 2
-    sha256 "b3210dcfc79345c62594110cca80ec252285ab149aa95214ca79000490d3b179" => :el_capitan
-    sha256 "a747a41990ed2455483658672c971465a55bbfb99f3b1b6dfa24282cf6497e41" => :yosemite
-    sha256 "776433a65c48183e5a1161ed57c375f9e150b7c6d8c4e8c2ad811dd71253ff69" => :mavericks
+    sha256 "cc5c5987a2bc21c05092e15b5d793c10ab71c532eb6e4d938b7688129f653483" => :sierra
+    sha256 "899dd6664ab239fd6a3d4d01066c216644d06716c3359227e76f6da7f49525d7" => :el_capitan
+    sha256 "f9f1c4729c8f5aaaae72e0b2becc6a082d48d779201119fc0633a5b4d51daa17" => :yosemite
   end
 
   head do
@@ -24,7 +23,7 @@ class Global < Formula
   end
 
   option "with-ctags", "Enable Exuberant Ctags as a plug-in parser"
-  option "with-pygments", "Enable Pygments as a plug-in parser (should enable exuberent-ctags too)"
+  option "with-pygments", "Enable Pygments as a plug-in parser (should enable exuberant-ctags too)"
   option "with-sqlite3", "Use SQLite3 API instead of BSD/DB API for making tag files"
 
   deprecated_option "with-exuberant-ctags" => "with-ctags"
@@ -33,9 +32,9 @@ class Global < Formula
 
   skip_clean "lib/gtags"
 
-  resource "pygments" do
-    url "https://pypi.python.org/packages/source/P/Pygments/Pygments-2.1.3.tar.gz"
-    sha256 "88e4c8a91b2af5962bfa5ea2447ec6dd357018e86e94c7d14bd8cacbc5b55d81"
+  resource "Pygments" do
+    url "https://files.pythonhosted.org/packages/71/2a/2e4e77803a8bd6408a2903340ac498cb0a2181811af7c9ec92cb70b0308a/Pygments-2.2.0.tar.gz"
+    sha256 "dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc"
   end
 
   def install
@@ -56,7 +55,7 @@ class Global < Formula
     if build.with? "pygments"
       ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
       pygments_args = %W[build install --prefix=#{libexec}]
-      resource("pygments").stage { system "python", "setup.py", *pygments_args }
+      resource("Pygments").stage { system "python", "setup.py", *pygments_args }
     end
 
     system "./configure", *args

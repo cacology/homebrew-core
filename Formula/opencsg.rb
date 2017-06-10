@@ -1,27 +1,24 @@
 class Opencsg < Formula
   desc "The CSG rendering library"
   homepage "http://www.opencsg.org"
-  url "http://www.opencsg.org/OpenCSG-1.4.0.tar.gz"
-  sha256 "ecb46be54cfb8a338d2a9b62dec90ec8da6c769078c076f58147d4a6ba1c878d"
-  revision 1
+  url "http://www.opencsg.org/OpenCSG-1.4.2.tar.gz"
+  sha256 "d952ec5d3a2e46a30019c210963fcddff66813efc9c29603b72f9553adff4afb"
 
   bottle do
     cellar :any
-    sha256 "577e6777db3c9ee1010577e9dd29f7d86cff106273ef650bf58b08b20020a751" => :el_capitan
-    sha256 "d6e5913457b310b32a3dd9673a248793fd53bc6d2863f55b3d3334be7665c544" => :yosemite
-    sha256 "26098d8c2d4e89f2a0389c470f8b094a805e97c959defa3381ab0cd8c8d8ec9e" => :mavericks
+    rebuild 1
+    sha256 "e62e1f707d9aa71d0fc7a8f3ae33273d71162a400fb81fcb6f713ea1d1948530" => :sierra
+    sha256 "0363ac5efebc67433d163bfc7f88b063a989f9851adb691cdbc4ffdb8528df91" => :el_capitan
+    sha256 "dcd887e9c5e0512747c7db19197999d29adbf4fff24793cdb9f91b64edf5259f" => :yosemite
   end
 
-  depends_on "qt5" => :build
+  depends_on "qt" => :build
   depends_on "glew"
 
-  # This patch adds support for specifying INSTALLDIR
-  # It has been submitted upstream and accepted 20160709, through private email
-  # (as that's how submissions are done)
-  # Should be in the next release (> 1.4.0)
+  # This patch disabling building examples
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/814a29d3ce4c6e7e919cd2fcd64bf45d421e821b/opencsg/patch-build.diff"
-    sha256 "9d710cf6c2d5495ca5ba51c0319785cefc21477c85fa3aacb9ccd3473fee54f3"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/990b9bb/opencsg/disable-examples.diff"
+    sha256 "12cc799a6352eda4a18706eeefea059d14e23605a627dc12ed2a809f65328d69"
   end
 
   def install

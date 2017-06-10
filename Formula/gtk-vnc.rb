@@ -1,12 +1,13 @@
 class GtkVnc < Formula
   desc "VNC viewer widget for GTK."
   homepage "https://wiki.gnome.org/Projects/gtk-vnc"
-  url "https://download.gnome.org/sources/gtk-vnc/0.6/gtk-vnc-0.6.0.tar.xz"
-  sha256 "9559348805e64d130dae569fee466930175dbe150d2649bb868b5c095f130433"
+  url "https://download.gnome.org/sources/gtk-vnc/0.7/gtk-vnc-0.7.1.tar.xz"
+  sha256 "f34baa696615ef67666e8465b4d0ac563355e999a77d2cc42ad4625a24f7aab1"
 
   bottle do
-    sha256 "8989a4351aebfdb2510e8f3ab8b3048e14781c09ae63cb4cc3fd1c10ed5da054" => :el_capitan
-    sha256 "221d067174aaee6f1f2875b143c905db8677da91e31e251c706649da9951816e" => :yosemite
+    sha256 "c95f372db04ab13aa14d32a08365c70b2509f44e2e00e35dbe8951c0fbf2ff35" => :sierra
+    sha256 "8a06aa2e8724eff7e84b5249eaa8d0b2f82dba260b35fab9785c4ff4ed2ef065" => :el_capitan
+    sha256 "9d4ceb7f6eddd4a8db287c1e4c4dcdca1bd302eaaf11879d2080c39e771c333e" => :yosemite
   end
 
   # Fails with Xcode 7.1 or older

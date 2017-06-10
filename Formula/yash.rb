@@ -1,27 +1,26 @@
 class Yash < Formula
   desc "Yet another shell: a POSIX-compliant command-line shell"
   homepage "https://yash.osdn.jp/"
-  url "http://dl.osdn.jp/yash/62651/yash-2.37.tar.gz"
-  sha256 "b976692de245ad3fb17bf87eb8b2e4c9bba4537e3820d488624c868e7408faaa"
+  url "http://dl.osdn.jp/yash/66984/yash-2.44.tar.xz"
+  sha256 "f1352b49195a3879284e3ab60af4b30d3a87d696c838b246e2068ccbdfcf2e66"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9b31936a60f2de87ee04f8c8be354d460c4806be7ef9384928c06e1b4c4af32b" => :el_capitan
-    sha256 "e155165566942ee1bde9cd71ef246ef0454befb2e5b23e43ac1eaca007fc8b46" => :yosemite
-    sha256 "469eacccbb09edd965b099476fb616e8e3ecd10071f24c654ac525bde2e65721" => :mavericks
-    sha256 "93538457f7f06a70634be8d1242bae4adb99ff3aac2518ae14b903fd987755ca" => :mountain_lion
+    sha256 "da1943d53ced363a3670017129947a4ba996ec82604112788ad7f02830612663" => :sierra
+    sha256 "6c212b53de2e7dfc29a5c84be0242553f96c3873f5926b5168ce9cf374479c91" => :el_capitan
+    sha256 "547509067bd7e0d2c0cc6e6156b3d2abbd9fb1d67cc106538d2443fbcbd872a5" => :yosemite
   end
+
+  depends_on "gettext"
 
   def install
     system "sh", "./configure",
             "--prefix=#{prefix}",
-            "--enable-alias",
             "--enable-array",
             "--enable-dirstack",
             "--enable-help",
             "--enable-history",
             "--enable-lineedit",
-            "--disable-nls",
+            "--enable-nls",
             "--enable-printf",
             "--enable-socket",
             "--enable-test",

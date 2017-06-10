@@ -1,25 +1,27 @@
 class Glbinding < Formula
   desc "C++ binding for the OpenGL API"
   homepage "https://github.com/cginternals/glbinding"
-  url "https://github.com/cginternals/glbinding/archive/v2.1.1.tar.gz"
-  sha256 "253671f2b730a6efa55de92a704938bb0f1761d151f3f8e87c043c51d46ea1e4"
+  url "https://github.com/cginternals/glbinding/archive/v2.1.3.tar.gz"
+  sha256 "48f2e590a4a951005f79fec6c487217aa9b344a33ca1a8d2b7e618f04681ec60"
 
   bottle do
     cellar :any
-    sha256 "a41937f898840ca580188b002308a6e13696e1e659feda33493f0c6c4cf9287f" => :el_capitan
-    sha256 "773e5ce2e1012af403b58e0db3f4cc0f7b98d111eaea9cab528057d27c5c7c35" => :yosemite
-    sha256 "97b4e0dc61be2fdd33928db4b2ed51250f38b4cab55310819715ef6f9f324530" => :mavericks
+    sha256 "792fd850648cdeea9e5e8a699ba1554e3936b62419c3a0912c81ce22b58d096e" => :sierra
+    sha256 "c26c8b3e87d1721dc224a5b8c3438c451fc2661fb184f3d450cff051f61a64cd" => :el_capitan
+    sha256 "f8143d1a2fcf8a3d08d85b964d6325068c19c19565c463559dc9f264b65766ed" => :yosemite
   end
 
-  option "with-glfw3", "Enable tools that display OpenGL information for your system"
+  option "with-glfw", "Enable tools that display OpenGL information for your system"
 
   depends_on "cmake" => :build
-  depends_on "homebrew/versions/glfw3" => :optional
+  depends_on "glfw" => :optional
   needs :cxx11
 
   def install
     ENV.cxx11
-    system "cmake", ".", *std_cmake_args
+    args = std_cmake_args
+    args << "-DGLFW_LIBRARY_RELEASE=" if build.without? "glfw"
+    system "cmake", ".", *args
     system "cmake", "--build", ".", "--target", "install"
   end
 

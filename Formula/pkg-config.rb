@@ -1,15 +1,14 @@
 class PkgConfig < Formula
   desc "Manage compile and link flags for libraries"
   homepage "https://freedesktop.org/wiki/Software/pkg-config/"
-  url "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.1.tar.gz"
-  mirror "https://fossies.org/linux/misc/pkg-config-0.29.1.tar.gz"
-  sha256 "beb43c9e064555469bd4390dcfd8030b1536e0aa103f08d7abf7ae8cac0cb001"
-  revision 1
+  url "https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+  mirror "https://fossies.org/linux/misc/pkg-config-0.29.2.tar.gz"
+  sha256 "6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591"
 
   bottle do
-    sha256 "7354d2e9f337af437a22433926dd38a68413a8d8bef3aac52f203ae581d7669d" => :el_capitan
-    sha256 "d84a72010d87c3f517a53b72a266bd5a4674efcf398eb94382621d2ee939a6b4" => :yosemite
-    sha256 "7fe94019f0b3d0417bc9fffdaed1b066290cb0c051282bf6799cc589b80bb9ec" => :mavericks
+    sha256 "8eb723bfc03cd468d779d54d015d47d2e8ab1dd4d35e595ab4abaca8833b3277" => :sierra
+    sha256 "93f044f166bcbd84db14133ee4f56104031c65409cfd2801c7ac0d182936dc78" => :el_capitan
+    sha256 "d9ccc19f1a55919408a1b27260b0404aa36dc6782a4a5964e6fd8409abf3b830" => :yosemite
   end
 
   def install
@@ -21,7 +20,6 @@ class PkgConfig < Formula
       #{HOMEBREW_LIBRARY}/Homebrew/os/mac/pkgconfig/#{MacOS.version}
     ].uniq.join(File::PATH_SEPARATOR)
 
-    ENV.append "LDFLAGS", "-framework Foundation -framework Cocoa"
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",
                           "--disable-host-tool",

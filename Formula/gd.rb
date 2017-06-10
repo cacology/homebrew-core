@@ -1,14 +1,23 @@
 class Gd < Formula
   desc "Graphics library to dynamically manipulate images"
   homepage "https://libgd.github.io/"
-  url "https://github.com/libgd/libgd/releases/download/gd-2.2.3/libgd-2.2.3.tar.xz"
-  sha256 "746b6cbd6769a22ff3ba6f5756f3512a769bd4cdf4695dff17f4867f25fa7d3c"
+  revision 1
+
+  stable do
+    url "https://github.com/libgd/libgd/releases/download/gd-2.2.4/libgd-2.2.4.tar.xz"
+    sha256 "137f13a7eb93ce72e32ccd7cebdab6874f8cf7ddf31d3a455a68e016ecd9e4e6"
+
+    patch do
+      url "https://github.com/libgd/libgd/commit/381e89de.patch"
+      sha256 "5604fb87dfaabff0ae399bb6f6ed0fbe01dbb8a63db9cead85623c7bc63d4963"
+    end
+  end
 
   bottle do
     cellar :any
-    sha256 "29776f468bbff2cac3cec5cf9045521a4f5f3b4109a97491f6ded9cf7723a513" => :el_capitan
-    sha256 "eb416148f999b18da74eb0810cc5156e7d2ab4d92b269f7c110f603665c9815b" => :yosemite
-    sha256 "b0646d10f7bf588bb6c0d148ea79b602574cfff82164b3a82fd2baba80415ca2" => :mavericks
+    sha256 "23a18720365fd4c7aaa4d8097f339ef4177a5d708990db6711f72661d04035c9" => :sierra
+    sha256 "f466f3c052633de8e1a649345890e3da2579791a8876e8ddc81e582654319e92" => :el_capitan
+    sha256 "b1db65caa81c5bfdcf16b63b44dcbccbad82a7007111479a5a94a2bbc497a2d1" => :yosemite
   end
 
   head do
@@ -19,8 +28,6 @@ class Gd < Formula
     depends_on "libtool" => :build
   end
 
-  option :universal
-
   depends_on "fontconfig" => :recommended
   depends_on "freetype" => :recommended
   depends_on "jpeg" => :recommended
@@ -28,14 +35,7 @@ class Gd < Formula
   depends_on "libtiff" => :recommended
   depends_on "webp" => :recommended
 
-  fails_with :llvm do
-    build 2326
-    cause "Undefined symbols when linking"
-  end
-
   def install
-    ENV.universal_binary if build.universal?
-
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}

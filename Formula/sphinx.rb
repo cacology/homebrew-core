@@ -6,6 +6,7 @@ class Sphinx < Formula
   head "https://github.com/sphinxsearch/sphinx.git"
 
   bottle do
+    sha256 "55ce34bdedf13946fa614bde50839d93135eae720f1021e2c87807d04515ab18" => :sierra
     sha256 "c75e018d69afb7d3cb662ebd129af67607d47f7b7f71ce8ea95be75d66dc502d" => :el_capitan
     sha256 "f89b43df8735d295a55c74f18d6af4a1a10b9f3ae81df69713c27f9240f78d14" => :yosemite
     sha256 "4ec1f1ea71e17b9e924e9f36747d7184114463640f100022cdbb46202e46261f" => :mavericks
@@ -29,20 +30,23 @@ class Sphinx < Formula
         :revision => "9b58e92c965cd7e3208247ace3cc00d173397f3c"
   end
 
-  fails_with :llvm do
-    build 2334
-    cause <<-EOS.undent
-      ld: rel32 out of range in _GetPrivateProfileString from
-          /usr/lib/libodbc.a(SQLGetPrivateProfileString.o)
-    EOS
-  end
-
   fails_with :clang do
     build 421
     cause "sphinxexpr.cpp:1802:11: error: use of undeclared identifier 'ExprEval'"
   end
 
+  needs :cxx11 if build.with? "re2"
+
   def install
+    if build.with? "re2"
+      ENV.cxx11
+
+      # Fix "error: invalid suffix on literal" and "error:
+      # non-constant-expression cannot be narrowed from type 'long' to 'int'"
+      # Upstream issue from 7 Dec 2016 http://sphinxsearch.com/bugs/view.php?id=2578
+      ENV.append "CXXFLAGS", "-Wno-reserved-user-defined-literal -Wno-c++11-narrowing"
+    end
+
     resource("stemmer").stage do
       system "make", "dist_libstemmer_c"
       system "tar", "xzf", "dist/libstemmer_c.tgz", "-C", buildpath

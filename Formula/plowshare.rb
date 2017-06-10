@@ -1,21 +1,21 @@
 class Plowshare < Formula
   desc "Download/upload tool for popular file sharing websites"
   homepage "https://github.com/mcrapet/plowshare"
-  url "https://github.com/mcrapet/plowshare/archive/v2.1.4.tar.gz"
-  sha256 "d6bb484fe63a8e9219a3f284a9ad21e260e2fc21aa004eedfcac86fb65e8c13e"
+  url "https://github.com/mcrapet/plowshare/archive/v2.1.6.tar.gz"
+  sha256 "2823f4bc82ad9b30c0c122a312125cb923acc55ce448c56a503e03fe0a4d97c4"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "fe1496232d6c45a79a81454e82b2dd21d3790978d60c836d3edc189bf5f2d880" => :el_capitan
-    sha256 "a2f3b29825642936b27bc25023632bdb3123801fea2e78cb4118753c6e055781" => :yosemite
-    sha256 "53f41fc14ff8b13ba52912e3f9b104adfaafee29d701563eff83a8578da62387" => :mavericks
+    sha256 "ede17ceb41fc2bcd01e99a234437f41ef3cedaa472961913d8af87152437f367" => :sierra
+    sha256 "ede17ceb41fc2bcd01e99a234437f41ef3cedaa472961913d8af87152437f367" => :el_capitan
+    sha256 "ede17ceb41fc2bcd01e99a234437f41ef3cedaa472961913d8af87152437f367" => :yosemite
   end
 
-  depends_on "aview"
   depends_on "bash"
   depends_on "coreutils"
   depends_on "gnu-sed"
   depends_on "imagemagick" => "with-x11"
+  depends_on "libcaca"
   depends_on "recode"
   depends_on "spidermonkey"
 

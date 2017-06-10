@@ -1,13 +1,14 @@
 class Pdns < Formula
   desc "Authoritative nameserver"
   homepage "https://www.powerdns.com"
-  url "https://downloads.powerdns.com/releases/pdns-4.0.1.tar.bz2"
-  sha256 "d191eed4a6664430e85969f49835c59e810ecbb7b3eb506e64c6b2734091edd7"
+  url "https://downloads.powerdns.com/releases/pdns-4.0.3.tar.bz2"
+  sha256 "60fa21550b278b41f58701af31c9f2b121badf271fb9d7642f6d35bfbea8e282"
 
   bottle do
-    sha256 "a4c88ba530128cff489e1267e6970c89ec1019248d33cc033e1a2672f7b9e7ec" => :el_capitan
-    sha256 "45dd89931b7b94e779ccdec204dac373fa9a3b5869944cfbf01b3a150c59f730" => :yosemite
-    sha256 "69ed11aa0eb0e223e498f8a2181322a706349ecd95d3a6a02cd670c6d2dbbe1b" => :mavericks
+    rebuild 1
+    sha256 "1cbf7b9fee0547821a2e1272024a8f422f3a7d29352189fd31350058a48a9fa1" => :sierra
+    sha256 "21d3740b76c2db623bd0af082b19428491a8015ceb66a43b63ddc2bb0e582442" => :el_capitan
+    sha256 "b16f12210c373ed1c75b620617a59c74b5b458f7e151fe1ac5483e33586b42ed" => :yosemite
   end
 
   head do
@@ -19,16 +20,17 @@ class Pdns < Formula
     depends_on "ragel"
   end
 
-  option "with-pgsql", "Enable the PostgreSQL backend"
+  option "with-postgresql", "Enable the PostgreSQL backend"
 
-  deprecated_option "pgsql" => "with-pgsql"
+  deprecated_option "pgsql" => "with-postgresql"
+  deprecated_option "with-pgsql" => "with-postgresql"
 
   depends_on "pkg-config" => :build
   depends_on "boost"
   depends_on "lua"
   depends_on "openssl"
   depends_on "sqlite"
-  depends_on :postgresql if build.with? "pgsql"
+  depends_on :postgresql => :optional
 
   def install
     args = %W[
@@ -39,7 +41,7 @@ class Pdns < Formula
     ]
 
     # Include the PostgreSQL backend if requested
-    if build.with? "pgsql"
+    if build.with? "postgresql"
       args << "--with-modules=gsqlite3 gpgsql"
     else
       # SQLite3 backend only is the default
@@ -49,9 +51,32 @@ class Pdns < Formula
     system "./bootstrap" if build.head?
     system "./configure", *args
 
-    # Compilation fails at polarssl if we skip straight to make install
-    system "make"
     system "make", "install"
+  end
+
+  plist_options :manual => "pdns_server start"
+
+  def plist; <<-EOS.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>KeepAlive</key>
+      <true/>
+      <key>Label</key>
+      <string>#{plist_name}</string>
+      <key>ProgramArguments</key>
+      <array>
+        <string>#{opt_bin}/pdns_server</string>
+      </array>
+      <key>EnvironmentVariables</key>
+      <key>KeepAlive</key>
+      <true/>
+      <key>SHAuthorizationRight</key>
+      <string>system.preferences</string>
+    </dict>
+    </plist>
+    EOS
   end
 
   test do

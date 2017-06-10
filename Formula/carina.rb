@@ -1,29 +1,30 @@
 class Carina < Formula
-  desc "Work with Swarm clusters on Carina"
+  desc "command-line client for Carina"
   homepage "https://github.com/getcarina/carina"
   url "https://github.com/getcarina/carina.git",
-        :tag => "v1.4.0",
-        :revision => "f63790db44677584dc2639f42c7527626039f490"
+        :tag => "v2.1.3",
+        :revision => "2b3ec267e298e095d7c2f81a2d82dc50a720e81c"
   head "https://github.com/getcarina/carina.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "f5355dc0fc7e0d647d8ed7a6310d9407f96646c47dde1c78e5530e4501f5a1ce" => :el_capitan
-    sha256 "92e9e6b093d76ef440fb5b258c38c4a590dfbc47fb2536601df077c26b856bd3" => :yosemite
-    sha256 "13bd8c316df9c401f76893ab397c7681489bd81667c2861edde1f17d93d8c378" => :mavericks
+    sha256 "ee6c8cdf2eddda983618f7de29bf3bcc7e81d8d9a7085a037d67cd7cdb25377a" => :sierra
+    sha256 "34086f8b3418d96c3ee5c2f50ad5ffc7ee839fd26b36d0e8911c364a8c82586e" => :el_capitan
+    sha256 "0706998cd1dc286030e20382ac69a96c744ec558784685f769aa4276966dcd12" => :yosemite
   end
 
   depends_on "go" => :build
 
   def install
     ENV["GOPATH"] = buildpath
+    ENV.prepend_create_path "PATH", buildpath/"bin"
 
     carinapath = buildpath/"src/github.com/getcarina/carina"
     carinapath.install Dir["{*,.git}"]
 
     cd carinapath do
       system "make", "get-deps"
-      system "make", "carina", "VERSION=#{version}"
+      system "make", "local", "VERSION=#{version}"
       bin.install "carina"
     end
   end

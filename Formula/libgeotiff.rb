@@ -1,15 +1,21 @@
 class Libgeotiff < Formula
   desc "Library and tools for dealing with GeoTIFF"
   homepage "https://geotiff.osgeo.org/"
-  url "http://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.4.1.tar.gz"
-  sha256 "acfc76ee19b3d41bb9c7e8b780ca55d413893a96c09f3b27bdb9b2573b41fd23"
-  revision 1
+  url "http://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.4.2.tar.gz"
+  sha256 "ad87048adb91167b07f34974a8e53e4ec356494c29f1748de95252e8f81a5e6e"
 
   bottle do
-    sha256 "2d90f23486794745cbf3880b8327f6c9b8d1ee5b3952b599d372e139e3fa386a" => :el_capitan
-    sha256 "cc50df08d046654c4dcdb71dca892522ddbe7f4d08bf76db875843b5278f8c72" => :yosemite
-    sha256 "a06efe08c1bd6a4c8c2e17d8081bafb2c6fd7e6a46083d7ff3228f98d3dca7e3" => :mavericks
-    sha256 "07efe6adec3e35b7e3d05af18e62a407041d84a96fa91a64757aa1e0b4696fd6" => :mountain_lion
+    sha256 "194dc211dc45fe89183b53245ed494f4338afedaf65635202ae61df4495139aa" => :sierra
+    sha256 "2256a133251e48d5df3719d1e83e9b2ac2e8be7bea41fcff25d036dce1e3cef7" => :el_capitan
+    sha256 "0e283a6d16503c98c978092d98573f68a8d4e59aefe0b86f7ba6e6e3f33597c8" => :yosemite
+  end
+
+  head do
+    url "https://svn.osgeo.org/metacrs/geotiff/trunk/libgeotiff"
+
+    depends_on "automake" => :build
+    depends_on "autoconf" => :build
+    depends_on "libtool" => :build
   end
 
   depends_on "libtiff"
@@ -18,12 +24,45 @@ class Libgeotiff < Formula
   depends_on "proj"
 
   def install
-    args = ["--disable-dependency-tracking", "--prefix=#{prefix}",
-            "--with-libtiff=#{HOMEBREW_PREFIX}",
-            "--with-zlib=#{HOMEBREW_PREFIX}",
-            "--with-jpeg=#{HOMEBREW_PREFIX}"]
-    system "./configure", *args
+    system "./autogen.sh" if build.head?
+
+    system "./configure", "--disable-dependency-tracking",
+                          "--prefix=#{prefix}"
     system "make" # Separate steps or install fails
     system "make", "install"
+  end
+
+  test do
+    (testpath/"test.c").write <<-EOS.undent
+      #include "geotiffio.h"
+      #include "xtiffio.h"
+      #include <stdlib.h>
+      #include <string.h>
+
+      int main(int argc, char* argv[])
+      {
+        TIFF *tif = XTIFFOpen(argv[1], "w");
+        GTIF *gtif = GTIFNew(tif);
+        TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, (uint32) 10);
+        GTIFKeySet(gtif, GeogInvFlatteningGeoKey, TYPE_DOUBLE, 1, (double)123.456);
+
+        int i;
+        char buffer[20L];
+
+        memset(buffer,0,(size_t)20L);
+        for (i=0;i<20L;i++){
+          TIFFWriteScanline(tif, buffer, i, 0);
+        }
+
+        GTIFWriteKeys(gtif);
+        GTIFFree(gtif);
+        XTIFFClose(tif);
+        return 0;
+      }
+    EOS
+
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-ltiff", "-lgeotiff", "-o", "test"
+    system "./test", "test.tif"
+    assert_match /GeogInvFlatteningGeoKey.*123.456/, shell_output("#{bin}/listgeo test.tif")
   end
 end

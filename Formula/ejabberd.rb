@@ -1,13 +1,13 @@
 class Ejabberd < Formula
   desc "XMPP application server"
   homepage "https://www.ejabberd.im"
-  url "https://www.process-one.net/downloads/ejabberd/16.08/ejabberd-16.08.tgz"
-  sha256 "b45598a6f2f1b398a19f23e3280b45eccc833d3339b1aeb6ec08ded7c19b1137"
+  url "https://www.process-one.net/downloads/ejabberd/17.04/ejabberd-17.04.tgz"
+  sha256 "b8395bc65b09f135a60320b62338258acd6056cc241e9e245fde267fb18dd3c9"
 
   bottle do
-    sha256 "4777eaed733a8b3f18b35bbde17de86c9e2d7e52e35cd36a001c3aaf66501f7c" => :el_capitan
-    sha256 "51d710e380a5db954eec6337c3232fd5ef814ede0f969ffb695a4ebc50b637db" => :yosemite
-    sha256 "e9dc90bbc28eb04b62e7393f5c7e8991cb8b0c7b2af23cf9be759182252feb30" => :mavericks
+    sha256 "acf6cafde085065fd6d6a9857c92ea41218a0921baaca76fec7e753c324a6b4d" => :sierra
+    sha256 "05fee3e510aaa61277cf22ed6d4545a4668a8ae1c8922f4c32413e270ce04cc4" => :el_capitan
+    sha256 "5cfe591d532c9b739835611a2a504449cf85c36a3f9f68d7b52bdcf5d6eb3b87" => :yosemite
   end
 
   head do
@@ -16,8 +16,6 @@ class Ejabberd < Formula
     depends_on "automake" => :build
     depends_on "autoconf" => :build
   end
-
-  option "32-bit"
 
   depends_on "openssl"
   depends_on "erlang"
@@ -30,10 +28,6 @@ class Ejabberd < Formula
     ENV["MAN_DIR"] = man
     ENV["SBIN_DIR"] = sbin
 
-    if build.build_32_bit?
-      ENV.append %w[CFLAGS LDFLAGS], "-arch #{Hardware::CPU.arch_32_bit}"
-    end
-
     args = ["--prefix=#{prefix}",
             "--sysconfdir=#{etc}",
             "--localstatedir=#{var}",
@@ -45,6 +39,8 @@ class Ejabberd < Formula
     system "./autogen.sh" if build.head?
     system "./configure", *args
     system "make"
+
+    ENV.deparallelize
     system "make", "install"
 
     (etc/"ejabberd").mkpath

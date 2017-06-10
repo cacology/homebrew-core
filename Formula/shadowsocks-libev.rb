@@ -1,20 +1,23 @@
 class ShadowsocksLibev < Formula
   desc "Libev port of shadowsocks"
   homepage "https://github.com/shadowsocks/shadowsocks-libev"
-  url "https://github.com/shadowsocks/shadowsocks-libev/archive/v2.4.8.tar.gz"
-  sha256 "af3fc3be50fb24dfd1aed8ce34d2d13448735f6181269f54f4860438a1838472"
-  head "https://github.com/shadowsocks/shadowsocks-libev.git"
+  url "https://github.com/shadowsocks/shadowsocks-libev/releases/download/v3.0.6/shadowsocks-libev-3.0.6.tar.gz"
+  sha256 "7d9b43b0235a57c115bfe160efd54abef96bffcbfff61c5496e7c2800f0734ca"
 
   bottle do
     cellar :any
-    sha256 "6644ff81772e06f298a9c6f31a430a9c991d6981401704d6876a15add56313bf" => :el_capitan
-    sha256 "4935b75d1b17961633d87698546806f2fd94d6bf9258950bb3e8ad395aa2a812" => :yosemite
-    sha256 "63ee376b55bd165d3ca8c9253a1186f296f85e13119153b89cecf6ec9ffc3b84" => :mavericks
+    sha256 "3ea7264ce2f6f22855d7207cabf0fca81d2c946c15efc1a6b5cefe56c1882d75" => :sierra
+    sha256 "8a5632988a46a1b795a7e22a90d1e98cf140636285f42ecb3aa98f96f1aaaa86" => :el_capitan
+    sha256 "7db119e2acd4a7857462cfdf3bf2e312a88a545f92ebd95648d6a67d26193208" => :yosemite
   end
 
   depends_on "asciidoc" => :build
   depends_on "xmlto" => :build
-  depends_on "openssl"
+  depends_on "libev"
+  depends_on "libsodium"
+  depends_on "mbedtls"
+  depends_on "pcre"
+  depends_on "udns"
 
   def install
     ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
@@ -72,7 +75,7 @@ class ShadowsocksLibev < Formula
           "local_port":9999,
           "password":"test",
           "timeout":600,
-          "method":"table"
+          "method":null
       }
     EOS
     server = fork { exec bin/"ss-server", "-c", testpath/"shadowsocks-libev.json" }

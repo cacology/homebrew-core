@@ -7,6 +7,7 @@ class Colortail < Formula
 
   bottle do
     cellar :any_skip_relocation
+    sha256 "44e09610d285f503fbae67f930ae7bea894c737d1e2c9c634332188340a70e3e" => :sierra
     sha256 "e0c8c9af739ce911c0d09eaee26b615444c17f48de27c680cbaf27739e45d8f5" => :el_capitan
     sha256 "1be1c0067a5621f5edcabf64ec06a775d334924e4ea01bccd1c42830f6c9d0c6" => :yosemite
     sha256 "8570fbda1625d70eac83d0e53a1d32d0cd7b32f9fb0b8dea38d32a3228dc6688" => :mavericks
@@ -18,7 +19,7 @@ class Colortail < Formula
 
   # Upstream PR to fix the build on ML
   patch do
-    url "https://github.com/joakim666/colortail/pull/12.diff"
+    url "https://github.com/joakim666/colortail/commit/36dd0437bb364fd1493934bdb618cc102a29d0a5.diff"
     sha256 "2bb9963f6fc586c8faff3b51a48896cf09c68c4229c39c6ae978a59cb58d0fd7"
   end
 

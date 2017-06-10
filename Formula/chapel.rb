@@ -1,14 +1,14 @@
 class Chapel < Formula
   desc "Emerging programming language designed for parallel computing"
   homepage "http://chapel.cray.com/"
-  url "https://github.com/chapel-lang/chapel/releases/download/1.13.1/chapel-1.13.1.tar.gz"
-  sha256 "9745c313548df610da2a6a3e920526baba92f11737c38fbeffd4de7bef5c011f"
+  url "https://github.com/chapel-lang/chapel/releases/download/1.15.0/chapel-1.15.0.tar.gz"
+  sha256 "c7549124d90504027212a99176635b215ab11c12eadc995e89e7d019529d796f"
   head "https://github.com/chapel-lang/chapel.git"
 
   bottle do
-    sha256 "72d30fe0fb3c325bb6792dcc3cf52eecc9ce8d61d5d9664e4b48c0e2c17277d2" => :el_capitan
-    sha256 "8d202021042a3a738547a238051e8435a48b03d6f73b715dd28abb24ce736f35" => :yosemite
-    sha256 "fcd061dd0d1f4ebd5fd17d805f5c573dd12ead6fb770e927b932204cf9057fcf" => :mavericks
+    sha256 "df7074e302bb157e9eb54044a1bbf07639cca888badc6e57c5eed78412de4d15" => :sierra
+    sha256 "b98d3a5b6bbdc0e117ce6b4706c6b4f14de294280c7d54494f6655234fb5734e" => :el_capitan
+    sha256 "fb8d33a9926c574e025d74955164e9e2aadfe2a67099814e7089049d39b01bc6" => :yosemite
   end
 
   def install
@@ -21,6 +21,8 @@ class Chapel < Formula
     cd libexec do
       system "make"
       system "make", "chpldoc"
+      system "make", "test-venv"
+      system "make", "cleanall"
     end
 
     prefix.install_metafiles

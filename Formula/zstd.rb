@@ -1,22 +1,37 @@
 class Zstd < Formula
   desc "Zstandard is a real-time compression algorithm"
   homepage "http://zstd.net/"
-  url "https://github.com/Cyan4973/zstd/archive/v0.8.0.tar.gz"
-  sha256 "297ef978fd956a503de6a303f7d58714de3300f602c7cf5e4b382a82f1483051"
+  url "https://github.com/facebook/zstd/archive/v1.2.0.tar.gz"
+  sha256 "4a7e4593a3638276ca7f2a09dc4f38e674d8317bbea51626393ca73fc047cbfb"
 
   bottle do
     cellar :any
-    sha256 "1d7490f2ea299369b5bfe29f2bf861fbfda00116da7bdcd137a3311df592040f" => :el_capitan
-    sha256 "4ab2477cb9a287fff393b89f7e7f5a9557ec6f12f6040c933ef0cd6db9a3a6f9" => :yosemite
-    sha256 "6e18b2d200e79de2a5bd62b68983540edc1937683b3333a1690f9019ea54a784" => :mavericks
+    sha256 "bc2ff6cb7373b79d53896ded9b54fbaf225dc24621dee26dbe9d482ff592274a" => :sierra
+    sha256 "70cd43a12ae9a638221725bb3ca770d8080ed437c3f9f34a8789e44642e40e65" => :el_capitan
+    sha256 "2d0e998725164b7cee9197f5cf5d254370250528adfb1b0328b65683fd2a1ce5" => :yosemite
   end
+
+  option "without-pzstd", "Build without parallel (de-)compression tool"
+
+  depends_on "cmake" => :build
 
   def install
     system "make", "install", "PREFIX=#{prefix}/"
+
+    if build.with? "pzstd"
+      system "make", "-C", "contrib/pzstd", "googletest"
+      system "make", "-C", "contrib/pzstd", "PREFIX=#{prefix}"
+      bin.install "contrib/pzstd/pzstd"
+    end
   end
 
   test do
     assert_equal "hello\n",
       pipe_output("#{bin}/zstd | #{bin}/zstd -d", "hello\n", 0)
+
+    if build.with? "pzstd"
+      assert_equal "hello\n",
+        pipe_output("#{bin}/pzstd | #{bin}/pzstd -d", "hello\n", 0)
+    end
   end
 end

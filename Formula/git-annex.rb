@@ -5,15 +5,14 @@ class GitAnnex < Formula
 
   desc "Manage files with git without checking in file contents"
   homepage "https://git-annex.branchable.com/"
-  url "https://hackage.haskell.org/package/git-annex-6.20160808/git-annex-6.20160808.tar.gz"
-  sha256 "c729decece3dfc05366879b72328b5ebe4a86e77a32f634fcfa4dbebbb8799fd"
+  url "https://hackage.haskell.org/package/git-annex-6.20170519/git-annex-6.20170519.tar.gz"
+  sha256 "28606a334b8c2dfd3dfe7975b5310602c2f36c1b639131c082c76b7b8033772b"
   head "git://git-annex.branchable.com/"
 
   bottle do
-    cellar :any
-    sha256 "772c139ff5123997f0b609fe1931a98ef6b77876001810a946282377b853c97b" => :el_capitan
-    sha256 "cca5befc5a33ac7da5243eb487cd2364011a795c63dd9e178dee1a70130255fd" => :yosemite
-    sha256 "ca301112f74fd03a88da5cbfce70a074599290a2ba18cf7e0faf59b8742d8b5a" => :mavericks
+    sha256 "5767f473ff0fa5c36c290be9bd90ba905ad9c4b291f735f0e3dffa1d926337ca" => :sierra
+    sha256 "6c6b4327c036ae83b7d7f93fd15886c014c6f240a3b8460c1f042bbb8c7bad22" => :el_capitan
+    sha256 "a3f52f6ea6b9084b4aa569f1ee55f39d4bfd1dc9ed978fdb21cea49a3308f9d9" => :yosemite
   end
 
   option "with-git-union-merge", "Build the git-union-merge tool"
@@ -22,17 +21,9 @@ class GitAnnex < Formula
   depends_on "cabal-install" => :build
   depends_on "pkg-config" => :build
   depends_on "gsasl"
-  depends_on "libidn"
   depends_on "libmagic"
-  depends_on "gnutls"
   depends_on "quvi"
-
-  # Fixes CI timeout by providing a more specific hint for Solver
-  # Reported 9 Aug 2016: "git-annex.cabal: persistent ==2.2.4.1"
-  patch do
-    url "https://github.com/joeyh/git-annex/pull/56.patch"
-    sha256 "62ad81e3019f5c639708c679783e3f93e20996db1dc3577553ce90ab55fac9cf"
-  end
+  depends_on "xdot" => :recommended
 
   def install
     install_cabal_package :using => ["alex", "happy", "c2hs"], :flags => ["s3", "webapp"] do

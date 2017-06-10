@@ -1,27 +1,18 @@
-require "language/go"
-
 class Leaps < Formula
   desc "Collaborative web-based text editing service written in Golang"
   homepage "https://github.com/jeffail/leaps"
   url "https://github.com/Jeffail/leaps.git",
-    :tag => "v0.5.0",
-    :revision => "5cf7328a8c498041d2a887e89f22f138498f4621"
-  sha256 "5f3fe0bb1a0ca75616ba2cb6cba7b11c535ac6c732e83c71f708dc074e489b1f"
+      :tag => "v0.7.0",
+      :revision => "5fd7c3b10c1aad9c7d35288bbaa3d350515a5472"
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "fa920e95afa37d1a2690e3d5ac2cd6010f0b8c67f56c989250c542867cfc8825" => :el_capitan
-    sha256 "dcaf8dd1314c3b3d1b3e904e7c37f3b251cd5d3e7fc5e58fc49bec09418a9c29" => :yosemite
-    sha256 "b7d162e71b1daa2ff79218c0ea9caf51f8bd0f6d003c7c605c713f76a559daf1" => :mavericks
+    sha256 "fa9cf3e9eac808b4a137e5140bcc524f8581d87a1cf9f80e1ec32a78020ae3ff" => :sierra
+    sha256 "6057a6539732b2b7967ca6678981560b19f0cb5bd96557b6bd930f1922272abc" => :el_capitan
+    sha256 "e056193127c7d1c48aa01934ea4e3c0301a7124a9c7fa46d82a34e1f9cd20e28" => :yosemite
   end
 
   depends_on "go" => :build
-
-  go_resource "golang.org/x/net" do
-    url "https://go.googlesource.com/net.git",
-      :revision => "db8e4de5b2d6653f66aea53094624468caad15d2"
-  end
 
   def install
     ENV["GOBIN"] = bin
@@ -30,7 +21,6 @@ class Leaps < Formula
 
     mkdir_p buildpath/"src/github.com/jeffail/"
     ln_sf buildpath, buildpath/"src/github.com/jeffail/leaps"
-    Language::Go.stage_deps resources, buildpath/"src"
 
     system "go", "build", "-o", "#{bin}/leaps", "github.com/jeffail/leaps/cmd/leaps"
   end
@@ -48,7 +38,7 @@ class Leaps < Formula
       sleep(1)
 
       # Check that the server is responding correctly
-      assert_match /Choose a document from the left to get started/, shell_output("curl -o- http://localhost#{port}")
+      assert_match "You are alone", shell_output("curl -o- http://localhost#{port}")
     ensure
       # Stop the server gracefully
       Process.kill("HUP", leaps_pid)

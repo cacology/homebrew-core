@@ -1,22 +1,18 @@
 class Kafka < Formula
   desc "Publish-subscribe messaging rethought as a distributed commit log"
   homepage "https://kafka.apache.org"
-  url "http://mirrors.ibiblio.org/apache/kafka/0.10.0.1/kafka-0.10.0.1-src.tgz"
-  mirror "https://archive.apache.org/dist/kafka/0.10.0.1/kafka-0.10.0.1-src.tgz"
-  sha256 "ae5e58d60240d9c9b6c6090ef60bbdcc7b9d9861c6c9be86c5736a6ef74ca56e"
-
-  head "https://git-wip-us.apache.org/repos/asf/kafka.git", :branch => "trunk"
+  url "http://mirror.nbtelecom.com.br/apache/kafka/0.10.2.0/kafka_2.11-0.10.2.0.tgz"
+  mirror "https://archive.apache.org/dist/kafka/0.10.2.0/kafka_2.11-0.10.2.0.tgz"
+  sha256 "4c9e73059dea2dcb5022135f8e7eff5f187ffcc27a27b365b326ee61040214cd"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c44c17af6496c56bfea144628c67cc957ffa433ed28c1dcb4f9b6e3a5966055b" => :el_capitan
-    sha256 "138c0f7be5fc087852a9b6fccd05bfa306d3edc4dd382a98c5cc0757cad5eb16" => :yosemite
-    sha256 "d1864412af3c518555cefba70b65f4b95d623ec97eeaccfed860cab45faed251" => :mavericks
+    sha256 "ca56f89d5f7974749318f3fa98a7b1796f7652dacdde7e01bc88168b125bf68b" => :sierra
+    sha256 "ca56f89d5f7974749318f3fa98a7b1796f7652dacdde7e01bc88168b125bf68b" => :el_capitan
+    sha256 "ca56f89d5f7974749318f3fa98a7b1796f7652dacdde7e01bc88168b125bf68b" => :yosemite
   end
 
-  depends_on "gradle"
   depends_on "zookeeper"
-  depends_on :java => "1.7+"
+  depends_on :java => "1.8+"
 
   # Related to https://issues.apache.org/jira/browse/KAFKA-2034
   # Since Kafka does not currently set the source or target compability version inside build.gradle
@@ -29,9 +25,6 @@ class Kafka < Formula
   def install
     ENV.java_cache
 
-    system "gradle"
-    system "gradle", "jar"
-
     data = var/"lib"
     inreplace "config/server.properties",
       "log.dirs=/tmp/kafka-logs", "log.dirs=#{data}/kafka-logs"
@@ -39,16 +32,13 @@ class Kafka < Formula
     inreplace "config/zookeeper.properties",
       "dataDir=/tmp/zookeeper", "dataDir=#{data}/zookeeper"
 
-    # Workaround for conflicting slf4j-log4j12 jars (1.7.10 is preferred)
-    rm_f "core/build/dependant-libs-2.10.5/slf4j-log4j12-1.7.6.jar"
-
     # remove Windows scripts
     rm_rf "bin/windows"
 
-    libexec.install %w[clients core examples]
+    libexec.install "libs"
 
     prefix.install "bin"
-    bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env("1.7+"))
+    bin.env_script_all_files(libexec/"bin", Language::Java.java_home_env("1.8+"))
     Dir["#{bin}/*.sh"].each { |f| mv f, f.to_s.gsub(/.sh$/, "") }
 
     mv "config", "kafka"
@@ -59,7 +49,7 @@ class Kafka < Formula
     (var+"log/kafka").mkpath
   end
 
-  plist_options :manual => "zookeeper-server-start #{HOMEBREW_PREFIX}/etc/kafka/zookeeper.properties; kafka-server-start #{HOMEBREW_PREFIX}/etc/kafka/server.properties"
+  plist_options :manual => "zookeeper-server-start #{HOMEBREW_PREFIX}/etc/kafka/zookeeper.properties & kafka-server-start #{HOMEBREW_PREFIX}/etc/kafka/server.properties"
 
   def plist; <<-EOS.undent
     <?xml version="1.0" encoding="UTF-8"?>
@@ -99,26 +89,27 @@ class Kafka < Formula
 
     begin
       fork do
-        exec "#{bin}/zookeeper-server-start #{testpath}/kafka/zookeeper.properties >/dev/null"
+        exec "#{bin}/zookeeper-server-start #{testpath}/kafka/zookeeper.properties > #{testpath}/test.zookeeper-server-start.log 2>&1"
       end
 
-      sleep 5
+      sleep 15
 
       fork do
-        exec "#{bin}/kafka-server-start #{testpath}/kafka/server.properties >/dev/null"
+        exec "#{bin}/kafka-server-start #{testpath}/kafka/server.properties > #{testpath}/test.kafka-server-start.log 2>&1"
       end
 
-      sleep 5
+      sleep 30
 
-      @demo_pid = fork do
-        exec "#{libexec}/examples/bin/java-producer-consumer-demo.sh > #{testpath}/kafka/demo.out 2>/dev/null"
-      end
-
-      sleep 5
+      system "#{bin}/kafka-topics --zookeeper localhost:2181 --create --if-not-exists --replication-factor 1 --partitions 1 --topic test > #{testpath}/kafka/demo.out 2>/dev/null"
+      pipe_output("#{bin}/kafka-console-producer --broker-list localhost:9092 --topic test 2>/dev/null", "test message")
+      system "#{bin}/kafka-console-consumer --zookeeper localhost:2181 --topic test --from-beginning --max-messages 1 >> #{testpath}/kafka/demo.out 2>/dev/null"
+      system "#{bin}/kafka-topics --zookeeper localhost:2181 --delete --topic test >> #{testpath}/kafka/demo.out 2>/dev/null"
     ensure
-      quiet_system "pkill", "-9", "-f", "#{testpath}/kafka/"
+      system "#{bin}/kafka-server-stop"
+      system "#{bin}/zookeeper-server-stop"
+      sleep 10
     end
 
-    assert_match "Received message: ", IO.read("#{testpath}/kafka/demo.out")
+    assert_match /test message/, IO.read("#{testpath}/kafka/demo.out")
   end
 end

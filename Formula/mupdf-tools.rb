@@ -1,26 +1,28 @@
 class MupdfTools < Formula
   desc "Lightweight PDF and XPS viewer"
-  homepage "http://mupdf.com"
-  url "http://mupdf.com/downloads/archive/mupdf-1.9a-source.tar.gz"
-  sha256 "8015c55f4e6dd892d3c50db4f395c1e46660a10b460e2ecd180a497f55bbc4cc"
-  head "git://git.ghostscript.com/mupdf.git"
+  homepage "https://mupdf.com/"
+  url "https://mupdf.com/downloads/mupdf-1.11-source.tar.gz"
+  sha256 "209474a80c56a035ce3f4958a63373a96fad75c927c7b1acdc553fc85855f00a"
+  head "https://git.ghostscript.com/mupdf.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "091b901203e9633c053fccdd02644043ff9ab3d7e5c2ec72547d1966cfe74204" => :el_capitan
-    sha256 "d626c89c21af7f672342d08675e6694f819deae30af76a66e7a0301c093a87de" => :yosemite
-    sha256 "0dfd41dbe9c11575ce9a84449997d5291f8dca58066ac2fe4817b69178d09a6b" => :mavericks
+    sha256 "b758f982d165d1a78caf8ce612de4103f0fa5312d1ef5ea78003beece2698504" => :sierra
+    sha256 "b3058793714bb01bf5281bd1a64b914dffc1bcbe3938665ec59f41036828fb7b" => :el_capitan
+    sha256 "1984e3b0e8e71d4b1add14be7d1f4b9625b1a0dbe67c64fd67f0db237d5e78c5" => :yosemite
   end
 
-  depends_on :macos => :snow_leopard
-
   def install
+    # Work around bug: https://bugs.ghostscript.com/show_bug.cgi?id=697842
+    inreplace "Makerules", "RANLIB_CMD := xcrun", "RANLIB_CMD = xcrun"
+
     system "make", "install",
            "build=release",
            "verbose=yes",
            "HAVE_X11=no",
            "CC=#{ENV.cc}",
-           "prefix=#{prefix}"
+           "prefix=#{prefix}",
+           "HAVE_GLFW=no" # Do not build OpenGL viewer: https://bugs.ghostscript.com/show_bug.cgi?id=697842
 
     # Symlink `mutool` as `mudraw` (a popular shortcut for `mutool draw`).
     bin.install_symlink bin/"mutool" => "mudraw"
@@ -28,7 +30,6 @@ class MupdfTools < Formula
   end
 
   test do
-    pdf = test_fixtures("test.pdf")
-    assert_match "Homebrew test", shell_output("#{bin}/mutool draw -F txt #{pdf}")
+    assert_match "Homebrew test", shell_output("#{bin}/mutool draw -F txt #{test_fixtures("test.pdf")}")
   end
 end

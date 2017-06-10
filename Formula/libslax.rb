@@ -1,13 +1,13 @@
 class Libslax < Formula
   desc "Implementation of the SLAX language (an XSLT alternative)"
   homepage "http://www.libslax.org/"
-  url "https://github.com/Juniper/libslax/releases/download/0.20.1/libslax-0.20.1.tar.gz"
-  sha256 "59f8aace21fb7e02091da3b84de7e231d5d02af26401985b109d2b328ab3f09d"
+  url "https://github.com/Juniper/libslax/releases/download/0.22.0/libslax-0.22.0.tar.gz"
+  sha256 "a32fb437a160666d88d9a9ae04ee6a880ea75f1f0e1e9a5a01ce1c8fbded6dfe"
 
   bottle do
-    sha256 "05dc9585d259e452b4ae116f4885a854a17f01b5dad364559f51bd4540456e67" => :el_capitan
-    sha256 "c5d5205c1cf54433d4e3c37cde10488c5b6f3c78cbe00c7b903c7c4f4e42e804" => :yosemite
-    sha256 "6ebe095ba980ce574312cc694c2da90a12bd6e57c3016e0f9ed9f7acc56703b8" => :mavericks
+    sha256 "7b8f9a2b5da09d32b9d0f45458a0059ebecddf7e40e49f667ad9c6c5f2a75d84" => :sierra
+    sha256 "6c74666ce37951d72d6589914d203362195431324d89aeb7702c4d5574ebe17e" => :el_capitan
+    sha256 "ac6582a698eae9f96d92d29b9e0ea1fb25b74c969e52cc1a97a1830ac6bb0544" => :yosemite
   end
 
   head do
@@ -23,7 +23,7 @@ class Libslax < Formula
     depends_on "sqlite" # Needs 3.7.13, which shipped on 10.9.
   end
 
-  depends_on "libtool"  => :build
+  depends_on "libtool" => :build
   depends_on "curl" if MacOS.version <= :lion
   depends_on "openssl"
 

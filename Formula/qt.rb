@@ -1,114 +1,103 @@
+# Patches for Qt must be at the very least submitted to Qt's Gerrit codereview
+# rather than their bug-report Jira. The latter is rarely reviewed by Qt.
 class Qt < Formula
   desc "Cross-platform application and UI framework"
   homepage "https://www.qt.io/"
-  revision 2
-
-  head "https://code.qt.io/qt/qt.git", :branch => "4.8"
-
-  stable do
-    url "https://download.qt.io/official_releases/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz"
-    mirror "https://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz"
-    sha256 "e2882295097e47fe089f8ac741a95fef47e0a73a3f3cdf21b56990638f626ea0"
-  end
+  url "https://download.qt.io/official_releases/qt/5.9/5.9.0/single/qt-everywhere-opensource-src-5.9.0.tar.xz"
+  mirror "https://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/5.9/5.9.0/single/qt-everywhere-opensource-src-5.9.0.tar.xz"
+  sha256 "f70b5c66161191489fc13c7b7eb69bf9df3881596b183e7f6d94305a39837517"
+  head "https://code.qt.io/qt/qt5.git", :branch => "5.8", :shallow => false
 
   bottle do
-    sha256 "f6dc9df6f78e1d8c12ebf961c8a9196885a1ee732eed098b2cbe8320f2d9a7a8" => :el_capitan
-    sha256 "323bcba88bd3600a4a5dc26d43602e57a71609f1d9a620b9d42b63426569e191" => :yosemite
-    sha256 "157a2338190f124a7c9446ecafa6669f503ca4e0221fece620096832a767f852" => :mavericks
+    sha256 "c5ae7adc63815ccced11d0f01e2bc2035de491f1575a7e88051ac8b6e9d0b713" => :sierra
+    sha256 "e307b90e2cefbc918c357f0e2b3a6e8a336396259fcd639d98e1f4db28fbbc57" => :el_capitan
+    sha256 "d32bb8ddb9f0a1e74bb6600dc6021e57970ca093e6ec587933f47a783e2593a7" => :yosemite
   end
 
-  # Backport of Qt5 commit to fix the fatal build error with Xcode 7, SDK 10.11.
-  # https://code.qt.io/cgit/qt/qtbase.git/commit/?id=b06304e164ba47351fa292662c1e6383c081b5ca
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/480b7142c4e2ae07de6028f672695eb927a34875/qt/el-capitan.patch"
-    sha256 "c8a0fa819c8012a7cb70e902abb7133fc05235881ce230235d93719c47650c4e"
-  end
+  keg_only "Qt 5 has CMake issues when linked"
 
-  option "with-qt3support", "Build with deprecated Qt3Support module support"
   option "with-docs", "Build documentation"
-  option "without-webkit", "Build without QtWebKit module"
+  option "with-examples", "Build examples"
+  option "with-qtwebkit", "Build with QtWebkit module"
 
-  depends_on "openssl"
-  depends_on "dbus" => :optional
-  depends_on "mysql" => :optional
-  depends_on "postgresql" => :optional
+  # OS X 10.7 Lion is still supported in Qt 5.5, but is no longer a reference
+  # configuration and thus untested in practice. Builds on OS X 10.7 have been
+  # reported to fail: <https://github.com/Homebrew/homebrew/issues/45284>.
+  depends_on :macos => :mountain_lion
 
-  deprecated_option "qtdbus" => "with-dbus"
-  deprecated_option "with-d-bus" => "with-dbus"
+  depends_on "pkg-config" => :build
+  depends_on :xcode => :build
+  depends_on :mysql => :optional
+  depends_on :postgresql => :optional
 
-  resource "test-project" do
-    url "https://gist.github.com/tdsmith/f55e7e69ae174b5b5a03.git",
-        :revision => "6f565390395a0259fa85fdd3a4f1968ebcd1cc7d"
+  # http://lists.qt-project.org/pipermail/development/2016-March/025358.html
+  resource "qt-webkit" do
+    url "https://download.qt.io/community_releases/5.9/5.9.0-final/qtwebkit-opensource-src-5.9.0.tar.xz"
+    sha256 "8dad193b740055a998312e04a040f2e32a923c0823b2d239b24eab08276a4e04"
+  end
+
+  # Restore `.pc` files for framework-based build of Qt 5 on OS X. This
+  # partially reverts <https://codereview.qt-project.org/#/c/140954/> merged
+  # between the 5.5.1 and 5.6.0 releases. (Remove this as soon as feasible!)
+  #
+  # Core formulae known to fail without this patch (as of 2016-10-15):
+  #   * gnuplot  (with `--with-qt` option)
+  #   * mkvtoolnix (with `--with-qt` option, silent build failure)
+  #   * poppler    (with `--with-qt` option)
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/e8fe6567/qt5/restore-pc-files.patch"
+    sha256 "48ff18be2f4050de7288bddbae7f47e949512ac4bcd126c2f504be2ac701158b"
   end
 
   def install
     args = %W[
+      -verbose
       -prefix #{prefix}
       -release
-      -opensource
-      -confirm-license
-      -fast
+      -opensource -confirm-license
       -system-zlib
-      -qt-libtiff
       -qt-libpng
       -qt-libjpeg
-      -nomake demos
-      -nomake examples
-      -cocoa
+      -qt-freetype
+      -qt-pcre
+      -nomake tests
+      -no-rpath
+      -pkg-config
+      -dbus-runtime
     ]
 
-    if ENV.compiler == :clang
-      args << "-platform"
+    args << "-nomake" << "examples" if build.without? "examples"
 
-      if MacOS.version >= :mavericks
-        args << "unsupported/macx-clang-libc++"
-      else
-        args << "unsupported/macx-clang"
-      end
+    if build.with? "mysql"
+      args << "-plugin-sql-mysql"
+      (buildpath/"brew_shim/mysql_config").write <<-EOS.undent
+        #!/bin/sh
+        if [ x"$1" = x"--libs" ]; then
+          mysql_config --libs | sed "s/-lssl -lcrypto//"
+        else
+          exec mysql_config "$@"
+        fi
+      EOS
+      chmod 0755, "brew_shim/mysql_config"
+      args << "-mysql_config" << buildpath/"brew_shim/mysql_config"
     end
 
-    args << "-openssl-linked"
-    args << "-I" << Formula["openssl"].opt_include
-    args << "-L" << Formula["openssl"].opt_lib
-
-    args << "-plugin-sql-mysql" if build.with? "mysql"
     args << "-plugin-sql-psql" if build.with? "postgresql"
 
-    if build.with? "dbus"
-      dbus_opt = Formula["dbus"].opt_prefix
-      args << "-I#{dbus_opt}/lib/dbus-1.0/include"
-      args << "-I#{dbus_opt}/include/dbus-1.0"
-      args << "-L#{dbus_opt}/lib"
-      args << "-ldbus-1"
-      args << "-dbus-linked"
+    if build.with? "qtwebkit"
+      (buildpath/"qtwebkit").install resource("qt-webkit")
+      inreplace ".gitmodules", /.*status = obsolete\n((\s*)project = WebKit\.pro)/, "\\1\n\\2initrepo = true"
     end
-
-    if build.with? "qt3support"
-      args << "-qt3support"
-    else
-      args << "-no-qt3support"
-    end
-
-    args << "-nomake" << "docs" if build.without? "docs"
-
-    if MacOS.prefer_64_bit?
-      args << "-arch" << "x86_64"
-    else
-      args << "-arch" << "x86"
-    end
-
-    args << "-no-webkit" if build.without? "webkit"
 
     system "./configure", *args
     system "make"
-    ENV.j1
+    ENV.deparallelize
     system "make", "install"
 
-    # what are these anyway?
-    (bin+"pixeltool.app").rmtree
-    (bin+"qhelpconverter.app").rmtree
-    # remove porting file for non-humans
-    (prefix+"q3porting.xml").unlink if build.without? "qt3support"
+    if build.with? "docs"
+      system "make", "docs"
+      system "make", "install_docs"
+    end
 
     # Some config scripts will only find Qt in a "Frameworks" folder
     frameworks.install_symlink Dir["#{lib}/*.framework"]
@@ -120,30 +109,47 @@ class Qt < Formula
       include.install_symlink path => path.parent.basename(".framework")
     end
 
-    # Make `HOMEBREW_PREFIX/lib/qt4/plugins` an additional plug-in search path
-    # for Qt Designer to support formulae that provide Qt Designer plug-ins.
-    system "/usr/libexec/PlistBuddy",
-            "-c", "Add :LSEnvironment:QT_PLUGIN_PATH string \"#{HOMEBREW_PREFIX}/lib/qt4/plugins\"",
-           "#{bin}/Designer.app/Contents/Info.plist"
-
-    Pathname.glob("#{bin}/*.app") { |app| mv app, prefix }
+    # Move `*.app` bundles into `libexec` to expose them to `brew linkapps` and
+    # because we don't like having them in `bin`.
+    # (Note: This move breaks invocation of Assistant via the Help menu
+    # of both Designer and Linguist as that relies on Assistant being in `bin`.)
+    libexec.mkpath
+    Pathname.glob("#{bin}/*.app") { |app| mv app, libexec }
   end
 
   def caveats; <<-EOS.undent
     We agreed to the Qt opensource license for you.
     If this is unacceptable you should uninstall.
-
-    Qt Designer no longer picks up changes to the QT_PLUGIN_PATH environment
-    variable as it was tweaked to search for plug-ins provided by formulae in
-      #{HOMEBREW_PREFIX}/lib/qt4/plugins
     EOS
   end
 
   test do
-    Encoding.default_external = "UTF-8" unless RUBY_VERSION.start_with? "1."
-    resource("test-project").stage testpath
-    system bin/"qmake"
+    (testpath/"hello.pro").write <<-EOS.undent
+      QT       += core
+      QT       -= gui
+      TARGET = hello
+      CONFIG   += console
+      CONFIG   -= app_bundle
+      TEMPLATE = app
+      SOURCES += main.cpp
+    EOS
+
+    (testpath/"main.cpp").write <<-EOS.undent
+      #include <QCoreApplication>
+      #include <QDebug>
+
+      int main(int argc, char *argv[])
+      {
+        QCoreApplication a(argc, argv);
+        qDebug() << "Hello World!";
+        return 0;
+      }
+    EOS
+
+    system bin/"qmake", testpath/"hello.pro"
     system "make"
-    assert_match(/GitHub/, pipe_output(testpath/"qtnetwork-test 2>&1", nil, 0))
+    assert File.exist?("hello")
+    assert File.exist?("main.o")
+    system "./hello"
   end
 end

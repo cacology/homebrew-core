@@ -15,7 +15,13 @@ class Z < Formula
 
   def caveats; <<-EOS.undent
     For Bash or Zsh, put something like this in your $HOME/.bashrc or $HOME/.zshrc:
-      . `brew --prefix`/etc/profile.d/z.sh
+      . #{etc}/profile.d/z.sh
     EOS
+  end
+
+  test do
+    (testpath/"zindex").write("/usr/local|1|1491427986\n")
+    testcmd = "/bin/bash -c '_Z_DATA=#{testpath}/zindex; . #{etc}/profile.d/z.sh; _z -l 2>&1'"
+    assert_match "/usr/local", pipe_output(testcmd)
   end
 end

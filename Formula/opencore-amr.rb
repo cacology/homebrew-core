@@ -1,14 +1,14 @@
 class OpencoreAmr < Formula
   desc "Audio codecs extracted from Android open source project"
-  homepage "http://opencore-amr.sourceforge.net/"
-  url "https://downloads.sourceforge.net/opencore-amr/opencore-amr-0.1.3.tar.gz"
-  sha256 "106bf811c1f36444d7671d8fd2589f8b2e0cca58a2c764da62ffc4a070595385"
+  homepage "https://opencore-amr.sourceforge.io/"
+  url "https://downloads.sourceforge.net/opencore-amr/opencore-amr-0.1.5.tar.gz"
+  sha256 "2c006cb9d5f651bfb5e60156dbff6af3c9d35c7bbcc9015308c0aff1e14cd341"
 
   bottle do
     cellar :any
-    sha256 "2434237ad9e130eab8f89b4b3f7fb7d299c216bb28b344a47460a93180025eea" => :el_capitan
-    sha256 "b4373425e5d5ad32cfda4b98c17946a61a78d1d6001edd6bc31f17546d881036" => :yosemite
-    sha256 "b7d22ef690bc40dee36e90d747cfb108fd69b6cabd3b6a4593767fb49c553aff" => :mavericks
+    sha256 "2b6378d4427dc88bac7e01d2614dd100535f1d78b1e6b81560e3a074e1d5a770" => :sierra
+    sha256 "4b628ad01f725342698a8556c4176f5d57e3647cc0f52669092a0523b76cc5d0" => :el_capitan
+    sha256 "0e8940ad28407b353c69b7fa0cdcd7d90777345f5ea86dcc9974552f99c1030c" => :yosemite
   end
 
   def install

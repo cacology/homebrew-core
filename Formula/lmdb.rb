@@ -1,25 +1,23 @@
 class Lmdb < Formula
   desc "Lightning memory-mapped database: key-value data store"
   homepage "https://symas.com/mdb-and-sqlite/"
-  url "https://github.com/LMDB/lmdb/archive/LMDB_0.9.18.tar.gz"
-  sha256 "dd35b471d6eea84f48f2feece13d121abf59ef255308b8624a36223ffbdf9989"
+  url "https://github.com/LMDB/lmdb/archive/LMDB_0.9.21.tar.gz"
+  sha256 "1187b635a4cc415bb6972bba346121f81edd996e99b8f0816151d4090f90b559"
+  version_scheme 1
   head "https://github.com/LMDB/lmdb.git", :branch => "mdb.master"
 
   bottle do
     cellar :any
-    sha256 "daed319fbdae70b79a6413fcd0c6d17df2cf1a5ff8ed80fcd3ae3c6820cdfcef" => :el_capitan
-    sha256 "0aa8da475dd4f4f8cd0500244d37f3f301d4c50b96bca133535906f3a2d1a0f2" => :yosemite
-    sha256 "d08670a1b23fcea78ed3f192772c28ed1b995249aeb61e0b50391abb01d66f72" => :mavericks
+    sha256 "f7d8acade2be32886edf1d039e57070e35db0bdeca6f37ef7f42530ad404cc91" => :sierra
+    sha256 "b4dd9a1387599e22744bbb769ce71fd1588e5ea6f1ef1d83a2d32f71190cb6ff" => :el_capitan
+    sha256 "66e48198e7bf2a466a614727a71b10e3b865cf1f65451fe10c7d5d4068e46a5c" => :yosemite
   end
 
   def install
     cd "libraries/liblmdb" do
-      # Reported 19 Aug 2016: http://www.openldap.org/its/index.cgi?findid=8481
-      inreplace "Makefile", ".so", ".dylib"
-
-      system "make"
-      system "make", "test"
-      system "make", "install", "prefix=#{prefix}"
+      system "make", "SOEXT=.dylib"
+      system "make", "test", "SOEXT=.dylib"
+      system "make", "install", "SOEXT=.dylib", "prefix=#{prefix}"
     end
   end
 

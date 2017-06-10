@@ -1,16 +1,18 @@
 class Gtkx3 < Formula
   desc "Toolkit for creating graphical user interfaces"
-  homepage "http://gtk.org/"
-  url "https://download.gnome.org/sources/gtk+/3.20/gtk+-3.20.6.tar.xz"
-  sha256 "3f8016563a96b1cfef4ac9e795647f6316deb2978ff939b19e4e4f8f936fa4b2"
+  homepage "https://gtk.org/"
+  url "https://download.gnome.org/sources/gtk+/3.22/gtk+-3.22.15.tar.xz"
+  sha256 "c8a012c2a99132629ab043f764a2b7cb6388483a015cd15c7a4288bec3590fdb"
 
   bottle do
-    sha256 "f345d391726697573ab8cf0a9c3474976c8454c71f7700010a564c04a07aa634" => :el_capitan
-    sha256 "81ce6ee9a9277fb4d62f05b9fbf68a7cf8637f18425798ec472e97acaff09040" => :yosemite
-    sha256 "1194c59970bf267da7088d5ad4c3d01a643b0bfd8b22a0b11dd7e165224d1901" => :mavericks
+    sha256 "5ebc52a5731f83fdf0137a3acb8508a67453deabd47fd7b293600dbf3e40ad18" => :sierra
+    sha256 "dd4ef2c3f8d495389daaf257cb19b85f4d7c82c126d9ee8c6a74ad84b5120869" => :el_capitan
+    sha256 "1be3c9d2ff82bdfd97f27a4a90f3eb8080b9da7719bbcb0dc6baa06fb5d9bf53" => :yosemite
   end
 
-  option :universal
+  # see https://bugzilla.gnome.org/show_bug.cgi?id=781118
+  patch :DATA
+
   option "with-quartz-relocation", "Build with quartz relocation support"
 
   depends_on "pkg-config" => :build
@@ -24,28 +26,7 @@ class Gtkx3 < Formula
   depends_on "gsettings-desktop-schemas" => :recommended
   depends_on "jasper" => :optional
 
-  # Replace a keyword not supported by Snow Leopard's Objective-C compiler.
-  # https://bugzilla.gnome.org/show_bug.cgi?id=756770
-  if MacOS.version <= :snow_leopard
-    patch do
-      url "https://bugzilla.gnome.org/attachment.cgi?id=313599&format=raw"
-      sha256 "a090b19d3c15364914917d9893be292225e8b8a016f2833a5b8354f079475a73"
-    end
-  end
-
-  # Fixes detection of CUPS 2.x by the configure script
-  # https://bugzilla.gnome.org/show_bug.cgi?id=767766
-  # Merged upstream, should be in the next release.
-  if MacOS.version >= :sierra
-    patch :p0 do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/a1fccbb34751eabe52366b8bb68bcf56ae74517c/gtk%2B3/cups.patch"
-      sha256 "c1e8eb7ebf0fc75365bf76f1db11ac4ff347b9a568529b3051adaecca0573c81"
-    end
-  end
-
   def install
-    ENV.universal_binary if build.universal?
-
     args = %W[
       --enable-debug=minimal
       --disable-dependency-tracking
@@ -133,3 +114,32 @@ class Gtkx3 < Formula
     system "./test"
   end
 end
+
+__END__
+diff --git a/gdk/quartz/gdkscreen-quartz.c b/gdk/quartz/gdkscreen-quartz.c
+index 586f7af..d032643 100644
+--- a/gdk/quartz/gdkscreen-quartz.c
++++ b/gdk/quartz/gdkscreen-quartz.c
+@@ -79,7 +79,7 @@ gdk_quartz_screen_init (GdkQuartzScreen *quartz_screen)
+   NSDictionary *dd = [[[NSScreen screens] objectAtIndex:0] deviceDescription];
+   NSSize size = [[dd valueForKey:NSDeviceResolution] sizeValue];
+
+-  _gdk_screen_set_resolution (screen, size.width);
++  _gdk_screen_set_resolution (screen, 72.0);
+
+   gdk_quartz_screen_calculate_layout (quartz_screen);
+
+@@ -334,11 +334,8 @@ gdk_quartz_screen_get_height (GdkScreen *screen)
+ static gint
+ get_mm_from_pixels (NSScreen *screen, int pixels)
+ {
+-  const float mm_per_inch = 25.4;
+-  NSDictionary *dd = [[[NSScreen screens] objectAtIndex:0] deviceDescription];
+-  NSSize size = [[dd valueForKey:NSDeviceResolution] sizeValue];
+-  float dpi = size.width;
+-  return (pixels / dpi) * mm_per_inch;
++  const float dpi = 72.0;
++  return (pixels / dpi) * 25.4;
+ }
+
+ static gchar *

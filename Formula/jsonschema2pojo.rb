@@ -1,16 +1,16 @@
 class Jsonschema2pojo < Formula
   desc "Generates Java types from JSON Schema (or example JSON)"
   homepage "http://www.jsonschema2pojo.org/"
-  url "https://github.com/joelittlejohn/jsonschema2pojo/releases/download/jsonschema2pojo-0.4.23/jsonschema2pojo-0.4.23.tar.gz"
-  sha256 "98fe0ce1f641646251b8b47a2234f153e97b604fa58fa45c3bdf7d5650c3adc3"
+  url "https://github.com/joelittlejohn/jsonschema2pojo/releases/download/jsonschema2pojo-0.4.35/jsonschema2pojo-0.4.35.tar.gz"
+  sha256 "e88b26bd477a7efb82634028b2a450ce08a5dd2a86515046225898f11cc39c1b"
 
   bottle :unneeded
 
   depends_on :java => "1.6+"
 
   def install
-    libexec.install %W[jsonschema2pojo-cli-#{version}.jar lib]
-    bin.write_jar_script libexec/"jsonschema2pojo-cli-#{version}.jar", "jsonschema2pojo"
+    libexec.install "jsonschema2pojo-#{version}-javadoc.jar", "lib"
+    bin.write_jar_script libexec/"lib/jsonschema2pojo-cli-#{version}.jar", "jsonschema2pojo"
   end
 
   test do

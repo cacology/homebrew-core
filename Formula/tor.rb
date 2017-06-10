@@ -1,21 +1,14 @@
 class Tor < Formula
   desc "Anonymizing overlay network for TCP"
   homepage "https://www.torproject.org/"
-  url "https://dist.torproject.org/tor-0.2.8.6.tar.gz"
-  mirror "https://tor.eff.org/dist/tor-0.2.8.6.tar.gz"
-  sha256 "3dc9fc02f7cd22ed5fce707e0d9b26a72b1bd0976766a804cb13078d32e3ab5a"
+  url "https://tor.eff.org/dist/tor-0.3.0.8.tar.gz"
+  mirror "https://www.torproject.org/dist/tor-0.3.0.8.tar.gz"
+  sha256 "663a3ba7b8a124c0f8a7351eaa2dda6fd518de3f3c4ee28fff869bfb03860d48"
 
   bottle do
-    sha256 "61d4930d118f6ffa5c2ce5b81a68f8a6e76df42dd732a3b2edabe9f7403b6150" => :el_capitan
-    sha256 "d4fe09c14eae1b909056cc9a258fd1f5e941bf9b07d7d61dd7dc4ef87a1d2c36" => :yosemite
-    sha256 "69cd219fde5288ed696ef0c85420b52e9852e7dd15e08a1dfa2dc582ae8a258e" => :mavericks
-  end
-
-  devel do
-    url "https://dist.torproject.org/tor-0.2.9.1-alpha.tar.gz"
-    mirror "https://tor.eff.org/dist/tor-0.2.9.1-alpha.tar.gz"
-    version "0.2.9.1-alpha"
-    sha256 "1a1b57af6bb47ecb62e4c60e2ceecb5609b558b1fdd87c86a91571d1601ba3f2"
+    sha256 "a5711584a1c11f5f0474a0946639c9a056c023de90cbc13edb074c72c08987a6" => :sierra
+    sha256 "8ae01e91e68d28c8393da54585281494a0c336bbb12af1c81f665490c4699efa" => :el_capitan
+    sha256 "a9bf0a2c773c21874b18160d2f43687a79998cb1262edf83fe80045da4bd17bc" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -37,15 +30,6 @@ class Tor < Formula
 
     system "./configure", *args
     system "make", "install"
-  end
-
-  def caveats; <<-EOS.undent
-    You will find a sample `torrc` file in #{etc}/tor.
-    It is advisable to edit the sample `torrc` to suit
-    your own security needs:
-      https://www.torproject.org/docs/faq#torrc
-    After editing the `torrc` you need to restart tor.
-    EOS
   end
 
   plist_options :manual => "tor"

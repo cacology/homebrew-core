@@ -1,21 +1,21 @@
 class Scriptcs < Formula
   desc "Tools to write and execute C#"
   homepage "https://github.com/scriptcs/scriptcs"
-  url "https://github.com/scriptcs/scriptcs/archive/0.16.0.tar.gz"
-  sha256 "e51060406606010f1ea67ae2573fcd7bc75b40ebe990ba546c7b646f6b4bdaba"
+  url "https://github.com/scriptcs/scriptcs/archive/v0.17.1.tar.gz"
+  sha256 "e876118d82f52cbdd9569783ec9278c4ac449055aa628cdcb2d785bf8098a434"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "bc27569acd1d41bc9e73a355c89bbf3bbcf8a37bbbb67ae8cf07e49d78927cad" => :el_capitan
-    sha256 "73c42a45b854ae25ef1ec2556f5488e2d4b48fecb48b223a7b7a96dfec5c04cf" => :yosemite
-    sha256 "096478d971450938f5c2333bc7ce93709c2c3456642477b8bc284093ce610e5a" => :mavericks
+    sha256 "9ccece2f779060ab23e699b07d6cc6ce0b2c2e0058cc995b1541e1170f69a6eb" => :sierra
+    sha256 "e3b6cb117d23ccf9a745e0ac5e61fcb531d7e8a08476699d2ece6c31e564450e" => :el_capitan
+    sha256 "21891cea519df48979320ba74660002d270fb414181e3f7087505169af15a471" => :yosemite
   end
 
-  depends_on "mono" => :recommended
+  depends_on "mono"
 
   def install
     script_file = "scriptcs.sh"
-    system "./build.sh"
+    system "sh", "./build_brew.sh"
     libexec.install Dir["src/ScriptCs/bin/Release/*"]
     (libexec/script_file).write <<-EOS.undent
       #!/bin/bash

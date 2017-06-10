@@ -1,12 +1,18 @@
 class Pyenv < Formula
   desc "Python version management"
-  homepage "https://github.com/yyuu/pyenv"
-  url "https://github.com/yyuu/pyenv/archive/v1.0.0.tar.gz"
-  sha256 "93216b9998cd1a3a09b8cc205a17de9a27b06788660749d36192c6a5ca346b4a"
+  homepage "https://github.com/pyenv/pyenv"
+  url "https://github.com/pyenv/pyenv/archive/v1.0.10.tar.gz"
+  sha256 "cc071d6a63445dc1f7cefa5961c74768bc3dadf8edab5c5a7e1d63bf536a99b5"
+  revision 1
   version_scheme 1
-  head "https://github.com/yyuu/pyenv.git"
+  head "https://github.com/pyenv/pyenv.git"
 
-  bottle :unneeded
+  bottle do
+    cellar :any
+    sha256 "bb53d2af447f7b4e54511a89f8a5b18e2d9d0fc44887241c0bea7532aca93e0b" => :sierra
+    sha256 "c5ac14c00ed44d999ab972026b2a0fe3639b4144abb9668c5096de0f1f6e0cee" => :el_capitan
+    sha256 "31db3cb79bb7f8213787faea877bb6bc688acd12e3905210b3d73f7deaf8bdaf" => :yosemite
+  end
 
   depends_on "autoconf" => [:recommended, :run]
   depends_on "pkg-config" => [:recommended, :run]
@@ -15,19 +21,14 @@ class Pyenv < Formula
 
   def install
     inreplace "libexec/pyenv", "/usr/local", HOMEBREW_PREFIX
+
+    system "src/configure"
+    system "make", "-C", "src"
+
     prefix.install Dir["*"]
     %w[pyenv-install pyenv-uninstall python-build].each do |cmd|
       bin.install_symlink "#{prefix}/plugins/python-build/bin/#{cmd}"
     end
-  end
-
-  def caveats; <<-EOS.undent
-    To use Homebrew's directories rather than ~/.pyenv add to your profile:
-      export PYENV_ROOT=#{var}/pyenv
-
-    To enable shims and autocompletion add to your profile:
-      if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-    EOS
   end
 
   test do

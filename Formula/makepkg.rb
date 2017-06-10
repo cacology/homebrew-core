@@ -2,13 +2,14 @@ class Makepkg < Formula
   desc "Compile and build packages suitable for installation with pacman"
   homepage "https://wiki.archlinux.org/index.php/makepkg"
   url "https://projects.archlinux.org/git/pacman.git",
-      :tag => "v5.0.1",
-      :revision => "f38de43eb68f1d9c577b4378310640c1eaa93338"
+      :tag => "v5.0.2",
+      :revision => "0c633c27eaeab2a9d30efb01199579896ccf63c9"
   head "https://projects.archlinux.org/git/pacman.git"
 
   bottle do
-    sha256 "0fabfa371db2dd7b98ec349e6b7a5ba1e8a2413fbef195a1d808829b21a59c4a" => :el_capitan
-    sha256 "71b87a9e173cfe65bda64ef6e14be450561aada6f4b337927e6a0d12e9a09ae7" => :yosemite
+    sha256 "457411b6d7fd00d32cde12826b55a93fbb6d59552215a19d7289550e64d3880a" => :sierra
+    sha256 "3052d0fdbd76e5e277f0e463eff423249e9b0c08c126a6d27affa1e5c69335ed" => :el_capitan
+    sha256 "64718b5dff7f979eaabd7f9d6aa18d56156bdfbd90f767820f1de6823361d870" => :yosemite
   end
 
   # libalpm now calls fstatat, which is only available for >= 10.10
@@ -19,6 +20,7 @@ class Makepkg < Formula
   depends_on "automake" => :build
   depends_on "autoconf" => :build
   depends_on "asciidoc" => :build
+  depends_on "docbook-xsl" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "libarchive"
@@ -29,6 +31,8 @@ class Makepkg < Formula
   depends_on "gpgme" => :optional
 
   def install
+    ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
+
     system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
@@ -39,7 +43,7 @@ class Makepkg < Formula
 
   test do
     (testpath/"PKGBUILD").write <<-EOS.undent
-      source=(https://androidnetworktester.googlecode.com/files/10kb.txt)
+      source=(https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/androidnetworktester/10kb.txt)
       pkgrel=0
       pkgver=0
     EOS

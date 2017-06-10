@@ -1,24 +1,17 @@
 class Elasticsearch < Formula
   desc "Distributed search & analytics engine"
   homepage "https://www.elastic.co/products/elasticsearch"
-  url "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz"
-  sha256 "1119a8c18620b98c4b85261318663a1f26dea92a26f34dfeb7f813fb7cbb468a"
-
-  devel do
-    url "https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.tar.gz"
-    sha256 "4ec8fa57310affa9e0510aa18fb98c8b08f7e7d6f591d29c3e1fffe88d411813"
-    version "5.0.0-alpha5"
-  end
+  url "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.4.1.tar.gz"
+  sha256 "09d6422bd33b82f065760cd49a31f2fec504f2a5255e497c81050fd3dceec485"
 
   head do
     url "https://github.com/elasticsearch/elasticsearch.git"
-    depends_on :java => "1.8"
     depends_on "gradle" => :build
   end
 
   bottle :unneeded
 
-  depends_on :java => "1.7+"
+  depends_on :java => "1.8+"
 
   def cluster_name
     "elasticsearch_#{ENV["USER"]}"
@@ -53,17 +46,12 @@ class Elasticsearch < Formula
 
     inreplace "#{libexec}/bin/elasticsearch.in.sh" do |s|
       # Configure ES_HOME
-      if build.devel? || build.head?
-        s.sub!(%r{#\!/bin/bash\n}, "#!/bin/bash\n\nES_HOME=#{libexec}")
-      else
-        s.sub!(%r{#\!/bin/sh\n}, "#!/bin/sh\n\nES_HOME=#{libexec}")
-      end
+      s.sub!(%r{#\!/bin/bash\n}, "#!/bin/bash\n\nES_HOME=#{libexec}")
     end
 
-    plugin=(build.devel? || build.head?) ? "#{libexec}/bin/elasticsearch-plugin" : "#{libexec}/bin/plugin"
-    inreplace plugin do |s|
+    inreplace "#{libexec}/bin/elasticsearch-plugin" do |s|
       # Add the proper ES_CLASSPATH configuration
-      s.sub!(/SCRIPT="\$0"/, %(SCRIPT="$0"\nES_CLASSPATH=#{libexec}/lib))
+      s.sub!(/SCRIPT="\$0"/, %Q(SCRIPT="$0"\nES_CLASSPATH=#{libexec}/lib))
       # Replace paths to use libexec instead of lib
       s.gsub!(%r{\$ES_HOME/lib/}, "$ES_CLASSPATH/")
     end
@@ -74,9 +62,7 @@ class Elasticsearch < Formula
     (libexec/"config").rmtree
 
     bin.write_exec_script Dir[libexec/"bin/elasticsearch"]
-    if build.devel? || build.head?
-      bin.write_exec_script Dir[libexec/"bin/elasticsearch-plugin"]
-    end
+    bin.write_exec_script Dir[libexec/"bin/elasticsearch-plugin"]
   end
 
   def post_install
@@ -93,13 +79,8 @@ class Elasticsearch < Formula
       Logs:    #{var}/log/elasticsearch/#{cluster_name}.log
       Plugins: #{libexec}/plugins/
       Config:  #{etc}/elasticsearch/
+      plugin script: #{libexec}/bin/elasticsearch-plugin
     EOS
-
-    if stable?
-      s += <<-EOS.undent
-        plugin script: #{libexec}/bin/plugin
-      EOS
-    end
 
     s
   end
@@ -117,7 +98,7 @@ class Elasticsearch < Formula
           <string>#{plist_name}</string>
           <key>ProgramArguments</key>
           <array>
-            <string>#{HOMEBREW_PREFIX}/bin/elasticsearch</string>
+            <string>#{opt_bin}/elasticsearch</string>
           </array>
           <key>EnvironmentVariables</key>
           <dict>
@@ -136,18 +117,10 @@ class Elasticsearch < Formula
   end
 
   test do
-    if devel? || head?
-      system "#{libexec}/bin/elasticsearch-plugin", "list"
-    else
-      system "#{libexec}/bin/plugin", "list"
-    end
+    system "#{libexec}/bin/elasticsearch-plugin", "list"
     pid = "#{testpath}/pid"
     begin
-      if devel? || head?
-        system "#{bin}/elasticsearch", "-d", "-p", pid, "-Epath.data=#{testpath}/data"
-      else
-        system "#{bin}/elasticsearch", "-d", "-p", pid, "--path.data", testpath/"data"
-      end
+      system "#{bin}/elasticsearch", "-d", "-p", pid, "-Epath.data=#{testpath}/data"
       sleep 10
       system "curl", "-XGET", "localhost:9200/"
     ensure

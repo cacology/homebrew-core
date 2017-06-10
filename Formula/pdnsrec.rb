@@ -1,21 +1,20 @@
 class Pdnsrec < Formula
   desc "Non-authoritative/recursing DNS server"
   homepage "https://www.powerdns.com/recursor.html"
-  url "https://downloads.powerdns.com/releases/pdns-recursor-4.0.1.tar.bz2"
-  sha256 "472db541307c8ca83a846d260ecfc854fd8e879c1bb2ce5683a8df5d21e860b0"
-  revision 1
+  url "https://downloads.powerdns.com/releases/pdns-recursor-4.0.4.tar.bz2"
+  sha256 "2338778f49ccd03401e65f6f4b39047890e691c8ff6d810ecee45321fb4f1e4d"
 
   bottle do
-    sha256 "6d1db92d6832f010a0e4e4f466a2fa3003320acbbffaf4bf3345f74f2ea706a3" => :el_capitan
-    sha256 "b4cb635ee48914b7e59e643c17bcc23a23e6c5ca74c1e76da9a3489dd11fc525" => :yosemite
-    sha256 "48cae0fd08da1919154a6b867906a836ccc82626939402690b120ebe3f7cfa87" => :mavericks
+    sha256 "2cdc2cca4313b14afa5f744a2f2fa9bf9a6d56a32a9d13b5fb04cbe976f430d3" => :sierra
+    sha256 "e529af26e330e54cb114e8adde9f458d83470da4f371bedac01a5c2dc724a339" => :el_capitan
+    sha256 "149d602439855b0b8a09854d746ab4f31d340db26179530e73309e77ac3878ef" => :yosemite
   end
 
   depends_on "pkg-config" => :build
   depends_on "boost"
   depends_on "openssl"
   depends_on "lua"
-  depends_on "gcc" if MacOS.version <= :mavericks
+  depends_on "gcc" if DevelopmentTools.clang_build_version <= 600
 
   needs :cxx11
 
@@ -24,15 +23,14 @@ class Pdnsrec < Formula
     cause "incomplete C++11 support"
   end
 
-  # boost 1.61.0 compat
-  # upstream commit "fix type"; remove for > 4.0.1
-  patch :p2 do
-    url "https://github.com/PowerDNS/pdns/commit/33f13fde.patch"
-    sha256 "f7944b9fd573619bdeb20bc211b3eb5fd4f129cb0e691ece686d213ebf6e5393"
-  end
-
   def install
     ENV.cxx11
+
+    # Remove for > 4.0.3; using inreplace avoids Autotools dependencies
+    # Upstream PR "Fall back to SystemV ucontexts on boost >= 1.61"
+    # See https://github.com/PowerDNS/pdns/commit/fbf562c
+    inreplace "configure", "boost/context/detail/fcontext.hpp",
+                           "boost/context/fcontext.hpp"
 
     args = %W[
       --prefix=#{prefix}

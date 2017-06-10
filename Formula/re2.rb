@@ -1,21 +1,25 @@
 class Re2 < Formula
   desc "Alternative to backtracking PCRE-style regular expression engines"
   homepage "https://github.com/google/re2"
-  url "https://github.com/google/re2/archive/2016-07-01.tar.gz"
-  version "20160701"
-  sha256 "06c8c99c7c7b4bb869e088c007d4162b4f302ab55671880333d01eff63997626"
+  url "https://github.com/google/re2/archive/2017-06-01.tar.gz"
+  version "20170601"
+  sha256 "bb60df9576e595c1c636020cad6a09c47926f9228c0db7dc43ac9ed059ad502e"
   head "https://github.com/google/re2.git"
 
   bottle do
     cellar :any
-    sha256 "917546580bed4d2f8e60531a93ddc3cd5001be66100ffe52c862a31d30b1067b" => :el_capitan
-    sha256 "3b75d5e178a745d21e338e9ab54f373dc81f4c3a85bce08e8e6f47f0f259b94e" => :yosemite
-    sha256 "091c858f09f468f04b964f5b8986a85c0e4eb2b0c458502e96382a81b330e0f7" => :mavericks
+    sha256 "1a5ba0d547cc62d51f3a27e6dedbfdb706a12e4065eef64a0ba1dab9d86d7f61" => :sierra
+    sha256 "91eb90a856183ef7dae756ff1a67e87694c19bc5ace9d3ea28c4865eedb1f138" => :el_capitan
+    sha256 "2e26e1f6796f8fc98999f69d0f9c93109e18617df8becbbd2862f2870e5e4417" => :yosemite
   end
 
+  needs :cxx11
+
   def install
+    ENV.cxx11
+
     system "make", "install", "prefix=#{prefix}"
-    system "install_name_tool", "-id", "#{lib}/libre2.0.dylib", "#{lib}/libre2.0.0.0.dylib"
+    MachO::Tools.change_dylib_id("#{lib}/libre2.0.0.0.dylib", "#{lib}/libre2.0.dylib")
     lib.install_symlink "libre2.0.0.0.dylib" => "libre2.0.dylib"
     lib.install_symlink "libre2.0.0.0.dylib" => "libre2.dylib"
   end
@@ -30,8 +34,8 @@ class Re2 < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "-I#{include}", "-L#{lib}", "-lre2",
-           testpath/"test.cpp", "-o", "test"
+    system ENV.cxx, "-std=c++11", "-I#{include}", "-L#{lib}", "-lre2",
+           "test.cpp", "-o", "test"
     system "./test"
   end
 end

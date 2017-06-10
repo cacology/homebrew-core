@@ -1,20 +1,27 @@
 class Djview4 < Formula
   desc "Viewer for the DjVu image format"
-  homepage "http://djvu.sourceforge.net/djview4.html"
-  url "https://downloads.sourceforge.net/project/djvu/DjView/4.10/djview-4.10.5.tar.gz"
-  sha256 "a0b302807106053d1983659ebb0139c7b1c393b3e6407f1f47990d7e3c5d7b3d"
+  homepage "https://djvu.sourceforge.io/djview4.html"
+  url "https://downloads.sourceforge.net/project/djvu/DjView/4.10/djview-4.10.6.tar.gz"
+  sha256 "8446f3cd692238421a342f12baa365528445637bffb96899f319fe762fda7c21"
+  revision 1
 
   bottle do
-    sha256 "0b5835bf2e00677dbe5ac47fc17f93fc7e36575c7f2b8820e80f98a83639c224" => :el_capitan
-    sha256 "12b09ccc4d3c86502407789cf187ea09622ed44988ca0ca63b42114520639898" => :yosemite
-    sha256 "864c1b3ae86440205b6f045b2fbc6db5b8e3af241ccf3f99b7f3ce9683ef66c4" => :mavericks
+    sha256 "8cc214252ddf146d8e4b65210436036197b556ff40b136e2784a1d95c9a4f43e" => :sierra
+    sha256 "82c4310f2e0af35fb98fce109660ec79bdc4075205b8f5c053d58b4b87b37099" => :el_capitan
+    sha256 "92dec68ad76d1e5a1e158b6b1a700d119f4a651cafd45c8cd4a787ecf31ff402" => :yosemite
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "djvulibre"
   depends_on "qt"
 
   def install
+    inreplace "src/djview.pro", "10.6", MacOS.version
+    system "autoreconf", "-fiv"
+
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",
                           "--with-x=no",

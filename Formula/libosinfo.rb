@@ -1,19 +1,18 @@
 class Libosinfo < Formula
   desc "The Operating System information database"
   homepage "https://libosinfo.org/"
-  url "https://fedorahosted.org/releases/l/i/libosinfo/libosinfo-0.3.1.tar.gz"
-  sha256 "50b272943d68b77d5259f72be860acfd048126bc27e7aa9c2f9c77a7eacf3894"
+  url "https://releases.pagure.org/libosinfo/libosinfo-1.0.0.tar.gz"
+  sha256 "f7b425ecde5197d200820eb44401c5033771a5d114bd6390230de768aad0396b"
 
   bottle do
-    revision 1
-    sha256 "279c60fff51a6465eb1468ff404f12d500ab51e2a9670d55bdc29984f26dd680" => :el_capitan
-    sha256 "3b163b7d2a6ac30966d0431484c98129ab06198c9041204f544284014dfcce62" => :yosemite
-    sha256 "7542db03c1cc84cec8eeb09dac6c33d0a6d1a9ef6f0b7a798768d1324a16790b" => :mavericks
+    rebuild 1
+    sha256 "a47562567ab29bd73b7f8412c66e744092102fcfa9919fff6659adfb5149b2f6" => :sierra
+    sha256 "657ba115e5432c8ab9e1262abd8b759fa847d8cded4249ee7681c0a73cddb5fd" => :el_capitan
+    sha256 "f15d2fccb9db83969e14a854ec1e3c8c1a4a78ba5e47e638622abcb0fe38edf8" => :yosemite
   end
 
   depends_on "intltool" => :build
   depends_on "pkg-config" => :build
-  depends_on "wget" => :build
 
   depends_on "check"
   depends_on "gettext"
@@ -26,6 +25,9 @@ class Libosinfo < Formula
   depends_on "vala" => :optional
 
   def install
+    # avoid wget dependency
+    inreplace "Makefile.in", "wget -q -O", "curl -o"
+
     args = %W[
       --prefix=#{prefix}
       --localstatedir=#{var}
@@ -37,7 +39,11 @@ class Libosinfo < Formula
     ]
 
     args << "--disable-introspection" if build.without? "gobject-introspection"
-    args << "--enable-vala" if build.with? "vala"
+    if build.with? "vala"
+      args << "--enable-vala"
+    else
+      args << "--disable-vala"
+    end
 
     system "./configure", *args
 
@@ -79,7 +85,10 @@ class Libosinfo < Formula
       for name in hvnames:
         print ("  HV short id " + name)
     EOS
-
+    ENV.append_path "GI_TYPELIB_PATH", lib+"girepository-1.0"
+    ENV.append_path "GI_TYPELIB_PATH", Formula["gobject-introspection"].opt_lib+"girepository-1.0"
+    ENV.append_path "PYTHONPATH", lib+"python2.7/site-packages"
+    ENV.append_path "PYTHONPATH", Formula["pygobject3"].opt_lib+"python2.7/site-packages"
     system "python", "test.py"
   end
 end

@@ -6,6 +6,7 @@ class Pixman < Formula
 
   bottle do
     cellar :any
+    sha256 "345c55cb038be8ad3cea956647fcbe8f06db0df61b7dda1a8d7da2f40efc0c3b" => :sierra
     sha256 "ce36799e5a38be394c20f7196f93c2bcfbf9a0a49c7964e59ab8980fb81cda26" => :el_capitan
     sha256 "d9db47ff106386a945bc74d1717a9215a6de5bdcc848aea99ef10d31ae480ef4" => :yosemite
     sha256 "810b4e5d428e6be2987e96767adf8bca06dd026fbcc5246f96d8d5ec4f64962c" => :mavericks
@@ -13,22 +14,9 @@ class Pixman < Formula
 
   keg_only :provided_pre_mountain_lion
 
-  option :universal
-
   depends_on "pkg-config" => :build
 
-  fails_with :llvm do
-    build 2336
-    cause <<-EOS.undent
-      Building with llvm-gcc causes PDF rendering issues in Cairo.
-      https://trac.macports.org/ticket/30370
-      See Homebrew issues #6631, #7140, #7463, #7523.
-      EOS
-  end
-
   def install
-    ENV.universal_binary if build.universal?
-
     system "./configure", "--disable-dependency-tracking",
                           "--disable-gtk",
                           "--disable-mmx", # MMX assembler fails with Xcode 7

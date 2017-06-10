@@ -1,15 +1,15 @@
 class SwaggerCodegen < Formula
   desc "Generation of client and server from Swagger definition"
-  homepage "http://swagger.io/swagger-codegen/"
-  url "https://github.com/swagger-api/swagger-codegen/archive/v2.2.0.tar.gz"
-  sha256 "4c0ba632e9da193c278b00bbb59deab68206a588b381de764d614e77ca99f171"
+  homepage "https://swagger.io/swagger-codegen/"
+  url "https://github.com/swagger-api/swagger-codegen/archive/v2.2.2.tar.gz"
+  sha256 "59f2fcd130836a61d8093cf711ccb34feb157762c36d7cb452e93a899ce1ed26"
   head "https://github.com/swagger-api/swagger-codegen.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "31ea44de7c313ce6d49d8f723d41d11acf09c924bdf32dfb803636e0f239659b" => :el_capitan
-    sha256 "d01702bbcd7bff6d82448b9d29b89599e9445daa9f161d71be8371370e36f50a" => :yosemite
-    sha256 "892c16f22439b2ab359deca9e0eb35b4319776a255ab204b87d06039cb17ef49" => :mavericks
+    sha256 "4b9948e4fa6a29dafb419a6ead0fa2072d3a0e209564b94639bedb531da1a681" => :sierra
+    sha256 "ba9912568441c56fd72a38e73648e8119643bdc4115f438ba399bc60cca156a2" => :el_capitan
+    sha256 "c482f92fa2688b5f15ecad071e8945c7fb10e24b4fc2aa134c4a351133aa6dc9" => :yosemite
   end
 
   depends_on :java => "1.7+"

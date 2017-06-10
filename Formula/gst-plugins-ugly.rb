@@ -1,13 +1,13 @@
 class GstPluginsUgly < Formula
-  desc "GStreamer plugins (well-supported, possibly problematic for distributors)"
+  desc "Library for constructing graphs of media-handling components"
   homepage "https://gstreamer.freedesktop.org/"
-  url "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.8.3.tar.xz"
-  sha256 "6fa2599fdd072d31fbaf50c34af406e2be944a010b1f4eab67a5fe32a0310693"
+  url "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.10.4.tar.xz"
+  sha256 "6386c77ca8459cba431ed0b63da780c7062c7cc48055d222024d8eaf198ffa59"
 
   bottle do
-    sha256 "b6ecf35ea61cac83275d43f10479459a4b2679aae4f09a52579c65001a39cf98" => :el_capitan
-    sha256 "cb93791fd100e84fd8fe2f08d433f074018cf2ce977267f8655ce70cc28669de" => :yosemite
-    sha256 "a94e5b415765f994266769754abc20f910880bf8eb71f51c84ee22335964f9d6" => :mavericks
+    sha256 "e8e895fd9d536d42f7cc5a1184b6aa305eda478254800e2e8f74e0a00a50a251" => :sierra
+    sha256 "5c388aca5c7bed75c0b3eab45adbf6275df105464845577f3e1b831da8a9e508" => :el_capitan
+    sha256 "72f1a1bfe20a5cb0dc5238d46c64fcc89f08a5595619d77671e68e333494cdef" => :yosemite
   end
 
   head do
@@ -24,9 +24,9 @@ class GstPluginsUgly < Formula
 
   # The set of optional dependencies is based on the intersection of
   # gst-plugins-ugly-0.10.17/REQUIREMENTS and Homebrew formulae
+  depends_on "jpeg" => :recommended
   depends_on "dirac" => :optional
   depends_on "mad" => :optional
-  depends_on "jpeg" => :optional
   depends_on "libvorbis" => :optional
   depends_on "cdparanoia" => :optional
   depends_on "lame" => :optional

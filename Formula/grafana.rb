@@ -1,23 +1,21 @@
-require "language/node"
-
 class Grafana < Formula
   desc "Gorgeous metric visualizations and dashboards for timeseries databases."
-  homepage "http://grafana.org"
-  url "https://github.com/grafana/grafana/archive/v3.1.1.tar.gz"
-  sha256 "77bff57f02e507fb998d6d2492798801db4cb10c82c1378e32bd1dde963dba3d"
+  homepage "https://grafana.com"
+  url "https://github.com/grafana/grafana/archive/v4.3.2.tar.gz"
+  sha256 "02753931d9abb5d94e0695fdb44f5ede0a537cad57a7d60f44125056c04129ab"
 
   head "https://github.com/grafana/grafana.git"
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "0a188a184ad09b6c6a5b66350d8563ef47c81cf360d807ec5b76006777d9d205" => :el_capitan
-    sha256 "426a722b7bdba4eb0f9004296c056df3aa06c27f4d58728f3985ede035aa5fff" => :yosemite
-    sha256 "96701f8bcc4ccbbcceb316084fe26ff7bd5ba9a478b5fb04fc8aadfa4361908e" => :mavericks
+    sha256 "ffa6027d1da42fcd265b76b240f0ed15e373101bf1ecf5af63a6fe88943d3ff9" => :sierra
+    sha256 "9f25eb9cf733fd0f1f022509bbc411b7e0e3cfae0287450ac5df93022dadc182" => :el_capitan
+    sha256 "8b6dfe422ecc7e1842b3dc23c2c18eb6b8e1204e51b3d191d129d8d706cf2200" => :yosemite
   end
 
   depends_on "go" => :build
   depends_on "node" => :build
+  depends_on "yarn" => :build
 
   def install
     ENV["GOPATH"] = buildpath
@@ -25,11 +23,13 @@ class Grafana < Formula
     grafana_path.install buildpath.children
 
     cd grafana_path do
-      system "go", "run", "build.go", "setup"
       system "go", "run", "build.go", "build"
-      system "npm", "install", *Language::Node.local_npm_install_args
-      system "npm", "install", "grunt-cli", *Language::Node.local_npm_install_args
-      system "node_modules/grunt-cli/bin/grunt", "build"
+      system "yarn", "install"
+
+      args = ["build"]
+      # Avoid PhantomJS error "unrecognized selector sent to instance"
+      args << "--force" unless build.bottle?
+      system "node_modules/grunt-cli/bin/grunt", *args
 
       bin.install "bin/grafana-cli"
       bin.install "bin/grafana-server"
@@ -116,7 +116,7 @@ class Grafana < Formula
     listening = Timeout.timeout(5) do
       li = false
       r.each do |l|
-        if l =~ /Listen/
+        if l =~ /Initializing HTTP Server/
           li = true
           break
         end

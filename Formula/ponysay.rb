@@ -7,6 +7,7 @@ class Ponysay < Formula
 
   bottle do
     cellar :any_skip_relocation
+    sha256 "4209ab259798a33086ee4af39fd260b1ed7f6ac3dc9a8b2b44cb9935129f17a5" => :sierra
     sha256 "69e2eb767ee25491e2a30893478bfdeff72023369ad4d9999f4b274e11b732f3" => :el_capitan
     sha256 "157fe5f14e1be281708d2c59987331484c40bd4d49d82c208bb7220503ba113a" => :yosemite
     sha256 "6c8ec0c8031407d5035f6cb7355deed95e6443c7200276ea5419ac31f2db4082" => :mavericks
@@ -20,7 +21,7 @@ class Ponysay < Formula
   # https://github.com/erkin/ponysay/pull/225
   patch do
     url "https://github.com/tdsmith/ponysay/commit/44fb0f85821eb34a811abb27d2c601a5d30af1f1.diff"
-    sha256 "0570b94a1179c189291cd9bad28cb93762aeed5ad6bbc3536027e178d0e6b9df"
+    sha256 "6d2e8e60c13a1e08e0408809edaa72ce8b00cce5e522b88e12a9b9c1047663d6"
   end
 
   def install

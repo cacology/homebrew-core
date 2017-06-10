@@ -3,16 +3,16 @@ class GstPluginsGood < Formula
   homepage "https://gstreamer.freedesktop.org/"
 
   stable do
-    url "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.8.3.tar.xz"
-    sha256 "a1d6579ba203a7734927c24b90bf6590d846c5a5fcec01a48201018c8ad2827a"
+    url "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.10.4.tar.xz"
+    sha256 "8a86c61434a8c44665365bd0b3557a040937d1f44bf69caee4e9ea816ce74d7e"
 
     depends_on "check" => :optional
   end
 
   bottle do
-    sha256 "dc7c5a95afec9579d3f52083a1c0f69bd8580762376fca494823168a70ccf975" => :el_capitan
-    sha256 "907528481b4134d32c35b090108c94555e364fe7bcdfe56c65e504cdea4bdaa0" => :yosemite
-    sha256 "637c886c5a565c107146e855453a069f11f6b30cfaa4f991f382ce594418b136" => :mavericks
+    sha256 "365561c72d6bc710f3942c5aa50c90fa089433f69112d8c8bb062a8fa36390cd" => :sierra
+    sha256 "c509f05b9004c2ce35814296efad31da32a1c0507dd77ec8370d3705bbb59ed3" => :el_capitan
+    sha256 "b48672b8a8871f8e736fa709816d61f2155a575d99d7befa5af7c8b94a363f54" => :yosemite
   end
 
   head do
@@ -34,12 +34,12 @@ class GstPluginsGood < Formula
   # Dependencies based on the intersection of
   # https://cgit.freedesktop.org/gstreamer/gst-plugins-good/tree/REQUIREMENTS
   # and Homebrew formulae.
+  depends_on "jpeg" => :recommended
   depends_on "orc" => :recommended
   depends_on "gdk-pixbuf" => :optional
   depends_on "aalib" => :optional
   depends_on "cairo" => :optional
   depends_on "flac" => [:optional, "with-libogg"]
-  depends_on "jpeg" => :optional
   depends_on "libcaca" => :optional
   depends_on "libdv" => :optional
   depends_on "libpng" => :optional

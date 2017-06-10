@@ -1,16 +1,16 @@
 # Reference: https://github.com/macvim-dev/macvim/wiki/building
 class Macvim < Formula
-  desc "GUI for vim, made for OS X"
+  desc "GUI for vim, made for macOS"
   homepage "https://github.com/macvim-dev/macvim"
-  url "https://github.com/macvim-dev/macvim/archive/snapshot-106.tar.gz"
-  version "7.4-106"
-  sha256 "6a6879b0093207cd36da6e67b8be8c8cd913fd97a094b4c21aea16fa35a1695f"
+  url "https://github.com/macvim-dev/macvim/archive/snapshot-133.tar.gz"
+  version "8.0-133"
+  sha256 "ed79e9568bd52e0c7ad1c6ff83fe3cfac1b37ed0efb3a4dd75318428efe2fd8b"
   head "https://github.com/macvim-dev/macvim.git"
 
   bottle do
-    sha256 "56bac7d65d37bde2af20a7e4b870b617fa2d8571154900c5af2b7ead7d0fcbb9" => :el_capitan
-    sha256 "095c24b1b5cf200360d1211db052cd9eb604ccdf95c0aaa19c71d9ba77b19112" => :yosemite
-    sha256 "642d7d09436e75dd3a2eca00dd8a11888308b65e68adb110a68a6df191730608" => :mavericks
+    sha256 "47fd96ad19b18a03286ee23b0774d0d38e8fb5692e3d78ab4a5a0a1d4de3e877" => :sierra
+    sha256 "cb140073ef098278a010cd159545271413845daa0e7daeb59b99c8a663dcd481" => :el_capitan
+    sha256 "7cdea1628ba5158fd53659ffce578bcefe72754c6c6f97ee700bbd1470ada8a7" => :yosemite
   end
 
   option "with-override-system-vim", "Override system vim"
@@ -29,10 +29,10 @@ class Macvim < Formula
   depends_on :python => :recommended
   depends_on :python3 => :optional
 
-  # Help us! We'd like to use superenv in these environments, too
-  env :std if MacOS.version <= :snow_leopard
-
   def install
+    # Avoid "fatal error: 'ruby/config.h' file not found"
+    ENV.delete("SDKROOT") if MacOS.version == :yosemite
+
     # MacVim doesn't have or require any Python package, so unset PYTHONPATH
     ENV.delete("PYTHONPATH")
 
@@ -91,9 +91,7 @@ class Macvim < Formula
     system "make"
 
     prefix.install "src/MacVim/build/Release/MacVim.app"
-    inreplace "src/MacVim/mvim", %r{^# VIM_APP_DIR=\/Applications$},
-                                 "VIM_APP_DIR=#{prefix}"
-    bin.install "src/MacVim/mvim"
+    bin.install_symlink prefix/"MacVim.app/Contents/bin/mvim"
 
     # Create MacVim vimdiff, view, ex equivalents
     executables = %w[mvimdiff mview mvimex gvim gvimdiff gview gvimex]
@@ -113,16 +111,8 @@ class Macvim < Formula
   test do
     # Simple test to check if MacVim was linked to Python version in $PATH
     if build.with? "python"
-      vim_path = prefix/"MacVim.app/Contents/MacOS/Vim"
-
-      # Get linked framework using otool
-      otool_output = `otool -L #{vim_path} | grep -m 1 Python`.gsub(/\(.*\)/, "").strip.chomp
-
-      # Expand the link and get the python exec path
-      vim_framework_path = Pathname.new(otool_output).realpath.dirname.to_s.chomp
       system_framework_path = `python-config --exec-prefix`.chomp
-
-      assert_equal system_framework_path, vim_framework_path
+      assert_match system_framework_path, `mvim --version`
     end
   end
 end

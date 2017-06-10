@@ -1,15 +1,15 @@
 class Minizinc < Formula
   desc "Medium-level constraint modeling language"
   homepage "http://www.minizinc.org"
-  url "https://github.com/MiniZinc/libminizinc/archive/2.0.13.tar.gz"
-  sha256 "0b94f56553d162c6888d5eb336342df27cb605e0c18b01c7f2a54ee7e31dcd46"
+  url "https://github.com/MiniZinc/libminizinc/archive/2.1.5.tar.gz"
+  sha256 "173a42189f0fa447d04d63b27afdd10af9c5035061db00ba1e2b390622b49803"
   head "https://github.com/MiniZinc/libminizinc.git", :branch => "develop"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "c764e61dc7f9e2508d9bf7fb5bb2bfa1e0d3c85521f441f9dc0e65447e30a626" => :el_capitan
-    sha256 "b36ee719d486ca15850472ed50d523eca256710079e236ac879ff4c700887732" => :yosemite
-    sha256 "2b48f64eabd1c4e88c71dc2c45d50fa7a6ba9fa90fc5e620de6baf2555e51ea6" => :mavericks
+    sha256 "882132f6bc368ec5d46d66557b61dde35f49c7d851d43494b342994f50ca2bec" => :sierra
+    sha256 "90acf36261eac25b7f287269dae131909befc7cf9be212879d61f3aead1d28e4" => :el_capitan
+    sha256 "8911b8f2511404931f87190390d0684c74e32a9580a65bf411bc2a8289d87f4b" => :yosemite
   end
 
   depends_on :arch => :x86_64

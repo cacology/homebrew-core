@@ -1,12 +1,12 @@
 class Nifi < Formula
   desc "Easy to use, powerful, and reliable system to process and distribute data."
   homepage "https://nifi.apache.org"
-  url "https://www.apache.org/dyn/closer.cgi?path=/nifi/0.7.0/nifi-0.7.0-bin.tar.gz"
-  sha256 "69952ca3778525496bbb83e583bcfd77598b2298c4368b0399b56c6bb91a7701"
+  url "https://www.apache.org/dyn/closer.cgi?path=/nifi/1.2.0/nifi-1.2.0-bin.tar.gz"
+  sha256 "9379dfbba1ec502f9d1e083a190fb80b62283265f00c6d55f0724de7a5084cbe"
 
   bottle :unneeded
 
-  depends_on :java => "1.7+"
+  depends_on :java => "1.8+"
 
   def install
     libexec.install Dir["*"]

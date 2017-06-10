@@ -14,9 +14,9 @@
 class Ocaml < Formula
   desc "General purpose programming language in the ML family"
   homepage "https://ocaml.org/"
-  url "http://caml.inria.fr/pub/distrib/ocaml-4.03/ocaml-4.03.0.tar.gz"
-  sha256 "7fdf280cc6c0a2de4fc9891d0bf4633ea417046ece619f011fd44540fcfc8da2"
-  head "http://caml.inria.fr/svn/ocaml/trunk", :using => :svn
+  url "https://caml.inria.fr/pub/distrib/ocaml-4.04/ocaml-4.04.1.tar.xz"
+  sha256 "222cc494b4eea45011234f2cc6620045ec4d4b539985086381a9a9db289bc285"
+  head "https://caml.inria.fr/svn/ocaml/trunk", :using => :svn
 
   pour_bottle? do
     # The ocaml compilers embed prefix information in weird ways that the default
@@ -27,9 +27,15 @@ class Ocaml < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "5a9ad99085350c0ac9a81bb9eb82543580c57069c2e1f6ca85efaf17ad2ab9f6" => :el_capitan
-    sha256 "495a9536a4b6a3b5bb8d4988f5c2c50d2e961a8cd1bc3b133b5d4f90425bc828" => :yosemite
-    sha256 "0d7ffe037bb862f141368110578f4c3aed01692ad5473bc222ea18d0cfcbac4a" => :mavericks
+    sha256 "6810d92aec79c61720173c17357452683262d9cda66493756f64e44cee514d9a" => :sierra
+    sha256 "97fcc838ece9d80698c0bff19c9640cbde0ea3d393cf2677fd39819a1f05b046" => :el_capitan
+    sha256 "4fab89ed28a639a356b87041a6b3fd59d6b1a4dd260038d495457d2f0a7b0092" => :yosemite
+  end
+
+  devel do
+    url "https://github.com/ocaml/ocaml/archive/4.05.0+beta3.tar.gz"
+    version "4.05.0+beta3"
+    sha256 "3d82d5b32310d1c010981c12508e0ff63fb71b0c89457bcac813b7c291d4b61c"
   end
 
   option "with-x11", "Install with the Graphics module"

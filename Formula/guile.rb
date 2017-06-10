@@ -1,47 +1,31 @@
 class Guile < Formula
-  desc "GUILE: GNU Ubiquitous Intelligent Language for Extensions"
+  desc "GNU Ubiquitous Intelligent Language for Extensions"
   homepage "https://www.gnu.org/software/guile/"
-  url "https://ftpmirror.gnu.org/guile/guile-2.0.11.tar.xz"
-  mirror "https://ftp.gnu.org/pub/gnu/guile/guile-2.0.11.tar.xz"
-  sha256 "aed0a4a6db4e310cbdfeb3613fa6f86fddc91ef624c1e3f8937a6304c69103e2"
-  revision 2
+  url "https://ftp.gnu.org/gnu/guile/guile-2.2.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/guile/guile-2.2.2.tar.xz"
+  sha256 "1c91a46197fb1adeba4fd62a25efcf3621c6450be166d7a7062ef6ca7e11f5ab"
 
   bottle do
-    sha256 "d7e7ad8d491f84c1405b82ee8ef0da5b21f551b6a0f2795bae92e8bec2f19be2" => :el_capitan
-    sha256 "8e4d3e402e6eb6d95dcfc308b067beb3f7bed522e801c04f2291ffb29aab8908" => :yosemite
-    sha256 "c62b53570f7ac7061820c2c3009c649ff7fbf176bddd0acc36802303ede235e2" => :mavericks
-    sha256 "51f5f379e25fab5cf8fb7cede02841aa716c0e90356705be2abc6a18c6af5371" => :mountain_lion
-  end
-
-  devel do
-    url "http://git.savannah.gnu.org/r/guile.git",
-        :tag => "v2.1.2",
-        :revision => "d236022eb0d285af3d462de9e99a212eba459df2"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "gettext" => :build
+    sha256 "f99bf6e5381bcb8c0a77d1eeee51f5a3a10094771cba1e06c6036c66dfcc0181" => :sierra
+    sha256 "894296e0f264fb2e9b093dfd2798363ef8ece41e5d92ba9544f65f5690c9c662" => :el_capitan
+    sha256 "dd1dbd7d3c0f9c5be7ae5177e7024739026886e9422704b2e561c5ed25f11052" => :yosemite
   end
 
   head do
-    url "http://git.sv.gnu.org/r/guile.git"
+    url "https://git.savannah.gnu.org/git/guile.git"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "gettext" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkg-config" => :run # guile-config is a wrapper around pkg-config.
   depends_on "libtool" => :run
   depends_on "libffi"
   depends_on "libunistring"
   depends_on "bdw-gc"
   depends_on "gmp"
   depends_on "readline"
-
-  fails_with :llvm do
-    build 2336
-    cause "Segfaults during compilation"
-  end
 
   fails_with :clang do
     build 211
@@ -56,7 +40,7 @@ class Guile < Formula
                           "--with-libgmp-prefix=#{Formula["gmp"].opt_prefix}"
     system "make", "install"
 
-    # A really messed up workaround required on OS X --mkhl
+    # A really messed up workaround required on macOS --mkhl
     Pathname.glob("#{lib}/*.dylib") do |dylib|
       lib.install_symlink dylib.basename => "#{dylib.basename(".dylib")}.so"
     end

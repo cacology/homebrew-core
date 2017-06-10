@@ -1,17 +1,15 @@
 class Fontconfig < Formula
   desc "XML-based font configuration API for X Windows"
   homepage "https://wiki.freedesktop.org/www/Software/fontconfig/"
-  url "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.bz2"
-  sha256 "dc62447533bca844463a3c3fd4083b57c90f18a70506e7a9f4936b5a1e516a99"
-  revision 4
+  url "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.3.tar.bz2"
+  sha256 "bd24bf6602731a11295c025909d918180e98385625182d3b999fd6f1ab34f8bd"
 
   # The bottle tooling is too lenient and thinks fontconfig
   # is relocatable, but it has hardcoded paths in the executables.
   bottle do
-    cellar :any
-    sha256 "6c1bf06d44c732a3304b4b8c39511e336fcce9e4255c59b250e18b63e30fe660" => :el_capitan
-    sha256 "a643c5596ef3e7c11d46d0cf8766f1e8a6e16dfedef55f0e14a2094d2e6bd3f0" => :yosemite
-    sha256 "217ed41407f0027afac6f1b3e6748ca51fb45e60168d0ee2b86c8ce1093ee7c2" => :mavericks
+    sha256 "5fb55037ab6f6927673d82e69d9760dda96eaf5df94c3a3e389d9c78df0551e8" => :sierra
+    sha256 "fb799680da59f2585f2f8e5eb171617664e0097942b7fb3bc6266c39d830147b" => :el_capitan
+    sha256 "fb94391f03d14f14c751d2492aefa4dd09b218e6c5b51236a79dfe477f33b54e" => :yosemite
   end
 
   pour_bottle? do
@@ -21,25 +19,35 @@ class Fontconfig < Formula
     satisfy { HOMEBREW_PREFIX.to_s == "/usr/local" }
   end
 
-  keg_only :provided_pre_mountain_lion
+  head do
+    url "https://anongit.freedesktop.org/git/fontconfig", :using => :git
 
-  option :universal
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
+
+  keg_only :provided_pre_mountain_lion
 
   depends_on "pkg-config" => :build
   depends_on "freetype"
 
-  # Reverts commit https://cgit.freedesktop.org/fontconfig/commit/?id=7a6622f25cdfab5ab775324bef1833b67109801b,
-  # which breaks caching font directories containing subdirectories
-  # See: https://github.com/Homebrew/homebrew/issues/28111
-  # Reported upstream, message to mailing list is waiting moderation.
-  patch :DATA
-
   def install
-    ENV.universal_binary if build.universal?
+    font_dirs = %w[
+      /System/Library/Fonts
+      /Library/Fonts
+      ~/Library/Fonts
+    ]
+
+    if MacOS.version >= :sierra
+      font_dirs << "/System/Library/Assets/com_apple_MobileAsset_Font3"
+    end
+
+    system "autoreconf", "-iv" if build.head?
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--enable-static",
-                          "--with-add-fonts=/System/Library/Fonts,/Library/Fonts,~/Library/Fonts",
+                          "--with-add-fonts=#{font_dirs.join(",")}",
                           "--prefix=#{prefix}",
                           "--localstatedir=#{var}",
                           "--sysconfdir=#{etc}"
@@ -55,212 +63,3 @@ class Fontconfig < Formula
     system "#{bin}/fc-list"
   end
 end
-
-__END__
-diff --git a/fc-cache/fc-cache.c b/fc-cache/fc-cache.c
-index 99e0e9f..bf3b6b4 100644
---- a/fc-cache/fc-cache.c
-+++ b/fc-cache/fc-cache.c
-@@ -187,13 +187,8 @@ scanDirs (FcStrList *list, FcConfig *config, FcBool force, FcBool really_force,
- 	
- 	if (!cache)
- 	{
--	    if (!recursive)
--		cache = FcDirCacheRescan (dir, config);
--	    else
--	    {
--		(*changed)++;
--		cache = FcDirCacheRead (dir, FcTrue, config);
--	    }
-+	    (*changed)++;
-+	    cache = FcDirCacheRead (dir, FcTrue, config);
- 	    if (!cache)
- 	    {
- 		fprintf (stderr, "%s: error scanning\n", dir);
-@@ -391,7 +386,6 @@ main (int argc, char **argv)
- 	ret += scanDirs (list, config, FcTrue, really_force, verbose, FcFalse, &changed, NULL);
- 	FcStrListDone (list);
-     }
--    FcStrSetDestroy (updateDirs);
- 
-     /*
-      * Try to create CACHEDIR.TAG anyway.
-diff --git a/fontconfig/fontconfig.h b/fontconfig/fontconfig.h
-index 2258251..d0b4e9e 100644
---- a/fontconfig/fontconfig.h
-+++ b/fontconfig/fontconfig.h
-@@ -541,9 +541,6 @@ FcDirSave (FcFontSet *set, FcStrSet *dirs, const FcChar8 *dir);
- 
- FcPublic FcCache *
- FcDirCacheLoad (const FcChar8 *dir, FcConfig *config, FcChar8 **cache_file);
--
--FcPublic FcCache *
--FcDirCacheRescan (const FcChar8 *dir, FcConfig *config);
-     
- FcPublic FcCache *
- FcDirCacheRead (const FcChar8 *dir, FcBool force, FcConfig *config);
-diff --git a/src/fccache.c b/src/fccache.c
-index 5173e0b..10eacff 100644
---- a/src/fccache.c
-+++ b/src/fccache.c
-@@ -828,19 +828,6 @@ bail1:
-     return NULL;
- }
- 
--FcCache *
--FcDirCacheRebuild (FcCache *cache, struct stat *dir_stat, FcStrSet *dirs)
--{
--    FcCache *new;
--    FcFontSet *set = FcFontSetDeserialize (FcCacheSet (cache));
--    const FcChar8 *dir = FcCacheDir (cache);
--
--    new = FcDirCacheBuild (set, dir, dir_stat, dirs);
--    FcFontSetDestroy (set);
--
--    return new;
--}
--
- /* write serialized state to the cache file */
- FcBool
- FcDirCacheWrite (FcCache *cache, FcConfig *config)
-diff --git a/src/fcdir.c b/src/fcdir.c
-index 3bcd0b8..b040a28 100644
---- a/src/fcdir.c
-+++ b/src/fcdir.c
-@@ -130,12 +130,7 @@ FcFileScanConfig (FcFontSet	*set,
-     if (FcFileIsDir (file))
- 	return FcStrSetAdd (dirs, file);
-     else
--    {
--	if (set)
--	    return FcFileScanFontConfig (set, blanks, file, config);
--	else
--	    return FcTrue;
--    }
-+	return FcFileScanFontConfig (set, blanks, file, config);
- }
- 
- FcBool
-@@ -311,45 +306,6 @@ FcDirCacheScan (const FcChar8 *dir, FcConfig *config)
-     return cache;
- }
- 
--FcCache *
--FcDirCacheRescan (const FcChar8 *dir, FcConfig *config)
--{
--    FcCache *cache = FcDirCacheLoad (dir, config, NULL);
--    FcCache *new = NULL;
--    struct stat dir_stat;
--    FcStrSet *dirs;
--
--    if (!cache)
--	return NULL;
--    if (FcStatChecksum (dir, &dir_stat) < 0)
--	goto bail;
--    dirs = FcStrSetCreate ();
--    if (!dirs)
--	goto bail;
--
--    /*
--     * Scan the dir
--     */
--    if (!FcDirScanConfig (NULL, dirs, NULL, dir, FcTrue, config))
--	goto bail1;
--    /*
--     * Rebuild the cache object
--     */
--    new = FcDirCacheRebuild (cache, &dir_stat, dirs);
--    if (!new)
--	goto bail1;
--    FcDirCacheUnload (cache);
--    /*
--     * Write out the cache file, ignoring any troubles
--     */
--    FcDirCacheWrite (new, config);
--
--bail1:
--    FcStrSetDestroy (dirs);
--bail:
--    return new;
--}
--
- /*
-  * Read (or construct) the cache for a directory
-  */
-diff --git a/src/fcfs.c b/src/fcfs.c
-index 21c6c7c..941abba 100644
---- a/src/fcfs.c
-+++ b/src/fcfs.c
-@@ -122,28 +122,6 @@ FcFontSetSerialize (FcSerialize *serialize, const FcFontSet * s)
- 
-     return s_serialize;
- }
--
--FcFontSet *
--FcFontSetDeserialize (const FcFontSet *set)
--{
--    int i;
--    FcFontSet *new = FcFontSetCreate ();
--
--    if (!new)
--	return NULL;
--    for (i = 0; i < set->nfont; i++)
--    {
--	if (!FcFontSetAdd (new, FcPatternDuplicate (FcFontSetFont (set, i))))
--	    goto bail;
--    }
--
--    return new;
--bail:
--    FcFontSetDestroy (new);
--
--    return NULL;
--}
--
- #define __fcfs__
- #include "fcaliastail.h"
- #undef __fcfs__
-diff --git a/src/fcint.h b/src/fcint.h
-index cdf2dab..362ea6f 100644
---- a/src/fcint.h
-+++ b/src/fcint.h
-@@ -567,9 +567,6 @@ FcDirCacheScan (const FcChar8 *dir, FcConfig *config);
- FcPrivate FcCache *
- FcDirCacheBuild (FcFontSet *set, const FcChar8 *dir, struct stat *dir_stat, FcStrSet *dirs);
- 
--FcPrivate FcCache *
--FcDirCacheRebuild (FcCache *cache, struct stat *dir_stat, FcStrSet *dirs);
--
- FcPrivate FcBool
- FcDirCacheWrite (FcCache *cache, FcConfig *config);
- 
-@@ -841,9 +838,6 @@ FcFontSetSerializeAlloc (FcSerialize *serialize, const FcFontSet *s);
- FcPrivate FcFontSet *
- FcFontSetSerialize (FcSerialize *serialize, const FcFontSet * s);
- 
--FcPrivate FcFontSet *
--FcFontSetDeserialize (const FcFontSet *set);
--
- /* fchash.c */
- FcPrivate FcChar8 *
- FcHashGetSHA256Digest (const FcChar8 *input_strings,
-diff --git a/src/fcpat.c b/src/fcpat.c
-index 986cca3..0614ac2 100644
---- a/src/fcpat.c
-+++ b/src/fcpat.c
-@@ -33,7 +33,6 @@ FcPatternCreate (void)
-     p = (FcPattern *) malloc (sizeof (FcPattern));
-     if (!p)
- 	return 0;
--    memset (p, 0, sizeof (FcPattern));
-     p->num = 0;
-     p->size = 0;
-     p->elts_offset = FcPtrToOffset (p, NULL);
-@@ -1311,7 +1310,6 @@ FcValueListSerialize (FcSerialize *serialize, const FcValueList *vl)
-     }
-     return head_serialized;
- }
--
- #define __fcpat__
- #include "fcaliastail.h"
- #include "fcftaliastail.h"

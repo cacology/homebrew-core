@@ -1,22 +1,21 @@
 class Mapserver < Formula
   desc "Publish spatial data and interactive mapping apps to the web"
   homepage "http://mapserver.org/"
-  url "http://download.osgeo.org/mapserver/mapserver-6.4.3.tar.gz"
-  sha256 "1f432d4b44e7a0e4e9ce883b02c91c9a66314123028eebb0415144903b8de9c2"
+  url "http://download.osgeo.org/mapserver/mapserver-7.0.4.tar.gz"
+  sha256 "c91d40da5cc242b20ca7e29c41bd9eb23097b98a77908b1d708e9708f6f6cf69"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "76b78fec6ddef503c68bc791259dba5e19afec1a0bca7bb0e9c70f06e7e01e33" => :el_capitan
-    sha256 "fa018ad2b14492f50e0b6a4ed50212201c016bb0f35baf81031062fbe5a337e2" => :yosemite
-    sha256 "a2c6ecfd38837a5a9287fdb0fb729ee4acbfb1d2df5a5e47dff8905cb982e237" => :mavericks
+    sha256 "770f4416f9dad46fb24d4c77655ce5b4f0fde80c01e87140d6d01fd3be010f5b" => :sierra
+    sha256 "410fcf486c9f534ed45fa676f3ac12b08dfa7765a0d4b611deef2736231922cd" => :el_capitan
+    sha256 "750bf42407ba4718345924fb793a5cb7101d6abb93af3be9776e47bbdea8d74c" => :yosemite
   end
 
   option "with-fastcgi", "Build with fastcgi support"
   option "with-geos", "Build support for GEOS spatial operations"
   option "with-php", "Build PHP MapScript module"
   option "with-postgresql", "Build support for PostgreSQL as a data source"
-
-  env :userpaths
 
   depends_on "pkg-config" => :build
   depends_on "cmake" => :build
@@ -30,12 +29,21 @@ class Mapserver < Formula
   depends_on "geos" => :optional
   depends_on "postgresql" => :optional unless MacOS.version >= :lion
   depends_on "cairo" => :optional
-  depends_on "fribidi" => :optional
   depends_on "fcgi" if build.with? "fastcgi"
 
   def install
-    args = std_cmake_args
-    args << "-DWITH_PROJ=ON" << "-DWITH_GDAL=ON" << "-DWITH_OGR=ON" << "-DWITH_WFS=ON"
+    # Harfbuzz support requires fribidi and fribidi support requires
+    # harfbuzz but fribidi currently fails to build with:
+    # fribidi-common.h:61:12: fatal error: 'glib.h' file not found
+    args = std_cmake_args + %w[
+      -DWITH_PROJ=ON
+      -DWITH_GDAL=ON
+      -DWITH_OGR=ON
+      -DWITH_WFS=ON
+      -DWITH_FRIBIDI=OFF
+      -DWITH_HARFBUZZ=OFF
+      -DPYTHON_EXECUTABLE:FILEPATH=#{which("python")}
+    ]
 
     # Install within our sandbox.
     inreplace "mapscript/php/CMakeLists.txt", "${PHP5_EXTENSION_DIR}", lib/"php/extensions"
@@ -78,12 +86,6 @@ class Mapserver < Formula
       args << "-DWITH_FCGI=OFF"
     end
 
-    if build.with? "fribidi"
-      args << "-DWITH_FRIBIDI=ON"
-    else
-      args << "-DWITH_FRIBIDI=OFF"
-    end
-
     mkdir "build" do
       system "cmake", "..", *args
       system "make", "install"
@@ -102,6 +104,7 @@ class Mapserver < Formula
   end
 
   test do
-    system "#{bin}/legend"
+    assert_match version.to_s, shell_output("#{bin}/mapserv -v")
+    system "python", "-c", "import mapscript"
   end
 end

@@ -1,15 +1,14 @@
 class Libbluray < Formula
   desc "Blu-Ray disc playback library for media players like VLC"
   homepage "https://www.videolan.org/developers/libbluray.html"
-  url "https://download.videolan.org/pub/videolan/libbluray/0.9.3/libbluray-0.9.3.tar.bz2"
-  sha256 "a6366614ec45484b51fe94fcd1975b3b8716f90f038a33b24d59978de3863ce0"
-  revision 2
+  url "https://download.videolan.org/pub/videolan/libbluray/1.0.0/libbluray-1.0.0.tar.bz2"
+  sha256 "f7e3add335c7bbef45824fcd2249a9bf293868598c13f8479352c44ec95374cc"
 
   bottle do
     cellar :any
-    sha256 "5b5fc234f491c10cbc6cb71897d3ad4b2ac508707839875afe007f44954edafe" => :el_capitan
-    sha256 "9195b6a924f16521708dd7c3252c9027ea085d2aecd203158826739694bf2ef2" => :yosemite
-    sha256 "ecd6c56c71390a90e3b9275661aa5e545af872056ee615f3ae518dd6a0913fbb" => :mavericks
+    sha256 "11ebf8f77e5562b5eed56947c226ad6296c19ff1b0673c0c6193d371bcb3b662" => :sierra
+    sha256 "4c77115e125da37a65fc2e25dc5c81fc3570a929ad326260ebf34c6766ce14ef" => :el_capitan
+    sha256 "9fc846e7a84e60a6a19c5efc3f9e8cc433cc980761b232e4f99775afa3769b8a" => :yosemite
   end
 
   head do
@@ -30,7 +29,6 @@ class Libbluray < Formula
   def install
     # https://mailman.videolan.org/pipermail/libbluray-devel/2014-April/001401.html
     ENV.append_to_cflags "-D_DARWIN_C_SOURCE"
-    ENV.libxml2
 
     args = %W[--prefix=#{prefix} --disable-dependency-tracking]
     args << "--without-freetype" if build.without? "freetype"

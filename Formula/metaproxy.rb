@@ -1,15 +1,15 @@
 class Metaproxy < Formula
   desc "Z39.50 proxy and router utilizing Yaz toolkit"
   homepage "https://www.indexdata.com/metaproxy"
-  url "http://ftp.indexdata.dk/pub/metaproxy/metaproxy-1.10.0.tar.gz"
-  sha256 "83a282a9aefa71fd073adc2ef1c474e8b594c921da0c2c4b977821bfc3cf5a5e"
-  revision 2
+  url "http://ftp.indexdata.dk/pub/metaproxy/metaproxy-1.11.8.tar.gz"
+  sha256 "9060db1fca1187077f7c9e274e6118add5770a4cbd849286a755b49e4be59d68"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "2f56dc6dee4a787530df30d7e90e293e7762edd1e0716e88c3f9438ab746c536" => :el_capitan
-    sha256 "c1bd04d4314082691ac797ad8472c20869e5e1cf4d7602323a0dd1955cba15d3" => :yosemite
-    sha256 "bcfdee8fdf7cf28bde13366383b9e61327b48f25ab67fa06307f294c9526dec9" => :mavericks
+    sha256 "d4ebfccd257fa5d8db787cdb6d9ecf0f7f1aaed9d64999e711186f8ecf451ed4" => :sierra
+    sha256 "d3227915e5c8dd8ffb54eb046d361527405ed0a1f983048dfcb2cc4897fa57dd" => :el_capitan
+    sha256 "a9b1366a328860394b83b1f486a858b9d88c827e8318e9bec0ea46defbb65657" => :yosemite
   end
 
   depends_on "pkg-config" => :build

@@ -3,12 +3,12 @@ class Pstoedit < Formula
   homepage "http://www.pstoedit.net/"
   url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.70/pstoedit-3.70.tar.gz"
   sha256 "06b86113f7847cbcfd4e0623921a8763143bbcaef9f9098e6def650d1ff8138c"
+  revision 2
 
   bottle do
-    revision 2
-    sha256 "cc96b0fb284bbabdf14cc129b8e1fe3d92bf9936395f492c9d6e374bbb4b741e" => :el_capitan
-    sha256 "30ceb72f6abb640d43688b3375815a5c7ebf5299916917788c10914519a43127" => :yosemite
-    sha256 "3389eded1fc8a6c62dc47ad1ceba64f2e476f964d09e4f989071d1b290a8996d" => :mavericks
+    sha256 "085860d9480d7d9558697d403f6628466a8fdfe52f568f21793568d1c71747f2" => :sierra
+    sha256 "ee6634e964c7687c5614c9e4358737154ab6f29d53a104416bdc1509b33e6930" => :el_capitan
+    sha256 "6330be58259fcfa74062eb1ebfa5eced31aea86ae5f1ce6b2bf49e2f544b3d73" => :yosemite
   end
 
   depends_on "pkg-config" => :build
@@ -33,7 +33,10 @@ class Pstoedit < Formula
   #   it exists, it skips blind attempts to find plugins.
   # As PSTOEDITLIBDIR is always defined by makefile, the blind fallback will
   # be attempted only in obscure environments.
-  patch :DATA
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/fa1823b/pstoedit/3.70.patch"
+    sha256 "9af1bbc9db97f5d5dc92816e5c5fdd5f98904f64d1ab0dd6fcdcde1fd8606ce6"
+  end
 
   def install
     ENV.deparallelize
@@ -47,143 +50,3 @@ class Pstoedit < Formula
     assert File.exist?("test.pdf")
   end
 end
-
-__END__
-diff --git a/doc/pstoedit.1 b/doc/pstoedit.1
-index 763a87e..1bc0b0e 100644
---- a/doc/pstoedit.1
-+++ b/doc/pstoedit.1
-@@ -1,5 +1,5 @@
- '\" t
--.\" Manual page created with latex2man on Thu Jan  1 20:55:12 CET 2015
-+.\" Manual page created with latex2man on Fri Mar 13 20:58:53 CET 2015
- .\" NOTE: This file is generated, DO NOT EDIT.
- .de Vb
- .ft CW
-@@ -10,7 +10,7 @@
- 
- .fi
- ..
--.TH "PSTOEDIT" "1" "01 January 2015" "Conversion Tools " "Conversion Tools "
-+.TH "PSTOEDIT" "1" "13 March 2015" "Conversion Tools " "Conversion Tools "
- .SH NAME
- 
- pstoedit
-@@ -367,7 +367,7 @@ MS Windows: The same directory where the pstoedit executable is located
- .B *
- Unix:
- .br 
--<\fIThe directory where the pstoedit executable is located\fP>
-+The default installation directory. If it fails, then <\fIThe directory where the pstoedit executable is located\fP>
- /../lib/ 
- .RS
- .PP
-diff --git a/doc/pstoedit.htm b/doc/pstoedit.htm
-index 2a2c500..e1ca481 100644
---- a/doc/pstoedit.htm
-+++ b/doc/pstoedit.htm
-@@ -1,5 +1,5 @@
- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
--<!-- Manual page created with latex2man on Thu Jan  1 20:55:13 CET 2015
-+<!-- Manual page created with latex2man on Fri Mar 13 20:58:54 CET 2015
- ** Author of latex2man: Juergen.Vollmer@informatik-vollmer.de
- ** NOTE: This file is generated, DO NOT EDIT. -->
- <html>
-@@ -9,7 +9,7 @@
- PSTOEDIT 
- </h1>
- <h4 align=center>Dr. Wolfgang Glunz </h4>
--<h4 align=center>01 January 2015</h4>
-+<h4 align=center>13 March 2015</h4>
- <h4 align=center>Version 3.70 </h4>
- <tt>pstoedit</tt>
- - a tool converting PostScript and PDF files into various 
-@@ -561,7 +561,7 @@ in the installation directory and uses that file as a default fontmap file if av
- </li>
- <li>Unix:<br>
-  
--&lt;<em>The directory where the pstoedit executable is located</em>&gt;
-+The default installation directory. If it fails, then &lt;<em>The directory where the pstoedit executable is located</em>&gt;
- <tt>/../lib/</tt> 
- <p>
- </li>
-diff --git a/doc/pstoedit.tex b/doc/pstoedit.tex
-index a3d5494..7f590ea 100644
---- a/doc/pstoedit.tex
-+++ b/doc/pstoedit.tex
-@@ -352,7 +352,7 @@ If  the \Opt{-fontmap} option is not specified, \Prog{pstoedit} automatically lo
-   \item MS Windows: The same directory where the \Prog{pstoedit} executable is located
- 
-   \item Unix:\\
--  $<$\emph{The directory where the pstoedit executable is located}$>$\verb+/../lib/+
-+  The default installation directory. If it fails, then $<$\emph{The directory where the pstoedit executable is located}$>$\verb+/../lib/+
- 
- \end{itemize}
- 
-diff --git a/src/pstoedit.cpp b/src/pstoedit.cpp
-index 7f66d23..a16f57d 100644
---- a/src/pstoedit.cpp
-+++ b/src/pstoedit.cpp
-@@ -30,6 +30,7 @@
- #include I_string_h
- 
- #include <assert.h>
-+#include <sys/stat.h>
- 
- #include "pstoeditoptions.h"
- 
-@@ -261,33 +262,33 @@ static void loadpstoeditplugins(const char *progname, ostream & errstream, bool
- 		loadPlugInDrivers(plugindir.c_str(), errstream, verbose);	// load the driver plugins
- 		pluginsloaded = true;
- 	}
--	// also look in the directory where the pstoedit .exe/dll was found
--	char szExePath[1000];
--	szExePath[0] = '\0';
--	const unsigned long r = P_GetPathToMyself(progname, szExePath, sizeof(szExePath));
--	if (verbose)  errstream << "pstoedit : path to myself:" << progname << " " << r << " " << szExePath<< endl;
--	char *p = 0;
--	if (r && (p = strrchr(szExePath, directoryDelimiter)) != 0) {
--		*p = '\0';
--		if (!strequal(szExePath, plugindir.c_str())) {
--			loadPlugInDrivers(szExePath, errstream,verbose);
--			pluginsloaded = true;
--		}
--	}
--	// now try also $exepath/../lib/pstoedit
--	strcat_s(szExePath,1000,"/../lib/pstoedit");
--	if (!strequal(szExePath, plugindir.c_str())) {
--    	loadPlugInDrivers(szExePath, errstream,verbose);
--		pluginsloaded = true;
--	}
--
- #ifdef PSTOEDITLIBDIR
--	if (!pluginsloaded) {
-+	struct stat s;
-+	if (!pluginsloaded &&
-+	    !stat(PSTOEDITLIBDIR, &s) &&
-+	    S_ISDIR(s.st_mode)) {
-   	  // also try to load drivers from the PSTOEDITLIBDIR
- 	  loadPlugInDrivers(PSTOEDITLIBDIR, errstream,verbose);
- 	  pluginsloaded = true;
- 	}
- #endif
-+	// If the above failed, also look in the directory where the pstoedit .exe/dll was found
-+	if (!pluginsloaded) {
-+	  char szExePath[1000];
-+	  szExePath[0] = '\0';
-+	  const unsigned long r = P_GetPathToMyself(progname, szExePath, sizeof(szExePath));
-+	  if (verbose)  errstream << "pstoedit : path to myself:" << progname << " " << r << " " << szExePath<< endl;
-+	  char *p = 0;
-+	  if (r && (p = strrchr(szExePath, directoryDelimiter)) != 0) {
-+		*p = '\0';
-+		loadPlugInDrivers(szExePath, errstream,verbose);
-+	  }
-+	  // now try also $exepath/../lib/pstoedit
-+	  strcat_s(szExePath,1000,"/../lib/pstoedit");
-+	  if (!strequal(szExePath, plugindir.c_str())) {
-+	  loadPlugInDrivers(szExePath, errstream,verbose);
-+	  }
-+	}
- 
- 	// delete[]plugindir;
- }

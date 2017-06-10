@@ -1,13 +1,14 @@
 class Schroedinger < Formula
   desc "High-speed implementation of the Dirac codec"
-  homepage "http://diracvideo.org/"
-  url "http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz"
+  homepage "https://launchpad.net/schroedinger"
+  url "https://launchpad.net/schroedinger/trunk/1.0.11/+download/schroedinger-1.0.11.tar.gz"
   mirror "https://mirrors.ocf.berkeley.edu/debian/pool/main/s/schroedinger/schroedinger_1.0.11.orig.tar.gz"
   sha256 "1e572a0735b92aca5746c4528f9bebd35aa0ccf8619b22fa2756137a8cc9f912"
 
   bottle do
     cellar :any
-    revision 1
+    rebuild 1
+    sha256 "7d2d6d343f571e21f27ce5c13645ebe7039e4d45d2b96dba550f6383185c18f6" => :sierra
     sha256 "1b990c49b7d72f3030bcee52bf70094a6cf16111867565cdb7541f670636cf05" => :el_capitan
     sha256 "5b1355803b730a9727c959261f0e2afc217f77502eac88120f77941c5cf373db" => :yosemite
     sha256 "64042317d9919652ab8577cec94435fb15d8eae3ad960196fc54bf9499b7c30e" => :mavericks

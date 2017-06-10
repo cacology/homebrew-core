@@ -1,31 +1,24 @@
-require "language/go"
-
 class Gor < Formula
   desc "Real-time HTTP traffic replay tool written in Go"
   homepage "https://gortool.com"
-  url "https://github.com/buger/gor.git",
-    :tag => "v0.15.0",
-    :revision => "ecd7e3a5e508886afd15ed670d72aac5dde9e370"
-  head "https://github.com/buger/gor.git"
+  url "https://github.com/buger/goreplay.git",
+      :tag => "v0.16.0.2",
+      :revision => "74225ebb2236a46fd18a8fa4fa7de441497c13c4"
+  head "https://github.com/buger/goreplay.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "dc9f2415ded76b790d9f27579b71a6d6af7570c49b3c74dd1451a494c0857057" => :el_capitan
-    sha256 "9c726a81aefa712a33e3a344761672ebad2d7d51f5ee31a40d95c3f1d1f91ed6" => :yosemite
-    sha256 "2c323e895d563fe8c3663ae7ad3e78d6526727917da921b1b0454529c00a3f74" => :mavericks
+    sha256 "be3d38e72512a06ba10818963b72edd43a906a38c1cca1b6224bdbd0b8d2a971" => :sierra
+    sha256 "52f1f8609a0d319c352bd758fa7c73a857ff9fe9f07a2fe25df3801d425fa607" => :el_capitan
+    sha256 "160b2205ee416e6ac7a79fea27588eee268c3657f5d42eccc6e20410d963c01b" => :yosemite
   end
 
   depends_on "go" => :build
-  go_resource "github.com/google/gopacket" do
-    url "https://github.com/google/gopacket.git",
-      :revision => "b1af1fa2fcae43d2eef926f31c7acb1c93c6e24f"
-  end
 
   def install
     ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/buger/gor").install buildpath.children
-    Language::Go.stage_deps resources, buildpath/"src"
-    cd "src/github.com/buger/gor" do
+    (buildpath/"src/github.com/buger/goreplay").install buildpath.children
+    cd "src/github.com/buger/goreplay" do
       system "go", "build", "-o", bin/"gor", "-ldflags", "-X main.VERSION=#{version}"
       prefix.install_metafiles
     end

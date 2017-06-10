@@ -1,14 +1,14 @@
 class Libgraphqlparser < Formula
   desc "GraphQL query parser in C++ with C and C++ APIs"
   homepage "https://github.com/graphql/libgraphqlparser"
-  url "https://github.com/graphql/libgraphqlparser/archive/v0.4.1.tar.gz"
-  sha256 "2ed66fd38b6e8a4a39c646fe713b5893d3d6b076dcd34be28a356cb3cb879595"
+  url "https://github.com/graphql/libgraphqlparser/archive/v0.6.0.tar.gz"
+  sha256 "3d8f5878754203563d06a65175accb8ee9e4eb8b49cb51e6d5c6a1d9ff6aa5ad"
 
   bottle do
     cellar :any
-    sha256 "52afe0dcec93ec9b886c3d7ecacf64c81f3887e299d3238aff7b4fd295a24329" => :el_capitan
-    sha256 "4fed85aba87c4cb54168cb1e8c73d6e7d4eee9689b09f18c07137ffdfb850ac3" => :yosemite
-    sha256 "1dfc83c494e8ceef8eb5d757190312d13ecafeb1b88464c44073417989bf5488" => :mavericks
+    sha256 "028d48186278fa12691294c46360fc1089b468ce88ea5164376be75b66ba8c43" => :sierra
+    sha256 "7c8cfa351e83f68e4e5e7c98416a32a21af1e522ab6426a7123b59a40092ad66" => :el_capitan
+    sha256 "f53b9bd6626d2d51eeadde6e39271d88be0f8a36e6416901792c5c6ec1384e2d" => :yosemite
   end
 
   depends_on "cmake" => :build
@@ -21,8 +21,6 @@ class Libgraphqlparser < Formula
   end
 
   test do
-    require "utils/json"
-
     sample_query = <<-EOS.undent
       { user }
     EOS
@@ -49,7 +47,7 @@ class Libgraphqlparser < Formula
                 "directives"=>nil,
                 "selectionSet"=>nil }] } }] }
 
-    test_ast = Utils::JSON.load pipe_output("#{libexec}/dump_json_ast", sample_query)
+    test_ast = JSON.parse pipe_output("#{libexec}/dump_json_ast", sample_query)
     assert_equal sample_ast, test_ast
   end
 end

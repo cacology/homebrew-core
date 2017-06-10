@@ -1,43 +1,30 @@
-require "language/go"
-
 class Fzf < Formula
   desc "Command-line fuzzy finder written in Go"
   homepage "https://github.com/junegunn/fzf"
-  url "https://github.com/junegunn/fzf/archive/0.13.5.tar.gz"
-  sha256 "3494f3e3987da31f6de100214b24203f67852a15b309f1a954a54635dc0dc238"
+  url "https://github.com/junegunn/fzf/archive/0.16.8.tar.gz"
+  sha256 "daef99f67cff3dad261dbcf2aef995bb78b360bcc7098d7230cb11674e1ee1d4"
+  revision 1
   head "https://github.com/junegunn/fzf.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "0c93b2d07b00466d85175bce953fabe1b186fe949327c2873f251670d847dc14" => :el_capitan
-    sha256 "8345d768a9e88f61718902cc2060049abf910e0b5cad9ca207f8b56b73bb99e8" => :yosemite
-    sha256 "5c13f239a8a21f2e26fde4e921163cc7592375d2b648d6e9f2e006ad53ef50b6" => :mavericks
+    sha256 "6b639612cd777a1e7347a8a89a357ae8cb7f0ee2a65a2f73c70907bf96f63a03" => :sierra
+    sha256 "4eb00250956dd5f1024f8385da7426befcdd3c989a385acb40f2d5004e10dd1d" => :el_capitan
+    sha256 "df146b34ec070efa9a45a598dd745b448f2c26210f7d6300bb5956f236a3cc29" => :yosemite
   end
 
+  depends_on "glide" => :build
   depends_on "go" => :build
 
-  go_resource "github.com/junegunn/go-shellwords" do
-    url "https://github.com/junegunn/go-shellwords.git",
-      :revision => "35d512af75e283aae4ca1fc3d44b159ed66189a4"
-  end
-
-  go_resource "github.com/junegunn/go-runewidth" do
-    url "https://github.com/junegunn/go-runewidth.git",
-      :revision => "63c378b851290989b19ca955468386485f118c65"
-  end
-
   def install
+    ENV["GLIDE_HOME"] = buildpath/"glide_home"
     ENV["GOPATH"] = buildpath
-    mkdir_p buildpath/"src/github.com/junegunn"
+    (buildpath/"src/github.com/junegunn").mkpath
     ln_s buildpath, buildpath/"src/github.com/junegunn/fzf"
-    Language::Go.stage_deps resources, buildpath/"src"
+    system "glide", "install"
+    system "go", "build", "-o", bin/"fzf", "-ldflags", "-X main.revision=brew"
 
-    cd buildpath/"src/fzf" do
-      system "go", "build"
-      bin.install "fzf"
-    end
-
-    prefix.install %w[install uninstall LICENSE]
+    prefix.install "install", "uninstall"
     (prefix/"shell").install %w[bash zsh fish].map { |s| "shell/key-bindings.#{s}" }
     (prefix/"shell").install %w[bash zsh].map { |s| "shell/completion.#{s}" }
     (prefix/"plugin").install "plugin/fzf.vim"

@@ -1,32 +1,49 @@
 class GribApi < Formula
   desc "Encode and decode grib messages (editions 1 and 2)"
   homepage "https://software.ecmwf.int/wiki/display/GRIB/Home"
-  url "https://software.ecmwf.int/wiki/download/attachments/3473437/grib_api-1.16.0-Source.tar.gz"
-  sha256 "0068ca4149a9f991d4c86a813ac73b4e2299c6a3fd53aba9e6ab276ef6f0ff9a"
+  url "https://mirrors.ocf.berkeley.edu/debian/pool/main/g/grib-api/grib-api_1.19.0.orig.tar.xz"
+  mirror "https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/g/grib-api/grib-api_1.19.0.orig.tar.xz"
+  sha256 "c234a0a6d551a79ac77eae86b5effaa82c96dfc16ba6a8e7570067d83f1f6326"
+  revision 1
 
   bottle do
-    revision 1
-    sha256 "036c3b51c4fd1b395621a203f6371e49e5556fd4f5d57406387d177d694f6f93" => :el_capitan
-    sha256 "99812f0ed49d23691574e0ca6848e9b4565576c252df94d92a402e1830729359" => :yosemite
-    sha256 "fa86bc7113fe94511e8c7d126e8ba34b0523feff0b71c35ca023e6c20e327ab4" => :mavericks
+    sha256 "6a405004526ab9d97fe7d26bd3ab9b08badfb8a77e09ce87a7a10872a606014c" => :sierra
+    sha256 "5468ebc85476730b762c46e74cff226c1447e19ae435205fcb0227769beb0921" => :el_capitan
+    sha256 "5d8349c159e1ad3edd0f354e340204262e654049105fc69ba7fc72421a8898ed" => :yosemite
   end
 
   option "with-static", "Build static instead of shared library."
 
-  depends_on :fortran
   depends_on "cmake" => :build
   depends_on "jasper" => :recommended
   depends_on "libpng" => :optional
+  depends_on :fortran
 
-  # Fixes build errors in Lion
-  # https://software.ecmwf.int/wiki/plugins/viewsource/viewpagesrc.action?pageId=12648475
-  patch :DATA
+  resource "numpy" do
+    url "https://files.pythonhosted.org/packages/16/f5/b432f028134dd30cfbf6f21b8264a9938e5e0f75204e72453af08d67eb0b/numpy-1.11.2.tar.gz"
+    sha256 "04db2fbd64e2e7c68e740b14402b25af51418fc43a59d9e54172b38b906b0f69"
+  end
 
   def install
+    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
+    resource("numpy").stage do
+      system "python", *Language::Python.setup_install_args(libexec/"vendor")
+    end
+
+    # Fix "no member named 'inmem_' in 'jas_image_t'"
+    inreplace "src/grib_jasper_encoding.c", "image.inmem_    = 1;", ""
+
+    inreplace "CMakeLists.txt", "find_package( OpenJPEG )", ""
+
     mkdir "build" do
       args = std_cmake_args
       args << "-DBUILD_SHARED_LIBS=OFF" if build.with? "static"
-      args << "-DPNG_PNG_INCLUDE_DIR=#{Formula["libpng"].opt_include}" << "-DENABLE_PNG=ON" if build.with? "libpng"
+
+      if build.with? "libpng"
+        args << "-DPNG_PNG_INCLUDE_DIR=#{Formula["libpng"].opt_include}"
+        args << "-DENABLE_PNG=ON"
+      end
+
       system "cmake", "..", *args
       system "make", "install"
     end
@@ -34,40 +51,7 @@ class GribApi < Formula
 
   test do
     grib_samples_path = shell_output("#{bin}/grib_info -t").strip
-    system "#{bin}/grib_ls", "#{grib_samples_path}/GRIB1.tmpl"
-    system "#{bin}/grib_ls", "#{grib_samples_path}/GRIB2.tmpl"
+    system bin/"grib_ls", "#{grib_samples_path}/GRIB1.tmpl"
+    system bin/"grib_ls", "#{grib_samples_path}/GRIB2.tmpl"
   end
 end
-
-__END__
-diff --git a/configure b/configure
-index 0a88b28..9dafe46 100755
---- a/configure
-+++ b/configure
-@@ -7006,7 +7006,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
-     darwin* | rhapsody*)
-       # PIC is the default on this platform
-       # Common symbols not allowed in MH_DYLIB files
--      lt_prog_compiler_pic='-fno-common'
-+      #lt_prog_compiler_pic='-fno-common'
-       ;;
- 
-     hpux*)
-@@ -12186,7 +12186,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
-     darwin* | rhapsody*)
-       # PIC is the default on this platform
-       # Common symbols not allowed in MH_DYLIB files
--      lt_prog_compiler_pic_F77='-fno-common'
-+      #lt_prog_compiler_pic_F77='-fno-common'
-       ;;
- 
-     hpux*)
-@@ -15214,7 +15214,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
-     darwin* | rhapsody*)
-       # PIC is the default on this platform
-       # Common symbols not allowed in MH_DYLIB files
--      lt_prog_compiler_pic_FC='-fno-common'
-+      #lt_prog_compiler_pic_FC='-fno-common'
-       ;;
- 
-     hpux*)

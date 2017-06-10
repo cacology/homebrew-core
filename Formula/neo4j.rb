@@ -1,9 +1,9 @@
 class Neo4j < Formula
   desc "Robust (fully ACID) transactional property graph database"
   homepage "https://neo4j.com/"
-  url "https://neo4j.com/artifact.php?name=neo4j-community-3.0.4-unix.tar.gz"
-  version "3.0.4"
-  sha256 "e1da51163eb18380623788eabea34dfe23ee21c99deca4e7922094b0d242e805"
+  url "https://neo4j.com/artifact.php?name=neo4j-community-3.2.0-unix.tar.gz"
+  version "3.2.0"
+  sha256 "77c0c142343ea834852d237828f1ddd8cb2d4b7be9131a00b4ec4e3c48d6f6d0"
 
   bottle :unneeded
 
@@ -18,14 +18,47 @@ class Neo4j < Formula
     libexec.install Dir["*"]
 
     # Symlink binaries
-    bin.install Dir["#{libexec}/bin/neo4j{,-shell,-import,-shared.sh,-admin}"]
+    bin.install Dir["#{libexec}/bin/neo4j{,-shell,-import,-shared.sh,-admin}", "#{libexec}/bin/cypher-shell"]
     bin.env_script_all_files(libexec/"bin", :NEO4J_HOME => ENV["NEO4J_HOME"])
 
     # Adjust UDC props
     # Suppress the empty, focus-stealing java gui.
-    (libexec/"conf/neo4j-wrapper.conf").append_lines <<-EOS.undent
+    (libexec/"conf/neo4j.conf").append_lines <<-EOS.undent
       wrapper.java.additional=-Djava.awt.headless=true
       wrapper.java.additional.4=-Dneo4j.ext.udc.source=homebrew
+    EOS
+  end
+
+  def post_install
+    (var/"log").mkpath
+  end
+
+  plist_options :manual => "neo4j start"
+
+  def plist; <<-EOS.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+      <dict>
+        <key>KeepAlive</key>
+        <false/>
+        <key>Label</key>
+        <string>#{plist_name}</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>#{opt_bin}/neo4j</string>
+          <string>console</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>WorkingDirectory</key>
+        <string>#{var}</string>
+        <key>StandardErrorPath</key>
+        <string>#{var}/log/neo4j.log</string>
+        <key>StandardOutPath</key>
+        <string>#{var}/log/neo4j.log</string>
+      </dict>
+    </plist>
     EOS
   end
 

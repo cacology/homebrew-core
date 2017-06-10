@@ -1,45 +1,50 @@
 class Ghostscript < Formula
   desc "Interpreter for PostScript and PDF"
-  homepage "http://www.ghostscript.com/"
+  homepage "https://www.ghostscript.com/"
+  revision 1
 
   stable do
-    url "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs919/ghostscript-9.19.tar.gz"
-    sha256 "cf3c0dce67db1557a87366969945f9c5235887989c0b585e037af366dc035989"
+    url "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs921/ghostscript-9.21.tar.xz"
+    sha256 "2be1d014888a34187ad4bbec19ab5692cc943bd1cb14886065aeb43a3393d053"
 
-    # http://djvu.sourceforge.net/gsdjvu.html
-    # Can't get 1.8 to compile, but feel free to open PR if you can.
-    resource "djvu" do
-      url "https://downloads.sourceforge.net/project/djvu/GSDjVu/1.6/gsdjvu-1.6.tar.gz"
-      sha256 "6236b14b79345eda87cce9ba22387e166e7614cca2ca86b1c6f0d611c26005df"
+    # Remove for > 9.21
+    # First part of fix for CVE-2017-8291
+    # https://www.cve.mitre.org/cgi-bin/cvename.cgi?name=2017-8291
+    # https://bugs.ghostscript.com/show_bug.cgi?id=697799
+    # Upstream commit from 27 Apr 2017 "Bug 697799: have .eqproc check its parameters"
+    patch do
+      url "https://git.ghostscript.com/?p=ghostpdl.git;a=patch;h=4f83478c88"
+      sha256 "81f087fa6f3de81a83a4830a7b243b6da5506d783cf37ef1259cd600b1322e47"
+    end
+
+    # Remove for > 9.21
+    # Second part of fix for CVE-2017-8291
+    # Upstream commit from 27 Apr 2017 "Bug 697799: have .rsdparams check its parameters"
+    patch do
+      url "https://git.ghostscript.com/?p=ghostpdl.git;a=patch;h=04b37bbce1"
+      sha256 "366bf4ded600fc7b0a8e2b0d4c877cc3ad5a0ccc192cb660d81f729575a47259"
     end
   end
 
   bottle do
-    sha256 "eeca121b96926b72e10f2bc75be45a2739ce9b57eba5ebbc6eac945db01aa542" => :el_capitan
-    sha256 "85459cef5b92ffb8ee30ab6af1a0649b2698716b4a9c23f12cf39f4435b3e542" => :yosemite
-    sha256 "bbf4584ed19c2c38530c9b1e77c543370a77e441b759f519bb8b80fa9b41ebec" => :mavericks
+    sha256 "36abfbade13731398f5746b4697a53aceb0e5c7ab17440a2687bfbd7251446d8" => :sierra
+    sha256 "e612d9a2411dd9dae86e53408270c4fc32e7ae5a1348724fe328eef0a1a916b5" => :el_capitan
+    sha256 "6a3b69ab539d1b6bf99135c36322bd74da4dc2a61686cff0d3249d0310e1870f" => :yosemite
   end
 
   head do
     # Can't use shallow clone. Doing so = fatal errors.
-    url "git://git.ghostscript.com/ghostpdl.git", :shallow => false
-
-    resource "djvu" do
-      url "git://git.code.sf.net/p/djvu/gsdjvu-git"
-    end
+    url "https://git.ghostscript.com/ghostpdl.git", :shallow => false
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  patch :DATA # Uncomment OS X-specific make vars
-
-  option "with-djvu", "Build drivers for DjVU file format"
+  patch :DATA # Uncomment macOS-specific make vars
 
   depends_on "pkg-config" => :build
   depends_on "little-cms2"
-  depends_on "djvulibre" if build.with? "djvu"
   depends_on :x11 => :optional
 
   # https://sourceforge.net/projects/gs-fonts/
@@ -49,16 +54,6 @@ class Ghostscript < Formula
   end
 
   def install
-    if build.with? "djvu"
-      resource("djvu").stage do
-        inreplace "gsdjvu.mak", "$(GL", "$(DEV"
-        (buildpath+"devices").install "gdevdjvu.c"
-        (buildpath+"lib").install "ps2utf8.ps"
-        ENV["EXTRA_INIT_FILES"] = "ps2utf8.ps"
-        (buildpath/"devices/contrib.mak").open("a") { |f| f.write(File.read("gsdjvu.mak")) }
-      end
-    end
-
     args = %W[
       --prefix=#{prefix}
       --disable-cups
@@ -71,12 +66,6 @@ class Ghostscript < Formula
       system "./autogen.sh", *args
     else
       system "./configure", *args
-    end
-
-    if build.with? "djvu"
-      inreplace "Makefile" do |s|
-        s.change_make_var!("DEVICE_DEVS17", "$(DD)djvumask.dev $(DD)djvusep.dev")
-      end
     end
 
     # Install binaries and libraries

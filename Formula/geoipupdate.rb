@@ -1,13 +1,13 @@
 class Geoipupdate < Formula
   desc "Automatic updates of GeoIP2 and GeoIP Legacy databases"
   homepage "https://github.com/maxmind/geoipupdate"
-  url "https://github.com/maxmind/geoipupdate/releases/download/v2.2.2/geoipupdate-2.2.2.tar.gz"
-  sha256 "156ab7604255a9c62c4a442c76d48d024ac813c6542639bffa93b28e2a781621"
+  url "https://github.com/maxmind/geoipupdate/releases/download/v2.4.0/geoipupdate-2.4.0.tar.gz"
+  sha256 "8b4e88ce8d84e9c75bc681704d19ec5c63c54f01e945f7669f97fb0df7e13952"
 
   bottle do
-    sha256 "0e69897d110e62e85a16536ee88955bd99ec20e428436f02253b8017535f5c48" => :el_capitan
-    sha256 "3cb6006adb116784d3aec5415be409feb2d663595fa05defab110d5856029b8b" => :yosemite
-    sha256 "5738a8729ef6111da261f11d7819d614d3d22c48d0261caea89b12b668b62a7e" => :mavericks
+    sha256 "c73d5d3d4ca5fd9247781271a804d92ea56069fa762ecb65378220e6c2e8bf26" => :sierra
+    sha256 "d37e9d640cb63cd56947a9e5cc0d1cafa3200daae9af2c3eccbd63fa0901d0a7" => :el_capitan
+    sha256 "b8ea3881d098a236eae73e69ad59d4a0b8da4ae6b07985a4bc5ce9e3c27f7187" => :yosemite
   end
 
   head do
@@ -17,17 +17,7 @@ class Geoipupdate < Formula
     depends_on "libtool" => :build
   end
 
-  option :universal
-
   def install
-    ENV.universal_binary if build.universal?
-
-    # Download free databases by default
-    # See https://github.com/maxmind/geoip-api-c#150
-    inreplace "conf/GeoIP.conf.default", "YOUR_USER_ID_HERE", "999999"
-    inreplace "conf/GeoIP.conf.default", "YOUR_LICENSE_KEY_HERE", "000000000000"
-    inreplace "conf/GeoIP.conf.default", /^ProductIds .*$/, "ProductIds 506 533 GeoLite2-City GeoLite2-Country"
-
     system "./bootstrap" if build.head?
 
     system "./configure", "--disable-dependency-tracking",

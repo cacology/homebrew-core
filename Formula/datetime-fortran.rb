@@ -1,14 +1,14 @@
 class DatetimeFortran < Formula
   desc "Fortran time and date manipulation library"
   homepage "https://github.com/milancurcic/datetime-fortran"
-  url "https://github.com/milancurcic/datetime-fortran/releases/download/v1.4.2/datetime-fortran-1.4.2.tar.gz"
-  sha256 "5b70c6e5d38032951e879b437e9ac7c5d483860ce8a9f6bbe6f1d6cd777e737f"
+  url "https://github.com/milancurcic/datetime-fortran/releases/download/v1.6.0/datetime-fortran-1.6.0.tar.gz"
+  sha256 "e46c583bca42e520a05180984315495495da4949267fc155e359524c2bf31e9a"
+  revision 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "38dc388b455327e84f09132794a4a116bd15d5da943bc8beb9a54d86f24e6f8d" => :el_capitan
-    sha256 "7946958a4af7b3ceab82df7f5daddae1fcc659a01368e3e96e30b2961eb822cf" => :yosemite
-    sha256 "c79a7073c0868cce8aba565992fcc30cba5920deb873c8ba480e23a656bf7457" => :mavericks
+    sha256 "a9fa586679b05377aeeeea71e2ae1932c630fb43a89eb7314276bc6fbbdd3383" => :sierra
+    sha256 "2fe1c9faee819e539afa30b8bbceb203bea388de7609418d80ee5fed4e716e7a" => :el_capitan
+    sha256 "ba3ad1df170d2027251c9c322e4250e8c49e4af1786a3f42d66f08562eb25a16" => :yosemite
   end
 
   head do

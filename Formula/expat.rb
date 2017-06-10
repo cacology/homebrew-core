@@ -1,24 +1,22 @@
 class Expat < Formula
   desc "XML 1.0 parser"
-  homepage "http://expat.sourceforge.net"
+  homepage "https://expat.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/expat/expat/2.2.0/expat-2.2.0.tar.bz2"
   mirror "https://fossies.org/linux/www/expat-2.2.0.tar.bz2"
   sha256 "d9e50ff2d19b3538bd2127902a89987474e1a4db8e43a66a4d1a712ab9a504ff"
-  head ":pserver:anonymous:@expat.cvs.sourceforge.net:/cvsroot/expat", :using => :cvs
+  head "https://github.com/libexpat/libexpat.git"
 
   bottle do
     cellar :any
+    sha256 "5e88f87911f6bc4da80d7c184bdda34e6c8de41740f6536602517a933e9ea9bb" => :sierra
     sha256 "b12ee86df3f1faa5eb07e2624ab464428d9b96fb09cadc25a20fe7a065459f54" => :el_capitan
     sha256 "228e8d539fc0447150a0f1508cad4ab33347e45178964966df0802389b0c5a3d" => :yosemite
     sha256 "48dcc5c1d0dedd3ebac9e238ff5e5cf1d725577062f5902cb58cfcb9f105d5f2" => :mavericks
   end
 
-  keg_only :provided_by_osx, "OS X includes Expat 1.5."
-
-  option :universal
+  keg_only :provided_by_osx, "macOS includes Expat 1.5"
 
   def install
-    ENV.universal_binary if build.universal?
     system "./configure", "--prefix=#{prefix}",
                           "--mandir=#{man}"
     system "make", "install"

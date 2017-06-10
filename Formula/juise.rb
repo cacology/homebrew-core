@@ -1,13 +1,13 @@
 class Juise < Formula
   desc "JUNOS user interface scripting environment"
   homepage "https://github.com/Juniper/juise/wiki"
-  url "https://github.com/Juniper/juise/releases/download/0.7.2/juise-0.7.2.tar.gz"
-  sha256 "869f18cb6095c2340872bc02235530616fcfc2e88c523c6a05238a521d0afe82"
+  url "https://github.com/Juniper/juise/releases/download/0.8.0/juise-0.8.0.tar.gz"
+  sha256 "eea1f6da0f24f6d86abd083bd193b953870fbfc8dab5d11e2a125c2f3ea1c83a"
 
   bottle do
-    sha256 "fc1e16d6035e93e4a13aa2eddb37d5588ee51095705a0f13470bd8a3c68e1ada" => :el_capitan
-    sha256 "c0efb90b6a493eb7ca92844378f560da1d11043e2a9c20f58309892613e2baeb" => :yosemite
-    sha256 "9fee9246ca23f5928cc5e8fd1d4feb77ce45ca31c8ce93385eb611976c63481b" => :mavericks
+    sha256 "5fad744e6dea03435e27a673e2652160dd7c5e9543993454f1df57f1132c4ebf" => :sierra
+    sha256 "cdb84f723d8178bcebdf8d29161c18b4fd847c18e98c50bdab62981afb22df4c" => :el_capitan
+    sha256 "a45ee7ce8991f0ec54d22c7be9d101d835f12465038ab0451824f123a2b644d7" => :yosemite
   end
 
   head do

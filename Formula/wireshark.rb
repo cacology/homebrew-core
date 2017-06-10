@@ -1,24 +1,23 @@
 class Wireshark < Formula
   desc "Graphical network analyzer and capture tool"
   homepage "https://www.wireshark.org"
-  url "https://www.wireshark.org/download/src/all-versions/wireshark-2.0.5.tar.bz2"
-  mirror "https://1.eu.dl.wireshark.org/src/wireshark-2.0.5.tar.bz2"
-  sha256 "0ce0241330828973f5b4efee422a3760cab8ce0b41e7721c4b9fd185be1bb10b"
-
+  url "https://www.wireshark.org/download/src/all-versions/wireshark-2.2.7.tar.bz2"
+  mirror "https://1.eu.dl.wireshark.org/src/wireshark-2.2.7.tar.bz2"
+  sha256 "689ddf62221b152779d8846ab5b2063cc7fd41ec1a9f04eefab09b5d5486dbb5"
   head "https://code.wireshark.org/review/wireshark", :using => :git
 
   bottle do
-    sha256 "0a9f98451f8ba2d167c9e75692794e4eced5181ae61cf8db349e371ff0061bc2" => :el_capitan
-    sha256 "2f6c421f4f9e8aff005d0cf0dbfc3c68b2114189b85fda10d7461b151ac1fa9d" => :yosemite
-    sha256 "54e3add2e9631aa400bca0f06a9952dc16d620a2db3a21f1bb450e94c3f8f493" => :mavericks
+    sha256 "222222ac7bfc31a9b9b3022c2f88e578b41dd93c6bbc0c5ad8d5651701038489" => :sierra
+    sha256 "e6f70edbd14b27790d2b854638d9741543dacd175f3a0081ff106068d1c61085" => :el_capitan
+    sha256 "38f177e30b9fbe9d3f1cb826bd21b33327af3437c5414fd80155eceeb70d8d01" => :yosemite
   end
+
+  deprecated_option "with-qt5" => "with-qt"
 
   option "with-gtk+3", "Build the wireshark command with gtk+3"
   option "with-gtk+", "Build the wireshark command with gtk+"
-  option "with-qt5", "Build the wireshark command with Qt5 (can be used with or without either GTK option)"
+  option "with-qt", "Build the wireshark command with Qt (can be used with or without either GTK option)"
   option "with-headers", "Install Wireshark library headers for plug-in development"
-
-  deprecated_option "with-qt" => "with-qt5"
 
   depends_on "pkg-config" => :build
   depends_on "cmake" => :build
@@ -31,33 +30,16 @@ class Wireshark < Formula
   depends_on "libsmi" => :optional
   depends_on "lua" => :optional
   depends_on "portaudio" => :optional
-  depends_on "qt5" => :optional
+  depends_on "qt" => :optional
   depends_on "gtk+3" => :optional
   depends_on "gtk+" => :optional
   depends_on "gnome-icon-theme" if build.with? "gtk+3"
 
-  resource "libpcap" do
-    url "http://www.tcpdump.org/release/libpcap-1.7.4.tar.gz"
-    sha256 "7ad3112187e88328b85e46dce7a9b949632af18ee74d97ffc3f2b41fe7f448b0"
-  end
-
   def install
-    if MacOS.version <= :mavericks
-      resource("libpcap").stage do
-        system "./configure", "--prefix=#{libexec}/vendor",
-                              "--enable-ipv6",
-                              "--disable-universal"
-        system "make", "install"
-      end
-      ENV.prepend_path "PATH", libexec/"vendor/bin"
-      ENV.prepend "CFLAGS", "-I#{libexec}/vendor/include"
-      ENV.prepend "LDFLAGS", "-L#{libexec}/vendor/lib"
-    end
-
     args = std_cmake_args
     args << "-DENABLE_GNUTLS=ON" << "-DENABLE_GCRYPT=ON"
 
-    if build.with? "qt5"
+    if build.with? "qt"
       args << "-DBUILD_wireshark=ON"
       args << "-DENABLE_APPLICATION_BUNDLE=ON"
       args << "-DENABLE_QT5=ON"
@@ -68,7 +50,7 @@ class Wireshark < Formula
 
     if build.with?("gtk+3") || build.with?("gtk+")
       args << "-DBUILD_wireshark_gtk=ON"
-      args << "-DENABLE_GTK3=" + ((build.with? "gtk+3") ? "ON" : "OFF")
+      args << "-DENABLE_GTK3=" + (build.with?("gtk+3") ? "ON" : "OFF")
       args << "-DENABLE_PORTAUDIO=ON" if build.with? "portaudio"
     else
       args << "-DBUILD_wireshark_gtk=OFF"
@@ -104,7 +86,7 @@ class Wireshark < Formula
     ENV.deparallelize # parallel install fails
     system "make", "install"
 
-    if build.with? "qt5"
+    if build.with? "qt"
       prefix.install bin/"Wireshark.app"
       bin.install_symlink prefix/"Wireshark.app/Contents/MacOS/Wireshark"
     end
@@ -124,7 +106,7 @@ class Wireshark < Formula
 
   def caveats; <<-EOS.undent
     If your list of available capture interfaces is empty
-    (default OS X behavior), try installing ChmodBPF from homebrew cask:
+    (default macOS behavior), try installing ChmodBPF from homebrew cask:
 
       brew cask install wireshark-chmodbpf
 
